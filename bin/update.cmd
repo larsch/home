@@ -1,4 +1,6 @@
 @echo off
+setlocal
+
 if not defined APPL set APPL=c:\appl
 
 cd %HOME%
@@ -25,3 +27,11 @@ if not exist "%APPL%\bin\pslist.exe" (
   unzip -q -d "%APPL%\bin" %TEMP%\SysinternalsSuite.zip
   del "%TEMP%\SysinternalsSuite.zip"
 )
+
+if not exist "%APPL%\Git-1.6.4-preview20090730" (
+   wget -m -nd -P %TEMP% http://msysgit.googlecode.com/files/Git-1.6.4-preview20090730.exe
+   "%TEMP%\Git-1.6.4-preview20090730.exe" "/DIR=%APPL%\Git-1.6.4-preview20090730" /SILENT
+   del "%TEMP%\Git-1.6.4-preview20090730.exe"
+)
+
+endlocal
