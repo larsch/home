@@ -18,18 +18,22 @@
 ; (gnuserv-start)
 ; (set 'gnuserv-frame (selected-frame))	; use the same frame for new files
 
-(server-start)
+;(server-start)
 
 (setq make-backup-files 'nil)		; real men don't take backups
 
 ;; bs - convenient buffer selector
 ;; http://www.geekware.de/software/emacs/
-(require 'bs)
-(global-set-key "\C-x\C-b" 'bs-show)
+;(require 'bs)
+;(global-set-key "\C-x\C-b" 'bs-show)
+(global-set-key "\C-x\C-b" 'buffer-menu)
+(global-set-key "\C-\M-l" 'buffer-menu)
 
 ;; ibs - MSVC like Ctrl-TAB buffer cycling
 ;; http://www.geekware.de/software/emacs/
 (require 'ibs)
+;(global-set-key [C-tab] 'next-buffer)
+;(global-set-key [C-S-tab] 'previous-buffer)
 
 ;; Enable column-number-mode always
 (column-number-mode 't)
@@ -65,7 +69,7 @@
 ;;
 
 ;; Convinient buffer navigation that returns to same position if you
-;; go down X and up X.
+;; go down  and up X.
 (defun jump-up ()
   "Jumps 10 lines up"
   (interactive)
@@ -123,6 +127,7 @@
 ;; css-mode
 (autoload 'css-mode "css-mode")
 (add-to-list 'auto-mode-alist '("\\.css\\'" . css-mode))
+(add-to-list 'auto-mode-alist '("\\.less?$" . css-mode))
 
 ;; lua-mode
 (autoload 'lua-mode "lua-mode")
@@ -188,7 +193,7 @@
 ;; mode local settings
 (defun setup-c++-mode () "Setups Custom C++ mode settings" (interactive)
   (set 'comment-column 35)
-  (set 'fill-column 120)		; default 70 gets a little crowded
+  (set 'fill-column 70)		; default 70 gets a little crowded
   (set 'indent-tabs-mode nil)		; dont use tabs
   (local-set-key "\C-m" 'newline-and-indent)
   (local-set-key "\C-cp" 'insert-private-copy-assign)
@@ -369,3 +374,18 @@
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
  )
+
+;; cmake
+(require 'cmake-mode)
+(setq auto-mode-alist
+      (append '(("CMakeLists\\.txt\\'" . cmake-mode)
+		("\\.cmake\\'" . cmake-mode))
+	      auto-mode-alist))
+(setq compile-command "mingw32-make -k ")
+
+
+(setq load-path (cons  "C:/Program Files/erl5.8.2/lib/tools-2.6.6.2/emacs"
+		       load-path))
+(setq erlang-root-dir "C:/Program Files/erl5.8.2")
+(setq exec-path (cons "C:/Program Files/erl5.8.2/bin" exec-path))
+(require 'erlang-start)
