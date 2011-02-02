@@ -4,11 +4,12 @@ require 'open3'
 require 'trollop'
 require 'tmpdir'
 
+ENCODING = 'ISO-8859-1'
 ASTYLE_EXECUTABLE = "astyle.exe"
 ASTYLE_OPTIONS =  ["-q", "--style=allman", "-Os3YHUjck1M60E" ]
 
 def restyle(file)
-  content = File.read(file, :encoding => 'ISO-8859-1')
+  content = File.read(file, :encoding => ENCODING)
   if not $opts.force and skip_file(content)
     puts "Skipping #{file}" if $opts.verbose
     return
@@ -21,8 +22,8 @@ def restyle(file)
   File.open(temp_file, "w") { |f| f << content }
   options = ASTYLE_OPTIONS + [temp_file]
   system(ASTYLE_EXECUTABLE, *options)
-  content = File.read(temp_file)
-  
+  content = File.read(temp_file, :encoding => ENCODING)
+
   if orig_content == content
     puts "No changes to #{file}" if $opts.verbose
   else
@@ -59,6 +60,8 @@ def restyle_code(code)
       }
     }.join("\n")
   }
+  # Forward slashes in includes
+  code.gsub!(/^(\s*#\s*include\s+["<])(.*?)([>"])/) { $1 + $2.tr('\\','/') + $3 }
 end
 
 def determine_headerguard(path)
@@ -79,6 +82,7 @@ def determine_headerguard(path)
     basedir = File.dirname(basedir)
   end
   hgpath ||= File.basename(path)
+  hgpath.downcase!
   hg = "_" + hgpath.gsub(/[\/\\\.]/, "_")
   return hg
 end
