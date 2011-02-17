@@ -17,15 +17,17 @@
 ; (require 'gnuserv)
 ; (gnuserv-start)
 ; (set 'gnuserv-frame (selected-frame))	; use the same frame for new files
-
-(server-start)
+; (server-start)
 
 (setq make-backup-files 'nil)		; real men don't take backups
+(setq vc-cvs-stay-local 'nil) 		; ditto -- WTF!?
 
 ;; bs - convenient buffer selector
 ;; http://www.geekware.de/software/emacs/
-(require 'bs)
-(global-set-key "\C-x\C-b" 'bs-show)
+;(require 'bs)
+;(global-set-key "\C-x\C-b" 'bs-show)
+(global-set-key "\C-x\C-b" 'buffer-menu)
+
 
 ;; ibs - MSVC like Ctrl-TAB buffer cycling
 ;; http://www.geekware.de/software/emacs/
@@ -357,3 +359,38 @@
   (set-buffer "Makefile")
   (compile "make"))
 (global-set-key [C-return] 'compile-makefile-buffer)
+(custom-set-variables
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(inhibit-startup-screen t))
+(custom-set-faces
+  ;; custom-set-faces was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(font-lock-variable-name-face ((((class color) (min-colors 88) (background light)) (:foreground "DarkRed")))))
+
+(require 'org-install)
+(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+(define-key global-map "\C-cl" 'org-store-link)
+(define-key global-map "\C-ca" 'org-agenda)
+(setq org-log-done t)
+
+(defun find-default-org ()
+  (interactive)
+  (find-file "~/org/default.org"))
+(global-set-key [f12] 'find-default-org)
+
+(require 'cmake-mode)
+(setq auto-mode-alist
+      (append '(("CMakeLists\\.txt\\'" . cmake-mode)
+		("\\.cmake\\'" . cmake-mode))
+	      auto-mode-alist))
+
+(setq load-path (cons  "C:/Program Files/erl5.8/lib/tools-2.6.6/emacs"
+		       load-path))
+(setq erlang-root-dir "C:/Program Files/erl5.8")
+(setq exec-path (cons "C:/Program Files/erl5.8/bin" exec-path))
+(require 'erlang-start)
