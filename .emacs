@@ -389,8 +389,10 @@
 		("\\.cmake\\'" . cmake-mode))
 	      auto-mode-alist))
 
-(setq load-path (cons  "C:/Program Files/erl5.8/lib/tools-2.6.6/emacs"
-		       load-path))
-(setq erlang-root-dir "C:/Program Files/erl5.8")
-(setq exec-path (cons "C:/Program Files/erl5.8/bin" exec-path))
-(require 'erlang-start)
+
+(if (file-exists-p "C:/Program Files/erl5.8")
+    '((setq load-path (cons  "C:/Program Files/erl5.8/lib/tools-2.6.6/emacs"
+			     load-path))
+      (setq erlang-root-dir "C:/Program Files/erl5.8")
+      (setq exec-path (cons "C:/Program Files/erl5.8/bin" exec-path))
+      (require 'erlang-start)))
