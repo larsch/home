@@ -1,2 +1,6 @@
 .emacs.d
 bin/*.exe
+.*
+test
+WikidPad.config
+WikidPad_Error.log
