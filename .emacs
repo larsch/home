@@ -22,12 +22,8 @@
 (setq make-backup-files 'nil)		; real men don't take backups
 (setq vc-cvs-stay-local 'nil) 		; ditto -- WTF!?
 
-;; bs - convenient buffer selector
-;; http://www.geekware.de/software/emacs/
-;(require 'bs)
-;(global-set-key "\C-x\C-b" 'bs-show)
-(global-set-key "\C-x\C-b" 'buffer-menu)
-
+; Convenient buffer menu
+(global-set-key "\C-x\C-b" 'electric-buffer-list)
 
 ;; ibs - MSVC like Ctrl-TAB buffer cycling
 ;; http://www.geekware.de/software/emacs/
