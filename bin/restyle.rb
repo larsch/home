@@ -42,8 +42,8 @@ end
 
 def restyle_code(code)
   year = Time.now.year
-  code.gsub!(/Copyright (©|\(C\)) ((\d+)(-\d+)?)/) do |m|
-    "Copyright #{$1} #{year}"
+  code.gsub!(/Copyright \S+ ((\d+)(-\d+)?)/) do |m|
+    "Copyright © #{year}"
   end
   # Exactly one newline at end of file
   code.gsub!(/(\S)\s*\z/m, "\\1\n")
@@ -62,6 +62,12 @@ def restyle_code(code)
   }
   # Forward slashes in includes
   code.gsub!(/^(\s*#\s*include\s+["<])(.*?)([>"])/) { $1 + $2.tr('\\','/') + $3 }
+
+  code.gsub!(/^( *)\/\*(.*?)\*\/[ \t]*\n/m) do
+    indent = $1
+    text = $2.gsub(/^\s*\*[\t ]*/, '').sub(/\A\s*/, '').sub(/\s*\Z/, "\n").gsub(/^/) { "#{indent} /// " }
+    text
+  end
 end
 
 def determine_headerguard(path)
