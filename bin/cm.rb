@@ -3,9 +3,63 @@
 # Updates CMakeLists.txt with all source files found in the current
 # hierachy. Creates two variables, 'sources' and 'headers'.
 
+def header_guard(fn)
+  "_" + File.basename(fn).gsub(/[^0-9a-z]/i, '_')
+end
+
+def header_comment(fn)
+  file = File.expand_path("~/.header_comment")
+  if File.exist?(file)
+    File.read(file)
+  else
+    ""
+  end
+end
+
+def header_template(fn)
+  hg = header_guard(fn)
+  "#{header_comment(fn)}\n\n#ifndef #{hg}\n#define #{hg}\n\n\n#endif // #{hg}\n"
+end
+
+def source_template(fn)
+  "#{header_comment(fn)}\n\n"
+end
+
+def create(fn, content = "")
+  if File.exist?(fn)
+    puts "Not overwriting #{fn}"
+  else
+    puts "Creating #{fn}"
+    File.open(fn, "w") { |f| f << content }
+  end
+end
+
+def add(fn)
+  case fn
+  when /\.h(pp|xx)?$/
+    create(fn, header_template(fn))
+  when /\.c(pp|xx)?$/
+    create(fn, source_template(fn))
+  when /\./
+    create(fn)
+  else
+    add(fn + ".h")
+    add(fn + ".cpp")
+  end
+end
+
+while arg = ARGV.shift
+  case arg
+  when '-a'
+    add(ARGV.shift)
+  else
+    puts "Unknown option: #{arg}"
+    exit 1
+  end
+end
+
 sources = Dir["**/*.{cpp,c,cxx}"].sort
 headers = Dir["**/*.{h,hpp,hxx}"].sort
-
 sources.delete_if { |fn| fn =~ /^test\// }
 headers.delete_if { |fn| fn =~ /^test\// }
 
@@ -78,3 +132,4 @@ if content != orig_content
 else
   puts "No changes."
 end
+
