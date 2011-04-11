@@ -6,7 +6,7 @@ require 'tmpdir'
 
 ENCODING = 'ISO-8859-1'
 ASTYLE_EXECUTABLE = "astyle.exe"
-ASTYLE_OPTIONS =  ["-q", "--style=allman", "-Os3YHUjck1M60E" ]
+ASTYLE_OPTIONS =  ["-q", "--style=allman", "-Os3YHUjck1M60EK" ]
 
 def restyle(file)
   content = File.read(file, :encoding => ENCODING)
@@ -63,10 +63,13 @@ def restyle_code(code)
   # Forward slashes in includes
   code.gsub!(/^(\s*#\s*include\s+["<])(.*?)([>"])/) { $1 + $2.tr('\\','/') + $3 }
 
-  code.gsub!(/^( *)\/\*(.*?)\*\/[ \t]*\n/m) do
-    indent = $1
-    text = $2.gsub(/^\s*\*[\t ]*/, '').sub(/\A\s*/, '').sub(/\s*\Z/, "\n").gsub(/^/) { "#{indent} /// " }
-    text
+  if false
+    # Restyle /** */ comment sections using //
+    code.gsub!(/^( *)\/\*\*(.*?)\*\/[ \t]*\n/m) do
+      indent = $1
+      text = $2.gsub(/^\s*\*[\t ]*/, '').sub(/\A\s*/, '').sub(/\s*\Z/, "\n").gsub(/^/) { "#{indent} /// " }
+      text
+    end
   end
 end
 
