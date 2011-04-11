@@ -22,7 +22,8 @@ def header_template(fn)
 end
 
 def source_template(fn)
-  "#{header_comment(fn)}\n\n"
+  headerfilename = fn.sub(/\.[^.]+$/, '.h')
+  "#{header_comment(fn)}\n\n#include \"#{headerfilename}\""
 end
 
 def create(fn, content = "")
