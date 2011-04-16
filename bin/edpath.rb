@@ -20,7 +20,11 @@ end
 def load_paths
   env = {}
   Win32::Registry::HKEY_LOCAL_MACHINE.open('SYSTEM\CurrentControlSet\Control\Session Manager\Environment') do |reg|
-    env[SystemVariables] = reg['Path'].split(File::PATH_SEPARATOR)
+    begin
+      env[SystemVariables] = reg['Path'].split(File::PATH_SEPARATOR)
+    rescue Win32::Registry::Error
+      env[SystemVariables] = []
+    end
   end
   Win32::Registry::HKEY_CURRENT_USER.open('Environment') do |reg|
     env[UserVariables] = reg['Path'].split(File::PATH_SEPARATOR)

@@ -21,16 +21,12 @@
 (set 'max-specpdl-size 2000)
 (set 'max-lisp-eval-depth 1000)
 
-(server-start)
+; (server-start)
 
 (setq make-backup-files 'nil)		; real men don't take backups
+(setq vc-cvs-stay-local 'nil) 		; ditto -- WTF!?
 
-;; bs - convenient buffer selector
-;; http://www.geekware.de/software/emacs/
-;(require 'bs)
-; (global-set-key "\C-x\C-b" 'bs-show)
-; (global-set-key "\C-x\C-b" 'buffer-menu)
-; (global-set-key "\C-\M-l" 'buffer-menu)
+; Convenient buffer menu
 (global-set-key "\C-x\C-b" 'electric-buffer-list)
 
 ;; ibs - MSVC like Ctrl-TAB buffer cycling
@@ -374,7 +370,9 @@
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- '(inhibit-startup-screen t))
+ '(inhibit-startup-screen t)
+ '(org-agenda-files (quote ("~/org/bre_test_workshop.org" "~/org/org.org"))))
+
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
@@ -383,16 +381,41 @@
  )
 
 ;; cmake
+=======
+ '(font-lock-variable-name-face ((((class color) (min-colors 88) (background light)) (:foreground "DarkRed")))))
+
+(require 'org-install)
+(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+(define-key global-map "\C-cl" 'org-store-link)
+(define-key global-map "\C-ca" 'org-agenda)
+(setq org-log-done t)
+
+(defun find-default-org ()
+  (interactive)
+  (find-file "~/org/default.org"))
+(global-set-key [f12] 'find-default-org)
+
 (require 'cmake-mode)
 (setq auto-mode-alist
       (append '(("CMakeLists\\.txt\\'" . cmake-mode)
 		("\\.cmake\\'" . cmake-mode))
 	      auto-mode-alist))
-(setq compile-command "mingw32-make -k ")
 
+;;
+;; Erlang
+;;
+(setq compile-command "mingw32-make -k ")
 
 (setq load-path (cons  "C:/Program Files/erl5.8.2/lib/tools-2.6.6.2/emacs"
 		       load-path))
 (setq erlang-root-dir "C:/Program Files/erl5.8.2")
 (setq exec-path (cons "C:/Program Files/erl5.8.2/bin" exec-path))
 (require 'erlang-start)
+
+
+(if (file-exists-p "C:/Program Files/erl5.8")
+    '((setq load-path (cons  "C:/Program Files/erl5.8/lib/tools-2.6.6/emacs"
+			     load-path))
+      (setq erlang-root-dir "C:/Program Files/erl5.8")
+      (setq exec-path (cons "C:/Program Files/erl5.8/bin" exec-path))
+      (require 'erlang-start)))
