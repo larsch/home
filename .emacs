@@ -18,16 +18,20 @@
 ; (gnuserv-start)
 ; (set 'gnuserv-frame (selected-frame))	; use the same frame for new files
 
-;(server-start)
+(set 'max-specpdl-size 2000)
+(set 'max-lisp-eval-depth 1000)
+
+(server-start)
 
 (setq make-backup-files 'nil)		; real men don't take backups
 
 ;; bs - convenient buffer selector
 ;; http://www.geekware.de/software/emacs/
 ;(require 'bs)
-;(global-set-key "\C-x\C-b" 'bs-show)
-(global-set-key "\C-x\C-b" 'buffer-menu)
-(global-set-key "\C-\M-l" 'buffer-menu)
+; (global-set-key "\C-x\C-b" 'bs-show)
+; (global-set-key "\C-x\C-b" 'buffer-menu)
+; (global-set-key "\C-\M-l" 'buffer-menu)
+(global-set-key "\C-x\C-b" 'electric-buffer-list)
 
 ;; ibs - MSVC like Ctrl-TAB buffer cycling
 ;; http://www.geekware.de/software/emacs/
@@ -123,6 +127,7 @@
 (autoload 'javascript-mode "javascript" nil t)
 (add-to-list 'auto-mode-alist '("\\.js?$" . javascript-mode))
 (add-to-list 'auto-mode-alist '("\\.as$" . javascript-mode))
+(add-to-list 'auto-mode-alist '("\\.json$" . javascript-mode))
 
 ;; css-mode
 (autoload 'css-mode "css-mode")
@@ -209,6 +214,8 @@
 )
 (set 'c++-mode-hook 'setup-c++-mode)
 (set 'c-mode-hook 'setup-c++-mode)
+
+(global-set-key "\C-c\C-c" 'comment-region)
 
 ;; Hungry deletion (deletes all continuos whitespace)
 (add-hook 'c-mode-common-hook (lambda () (c-toggle-hungry-state 1)))
