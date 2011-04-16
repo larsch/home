@@ -4,13 +4,14 @@ require 'open3'
 require 'trollop'
 require 'tmpdir'
 
+ENCODING = 'ISO-8859-1'
 ASTYLE_EXECUTABLE = "astyle.exe"
-ASTYLE_OPTIONS =  ["-q", "--style=allman", "-Os3YHUjck1M60E" ]
+ASTYLE_OPTIONS =  ["-q", "--style=allman", "-Os3YHUjck1M60EK" ]
 
 @skip_file_if_handlers = []
 
 def restyle(file)
-  content = File.read(file, :encoding => 'ISO-8859-1')
+  content = File.read(file, :encoding => ENCODING)
   if not $opts.force and skip_file(content)
     puts "Skipping #{file}" if $opts.verbose
     return
@@ -23,8 +24,8 @@ def restyle(file)
   File.open(temp_file, "w") { |f| f << content }
   options = ASTYLE_OPTIONS + [temp_file]
   system(ASTYLE_EXECUTABLE, *options)
-  content = File.read(temp_file)
-  
+  content = File.read(temp_file, :encoding => ENCODING)
+
   if orig_content == content
     puts "No changes to #{file}" if $opts.verbose
   else
@@ -43,8 +44,8 @@ end
 
 def restyle_code(code)
   year = Time.now.year
-  code.gsub!(/Copyright (©|\(C\)) ((\d+)(-\d+)?)/) do |m|
-    "Copyright #{$1} #{year}"
+  code.gsub!(/Copyright \S+ ((\d+)(-\d+)?)/) do |m|
+    "Copyright © #{year}"
   end
   # Exactly one newline at end of file
   code.gsub!(/(\S)\s*\z/m, "\\1\n")
@@ -62,8 +63,21 @@ def restyle_code(code)
     }.join("\n")
   }
 
+  # /* comment */ to // comment
   code.gsub!(/\/\*(.*?)\*\//) { "// " + $1.strip }
+  # Space after //
   code.gsub!(/\/\/(\S)/, "// \\1")
+  # Forward slashes in includes
+  code.gsub!(/^(\s*#\s*include\s+["<])(.*?)([>"])/) { $1 + $2.tr('\\','/') + $3 }
+
+  if false
+    # Restyle /** */ comment sections using //
+    code.gsub!(/^( *)\/\*\*(.*?)\*\/[ \t]*\n/m) do
+      indent = $1
+      text = $2.gsub(/^\s*\*[\t ]*/, '').sub(/\A\s*/, '').sub(/\s*\Z/, "\n").gsub(/^/) { "#{indent} /// " }
+      text
+    end
+  end
 end
 
 def determine_headerguard(path)
