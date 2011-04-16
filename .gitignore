@@ -1,2 +1,4 @@
 .emacs.d
 bin/*.exe
+.*
+archive
