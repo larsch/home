@@ -7,6 +7,8 @@ require 'tmpdir'
 ASTYLE_EXECUTABLE = "astyle.exe"
 ASTYLE_OPTIONS =  ["-q", "--style=allman", "-Os3YHUjck1M60E" ]
 
+@skip_file_if_handlers = []
+
 def restyle(file)
   content = File.read(file, :encoding => 'ISO-8859-1')
   if not $opts.force and skip_file(content)
@@ -59,6 +61,9 @@ def restyle_code(code)
       }
     }.join("\n")
   }
+
+  code.gsub!(/\/\*(.*?)\*\//) { "// " + $1.strip }
+  code.gsub!(/\/\/(\S)/, "// \\1")
 end
 
 def determine_headerguard(path)
@@ -79,6 +84,7 @@ def determine_headerguard(path)
     basedir = File.dirname(basedir)
   end
   hgpath ||= File.basename(path)
+  hgpath.downcase!
   hg = "_" + hgpath.gsub(/[\/\\\.]/, "_")
   return hg
 end
@@ -118,7 +124,7 @@ def restyle_headerguards(content, path)
 end
 
 def skip_file_if(&block)
-  (@skip_file_if_handlers ||= []) << block
+  @skip_file_if_handlers << block
 end
 
 def skip_file(content)
@@ -134,6 +140,10 @@ if __FILE__ == $0
     opt :diff, "Show the changes to be made, but don't overwrite original"
   end
   ARGV.each do |path|
+    if not File.file?(path)
+      puts "#{path} is not a file"
+      next
+    end
     restyle(path)
   end
   puts "#{ARGV.size} file(s) processed" if $opts.verbose
