@@ -1,17 +1,20 @@
 #!/usr/bin/env ruby
 # encoding: ISO-8859-1
-require 'open3'
-require 'trollop'
-require 'tmpdir'
+#
+# Restyle C++ code using AStyle and some additional cleaning up of
+# whitespace, copyright notice, etc.
+#
 
+FILENAME_PATTERN = /\.(h|c|cpp|hpp|cxx|hxx|c++|h++)$/
 ENCODING = 'ISO-8859-1'
-ASTYLE_EXECUTABLE = "astyle.exe"
+ASTYLE_EXECUTABLE = "astyle"
 ASTYLE_OPTIONS =  ["-q", "--style=allman", "-Os3YHUjck1M60EK" ]
 
+# Restyle the contents of a file.
 def restyle(file)
   content = File.read(file, :encoding => ENCODING)
   if not $opts.force and skip_file(content)
-    puts "Skipping #{file}" if $opts.verbose
+    log "Skipping #{file}"
     return
   end
   orig_content = content.dup
@@ -24,9 +27,7 @@ def restyle(file)
   system(ASTYLE_EXECUTABLE, *options)
   content = File.read(temp_file, :encoding => ENCODING)
 
-  if orig_content == content
-    puts "No changes to #{file}" if $opts.verbose
-  else
+  if orig_content != content
     if $opts.diff
       Dir.mktmpdir do |tmppath|
         tempfile = File.join(tmppath, File.basename(file))
@@ -35,16 +36,16 @@ def restyle(file)
       end
     else
       File.open(file, "w") { |f| f << content }
-      puts "Restyled #{file}" if $opts.verbose
+      log "Restyled #{file}"
     end
   end
 end
 
+# Restyle a chunk of code (our own rule set)
 def restyle_code(code)
+  # Adjust copyright year
   year = Time.now.year
-  code.gsub!(/Copyright \S+ ((\d+)(-\d+)?)/) do |m|
-    "Copyright © #{year}"
-  end
+  code.gsub!(/Copyright \S+ ((\d+)(-\d+)?)/) { |m| "Copyright © #{year}" }
   # Exactly one newline at end of file
   code.gsub!(/(\S)\s*\z/m, "\\1\n")
   # Only 1 empty line between sections
@@ -53,6 +54,7 @@ def restyle_code(code)
   code.gsub!(/\{\s*\n/m, "{\n")
   # No empty lines before close-brace
   code.gsub!(/\s*(\n *\})/, "\\1")
+  # Centre lines in file header
   code.sub!(/\A\s*\/\/={54}\n(\/\/(.*\n))+?\/\/-{54}/) { |x|
     x.split("\n").map { |ln|
       ln.sub(/\A(\/\/)\s+(.*?)\s*\Z/) { 
@@ -62,15 +64,6 @@ def restyle_code(code)
   }
   # Forward slashes in includes
   code.gsub!(/^(\s*#\s*include\s+["<])(.*?)([>"])/) { $1 + $2.tr('\\','/') + $3 }
-
-  if false
-    # Restyle /** */ comment sections using //
-    code.gsub!(/^( *)\/\*\*(.*?)\*\/[ \t]*\n/m) do
-      indent = $1
-      text = $2.gsub(/^\s*\*[\t ]*/, '').sub(/\A\s*/, '').sub(/\s*\Z/, "\n").gsub(/^/) { "#{indent} /// " }
-      text
-    end
-  end
 end
 
 def determine_headerguard(path)
@@ -138,16 +131,57 @@ def skip_file(content)
   @skip_file_if_handlers.inject(false) { |skip, handler| skip || handler.call(content) }
 end
 
+def log(str)
+  return unless $opts.verbose
+  if $opts.filelog
+    File.open("c:/log.txt", "a") do |log|
+      log.puts str
+    end
+  else
+    puts str
+  end
+end
+
+class Options
+  attr_accessor :force
+  attr_accessor :verbose
+  attr_accessor :diff
+  attr_accessor :filelog
+end
+
+def get_options
+  opts = Options.new
+  ARGV.size.times do
+    arg = ARGV.shift
+    case arg
+    when '--force', '-f'
+      opts.force = true
+    when '--verbose', '-v'
+      opts.verbose = true
+    when '--diff', '-d-'
+      opts.diff = true
+    when /^-/
+      puts "Unknown option: #{arg}"
+      exit
+    else
+      ARGV.push(arg)
+    end
+  end
+  return opts
+end
+
 if __FILE__ == $0
   dot_restyle = File.expand_path("~/.restyle")
   load dot_restyle if File.exist?(dot_restyle)
-  $opts = Trollop.options do
-    opt :force, "Restyle even when file does not look like our source"
-    opt :verbose, "Display additional messages"
-    opt :diff, "Show the changes to be made, but don't overwrite original"
-  end
+  $opts = get_options
+  
+  # Load tmpdir conditionally (bit more responsive in VS macro)
+  require 'tmpdir' if $opts.diff
+  
   ARGV.each do |path|
-    restyle(path)
+    if path =~ FILENAME_PATTERN
+      restyle(path)
+    end
   end
-  puts "#{ARGV.size} file(s) processed" if $opts.verbose
+  log "#{ARGV.size} file(s) processed"
 end
