@@ -39,8 +39,8 @@ def store_paths(paths)
   Win32::Registry::HKEY_CURRENT_USER.open('Environment', Win32::Registry::KEY_WRITE) do |reg|
     reg['Path'] = paths[UserVariables].join(File::PATH_SEPARATOR)
   end
-  sendmessage = Win32::API.new('SendMessage', 'LILP', 'L', 'user32')
-  sendmessage.call(0xFFFF, Windows::Window::Message::WM_SETTINGCHANGE, 0, 'Environment')
+  sendmessage = Win32::API.new('SendMessageTimeout', 'LILPLLP', 'L', 'user32')
+  sendmessage.call(0xFFFF, Windows::Window::Message::WM_SETTINGCHANGE, 0, 'Environment', 0x0002, 2, 0)
 end
 
 def validate_paths(paths)

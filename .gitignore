@@ -1,6 +1,7 @@
 .emacs.d
 bin/*.exe
 .*
+archive
 test
 WikidPad.config
 WikidPad_Error.log
