@@ -2,38 +2,32 @@
 
 (add-to-list 'load-path "~/.elisp")
 
-;(defun maximize-window ()
-;  ""
-;  (interactive)
-;  (w32-send-sys-command #xf030))
+					;(defun maximize-window ()
+					;  ""
+					;  (interactive)
+					;  (w32-send-sys-command #xf030))
 ;; (global-set-key [(meta f8)] 'maximize-window)
-; (maximize-window)
+					; (maximize-window)
 
 ;;
 ;; general
 ;;
 
-;; gnuserv - used to open new files in existing emacs process
-; (require 'gnuserv)
-; (gnuserv-start)
-; (set 'gnuserv-frame (selected-frame))	; use the same frame for new files
-
-(set 'max-specpdl-size 2000)
-(set 'max-lisp-eval-depth 1000)
-
-; (server-start)
+(require 'server)
+(defun server-ensure-safe-dir (dir) "Noop" t)
+(server-start)
 
 (setq make-backup-files 'nil)		; real men don't take backups
 (setq vc-cvs-stay-local 'nil) 		; ditto -- WTF!?
 
-; Convenient buffer menu
+;; Convenient buffer menu
 (global-set-key "\C-x\C-b" 'electric-buffer-list)
 
 ;; ibs - MSVC like Ctrl-TAB buffer cycling
 ;; http://www.geekware.de/software/emacs/
 (require 'ibs)
-;(global-set-key [C-tab] 'next-buffer)
-;(global-set-key [C-S-tab] 'previous-buffer)
+					;(global-set-key [C-tab] 'next-buffer)
+					;(global-set-key [C-S-tab] 'previous-buffer)
 
 ;; Enable column-number-mode always
 (column-number-mode 't)
@@ -81,7 +75,7 @@
 (global-set-key "\M-p" 'jump-up)
 (global-set-key "\M-n" 'jump-down)
 
-; avoid emacs being minimized when i press C-z
+					; avoid emacs being minimized when i press C-z
 (global-unset-key "\C-z")
 (global-set-key "\C-cg" 'goto-line)
 (global-set-key "\C-ct" 'todo-show)
@@ -102,9 +96,9 @@
 (global-set-key "\M-c" 'kill-word-under-cursor)
 
 ;; Version Control
-;(setq vc-cvs-stay-local nil)		;; Run locally whenever possible. Speeds up things.
-;(set 'vc-annotate-color-map nil)	;; Default cvs annotate colours are awful... remove them.
-;(set 'vc-annotate-background nil)	;; Default cvs annotate colours are awful... remove them.
+					;(setq vc-cvs-stay-local nil)		;; Run locally whenever possible. Speeds up things.
+					;(set 'vc-annotate-color-map nil)	;; Default cvs annotate colours are awful... remove them.
+					;(set 'vc-annotate-background nil)	;; Default cvs annotate colours are awful... remove them.
 
 ;; 
 ;; Programming Modes
@@ -160,7 +154,7 @@
 (add-to-list 'c-font-lock-extra-types "UINT")
 (add-to-list 'c-font-lock-extra-types "uint")
 
-; indentation style based on k&r
+					; indentation style based on k&r
 (setq c-default-style '((java-mode . "java") (other . "gh"))) ; indentation-style
 (set 'parens-require-spaces nil) 	;; dont insert space before parentheses
 
@@ -173,7 +167,7 @@
                        (inextern-lang . 0)
                        ))))
 
-; (shell-command (concat "ruby c:/user/lac/bin/jumptovc.rb " (buffer-name)))
+					; (shell-command (concat "ruby c:/user/lac/bin/jumptovc.rb " (buffer-name)))
 
 (global-set-key [C-f7] 'jumptovc-and-build)
 (defun jumptovc ()
@@ -207,7 +201,7 @@
   (if (string-equal "c:/user/gh/bps/impl" (substring (buffer-file-name) 0 19))
       (set 'compile-command "msdev c:\\user\\gh\\bps\\impl\\samples\\console\\console.dsw /make \"console - win32 debug\""))
   (show-paren-mode 't)
-)
+  )
 (set 'c++-mode-hook 'setup-c++-mode)
 (set 'c-mode-hook 'setup-c++-mode)
 
@@ -344,18 +338,18 @@
 (global-set-key [f5] 'insert-date-time)
 
 ;; Experiment with colorizing operators
-;(let ((c-font-lock-extras
-;       '(
-;	 ;; assignment operators:
-;	 ("->" . font-lock-warning-face)
-;	 ("[-+*/%&^|]=" . font-lock-warning-face)       ; -= += *= %= &= ^= |=
-;	 ("\\(>>\\|<<\\)=" . font-lock-warning-face)    ; <<= >>=
-;	 ("[<>!=]=" . 'default)                         ; <= >= != ==
-;	 ("=\\|\\+\\+\\|--" . font-lock-warning-face)   ; = ++ --
-;	 ("[+-/*.!~^|&{};:?()<>]" . font-lock-warning-face)
-;	 )))
-;  (font-lock-add-keywords 'c-mode c-font-lock-extras)
-;  (font-lock-add-keywords 'c++-mode c-font-lock-extras))
+					;(let ((c-font-lock-extras
+					;       '(
+					;	 ;; assignment operators:
+					;	 ("->" . font-lock-warning-face)
+					;	 ("[-+*/%&^|]=" . font-lock-warning-face)       ; -= += *= %= &= ^= |=
+					;	 ("\\(>>\\|<<\\)=" . font-lock-warning-face)    ; <<= >>=
+					;	 ("[<>!=]=" . 'default)                         ; <= >= != ==
+					;	 ("=\\|\\+\\+\\|--" . font-lock-warning-face)   ; = ++ --
+					;	 ("[+-/*.!~^|&{};:?()<>]" . font-lock-warning-face)
+					;	 )))
+					;  (font-lock-add-keywords 'c-mode c-font-lock-extras)
+					;  (font-lock-add-keywords 'c++-mode c-font-lock-extras))
 
 ;; More convinent way to call make (find an open Makefile buffer and
 ;; runs make)
@@ -366,35 +360,29 @@
   (compile "make"))
 (global-set-key [C-return] 'compile-makefile-buffer)
 (custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(inhibit-startup-screen t)
  '(org-agenda-files (quote ("~/org/bre_test_workshop.org" "~/org/org.org"))))
 
-(custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- )
-
-;; cmake
-=======
- '(font-lock-variable-name-face ((((class color) (min-colors 88) (background light)) (:foreground "DarkRed")))))
-
+;;
+;; org-mode
+;;
 (require 'org-install)
 (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
 (define-key global-map "\C-cl" 'org-store-link)
 (define-key global-map "\C-ca" 'org-agenda)
 (setq org-log-done t)
-
 (defun find-default-org ()
   (interactive)
   (find-file "~/org/default.org"))
 (global-set-key [f12] 'find-default-org)
 
+;;
+;; CMake
+;;
 (require 'cmake-mode)
 (setq auto-mode-alist
       (append '(("CMakeLists\\.txt\\'" . cmake-mode)
@@ -404,17 +392,10 @@
 ;;
 ;; Erlang
 ;;
-(setq compile-command "mingw32-make -k ")
-
-(setq load-path (cons  "C:/Program Files/erl5.8.2/lib/tools-2.6.6.2/emacs"
-		       load-path))
-(setq erlang-root-dir "C:/Program Files/erl5.8.2")
-(setq exec-path (cons "C:/Program Files/erl5.8.2/bin" exec-path))
-(require 'erlang-start)
-
-
 (if (file-exists-p "C:/Program Files/erl5.8")
-    '((setq load-path (cons  "C:/Program Files/erl5.8/lib/tools-2.6.6/emacs"
+    '((set 'max-specpdl-size 2000)
+      (set 'max-lisp-eval-depth 1000)
+      (setq load-path (cons  "C:/Program Files/erl5.8/lib/tools-2.6.6/emacs"
 			     load-path))
       (setq erlang-root-dir "C:/Program Files/erl5.8")
       (setq exec-path (cons "C:/Program Files/erl5.8/bin" exec-path))
