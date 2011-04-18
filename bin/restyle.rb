@@ -10,6 +10,8 @@ ENCODING = 'ISO-8859-1'
 ASTYLE_EXECUTABLE = "astyle"
 ASTYLE_OPTIONS =  ["-q", "--style=allman", "-Os3YHUjck1M60EK" ]
 
+@skip_file_if_handlers = []
+
 # Restyle the contents of a file.
 def restyle(file)
   content = File.read(file, :encoding => ENCODING)
@@ -62,6 +64,11 @@ def restyle_code(code)
       }
     }.join("\n")
   }
+
+  # /* comment */ to // comment
+  code.gsub!(/\/\*(.*?)\*\//) { "// " + $1.strip }
+  # Space after //
+  code.gsub!(/\/\/(\S)/, "// \\1")
   # Forward slashes in includes
   code.gsub!(/^(\s*#\s*include\s+["<])(.*?)([>"])/) { $1 + $2.tr('\\','/') + $3 }
 end
@@ -124,7 +131,7 @@ def restyle_headerguards(content, path)
 end
 
 def skip_file_if(&block)
-  (@skip_file_if_handlers ||= []) << block
+  @skip_file_if_handlers << block
 end
 
 def skip_file(content)
@@ -179,6 +186,10 @@ if __FILE__ == $0
   require 'tmpdir' if $opts.diff
   
   ARGV.each do |path|
+    if not File.file?(path)
+      puts "#{path} is not a file"
+      next
+    end
     if path =~ FILENAME_PATTERN
       restyle(path)
     end

@@ -17,6 +17,10 @@
 ; (require 'gnuserv)
 ; (gnuserv-start)
 ; (set 'gnuserv-frame (selected-frame))	; use the same frame for new files
+
+(set 'max-specpdl-size 2000)
+(set 'max-lisp-eval-depth 1000)
+
 ; (server-start)
 
 (setq make-backup-files 'nil)		; real men don't take backups
@@ -28,6 +32,8 @@
 ;; ibs - MSVC like Ctrl-TAB buffer cycling
 ;; http://www.geekware.de/software/emacs/
 (require 'ibs)
+;(global-set-key [C-tab] 'next-buffer)
+;(global-set-key [C-S-tab] 'previous-buffer)
 
 ;; Enable column-number-mode always
 (column-number-mode 't)
@@ -63,7 +69,7 @@
 ;;
 
 ;; Convinient buffer navigation that returns to same position if you
-;; go down X and up X.
+;; go down  and up X.
 (defun jump-up ()
   "Jumps 10 lines up"
   (interactive)
@@ -117,10 +123,12 @@
 (autoload 'javascript-mode "javascript" nil t)
 (add-to-list 'auto-mode-alist '("\\.js?$" . javascript-mode))
 (add-to-list 'auto-mode-alist '("\\.as$" . javascript-mode))
+(add-to-list 'auto-mode-alist '("\\.json$" . javascript-mode))
 
 ;; css-mode
 (autoload 'css-mode "css-mode")
 (add-to-list 'auto-mode-alist '("\\.css\\'" . css-mode))
+(add-to-list 'auto-mode-alist '("\\.less?$" . css-mode))
 
 ;; lua-mode
 (autoload 'lua-mode "lua-mode")
@@ -186,7 +194,7 @@
 ;; mode local settings
 (defun setup-c++-mode () "Setups Custom C++ mode settings" (interactive)
   (set 'comment-column 35)
-  (set 'fill-column 120)		; default 70 gets a little crowded
+  (set 'fill-column 70)		; default 70 gets a little crowded
   (set 'indent-tabs-mode nil)		; dont use tabs
   (local-set-key "\C-m" 'newline-and-indent)
   (local-set-key "\C-cp" 'insert-private-copy-assign)
@@ -202,6 +210,8 @@
 )
 (set 'c++-mode-hook 'setup-c++-mode)
 (set 'c-mode-hook 'setup-c++-mode)
+
+(global-set-key "\C-c\C-c" 'comment-region)
 
 ;; Hungry deletion (deletes all continuos whitespace)
 (add-hook 'c-mode-common-hook (lambda () (c-toggle-hungry-state 1)))
@@ -362,11 +372,16 @@
   ;; If there is more than one, they won't work right.
  '(inhibit-startup-screen t)
  '(org-agenda-files (quote ("~/org/bre_test_workshop.org" "~/org/org.org"))))
+
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
+ )
+
+;; cmake
+=======
  '(font-lock-variable-name-face ((((class color) (min-colors 88) (background light)) (:foreground "DarkRed")))))
 
 (require 'org-install)
@@ -385,6 +400,17 @@
       (append '(("CMakeLists\\.txt\\'" . cmake-mode)
 		("\\.cmake\\'" . cmake-mode))
 	      auto-mode-alist))
+
+;;
+;; Erlang
+;;
+(setq compile-command "mingw32-make -k ")
+
+(setq load-path (cons  "C:/Program Files/erl5.8.2/lib/tools-2.6.6.2/emacs"
+		       load-path))
+(setq erlang-root-dir "C:/Program Files/erl5.8.2")
+(setq exec-path (cons "C:/Program Files/erl5.8.2/bin" exec-path))
+(require 'erlang-start)
 
 
 (if (file-exists-p "C:/Program Files/erl5.8")
