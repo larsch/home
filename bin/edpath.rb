@@ -43,6 +43,15 @@ def store_paths(paths)
   sendmessage.call(0xFFFF, Windows::Window::Message::WM_SETTINGCHANGE, 0, 'Environment', 0x0002, 2, 0)
 end
 
+def write_cmd(paths)
+  cmdpath = File.join(ENV["TEMP"], "postedpath.cmd")
+  value = (paths[SystemVariables] + paths[UserVariables]).join(File::PATH_SEPARATOR)
+  File.open(cmdpath, "w") do |f|
+    f.puts "echo PATH=#{value}"
+    f.puts "set PATH=#{value}"
+  end
+end
+
 def validate_paths(paths)
   raise "Unexpected content in results" if paths.size > 2
   raise "Missing key #{UserVariables}" unless paths.has_key?(UserVariables)
@@ -121,6 +130,7 @@ paths = load_paths
 begin
   paths = edit_paths(paths)
   store_paths(paths)
+  write_cmd(paths)
 rescue NoChanges
   puts "No changes was made. Cancelling."
 rescue InvalidPaths
