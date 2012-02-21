@@ -53,16 +53,27 @@ while arg = ARGV.shift
   case arg
   when '-a'
     add(ARGV.shift)
+  when '-f'
+    $force = true      
   else
     puts "Unknown option: #{arg}"
     exit 1
   end
 end
 
+def has_cmakelists(path)
+  cmakelists = File.join(path, "CMakeLists.txt")
+  return false if path.empty? or path == "."
+  return true if File.exist?(cmakelists)
+  return has_cmakelists(File.dirname(path))
+end
+
 sources = Dir["**/*.{cpp,c,cxx}"].sort
 headers = Dir["**/*.{h,hpp,hxx}"].sort
 sources.delete_if { |fn| fn =~ /^test\// }
 headers.delete_if { |fn| fn =~ /^test\// }
+sources.delete_if { |path| has_cmakelists(path) }
+headers.delete_if { |path| has_cmakelists(path) }
 
 def set(var, list)
   files = list.join("\n  ")
@@ -71,7 +82,6 @@ end
 
 def source_group(group, list)
   files = list.map{|path| path.tr('\\','/')}.join("\n  ")
-  group = group.tr('\\','/')
   "source_group(#{group} FILES #{files})"
 end
   
@@ -107,14 +117,16 @@ all.each { |filename|
   if dirname == '.'
     sourcegroup = "\"\""
   else
-    sourcegroup = dirname.tr('/','\\')
+    sourcegroup = dirname.gsub('/') { "\\\\" }
   end
   sourcegroups[sourcegroup] ||= []
   sourcegroups[sourcegroup] << filename
 }
+
 sourcegroups.each do |group, files|
   sg_cmd = source_group(group, files)
-  if not content.gsub!(/^source_group\(#{Regexp.escape group} FILES.*?\)/im, sg_cmd)
+  re = Regexp.escape(group).gsub("\\\\") { "[\\\/]+" }
+  if not content.gsub!(/^source_group\(#{re} FILES.*?\)/im) { sg_cmd }
     content << sg_cmd << "\n"
   end
 end
@@ -125,7 +137,7 @@ if File.exist?("test")
   end
 end
 
-if content != orig_content
+if $force or content != orig_content
   puts "Updating CMakeLists.txt"
   File.open("CMakeLists.txt", "w") do |cmakelist|
     cmakelist << content
