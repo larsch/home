@@ -93,7 +93,7 @@ else
     above = File.basename(File.dirname(File.expand_path(Dir.pwd)))
     project = "#{above}_#{project}"
   end
-  content = "cmake_minimum_required(VERSION 2.6)\nproject(#{project})\nset(sources)\nset(headers)\nadd_library(#{project} ${sources} ${headers})\n"
+  content = "cmake_minimum_required(VERSION 2.6)\nproject(#{project})\nset(sources)\nset(headers)\nadd_library(#{project} ${sources} ${headers})\nsource_groups_by_path(#{project})\n"
 end
 
 orig_content = content.dup
@@ -122,14 +122,6 @@ all.each { |filename|
   sourcegroups[sourcegroup] ||= []
   sourcegroups[sourcegroup] << filename
 }
-
-sourcegroups.each do |group, files|
-  sg_cmd = source_group(group, files)
-  re = Regexp.escape(group).gsub("\\\\") { "[\\\/]+" }
-  if not content.gsub!(/^source_group\(#{re} FILES.*?\)/im) { sg_cmd }
-    content << sg_cmd << "\n"
-  end
-end
 
 if File.exist?("test")
   if content !~ /add_subdirectory\(test\)/
