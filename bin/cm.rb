@@ -123,9 +123,15 @@ all.each { |filename|
   sourcegroups[sourcegroup] << filename
 }
 
-if File.exist?("test")
-  if content !~ /add_subdirectory\(test\)/
-    content << "add_subdirectory(test)\n"
+Dir.foreach "." do |entry|
+  next if entry == "." or entry == ".."
+  if File.directory?(entry)
+    if File.exist?(File.join(entry, "CMakeLists.txt"))
+      if content !~ /add_subdirectory\(#{entry}\)/
+        content << "add_subdirectory(#{entry})\n"
+        puts "+ add_subdirectory(#{entry})"
+      end
+    end
   end
 end
 

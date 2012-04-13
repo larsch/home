@@ -10,6 +10,7 @@ ARGV.each do |glob|
     newcontent = content.gsub(search_text, replace_text)
     if content != newcontent or targetpath != path
       File.open(targetpath, "w") do |file|
+        puts targetpath
         file << newcontent
         File.unlink(path) if targetpath != path
       end
