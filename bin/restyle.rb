@@ -8,7 +8,8 @@
 FILENAME_PATTERN = /\.(h|c|cpp|hpp|cxx|hxx|c++|h++)$/
 ENCODING = 'ISO-8859-1'
 ASTYLE_EXECUTABLE = "astyle"
-ASTYLE_OPTIONS =  ["-q", "--style=allman", "-Os3YHUjck1M60EK" ]
+ASTYLE_OPTIONS =  ["-q", "-A1Os3YHUjck1M60Km0" ]
+CONDITION_PATTERN = /Copyright.*GateHouse/
 
 @skip_file_if_handlers = []
 
@@ -20,14 +21,15 @@ def restyle(file)
     return
   end
   orig_content = content.dup
-  restyle_code(content)
+  restyle_code(content, File.expand_path(file))
   restyle_headerguards(content, file) if file =~ /\.(h|hpp|hxx)$/
 
-  temp_file = File.join(ENV["TEMP"], "astyletemp")
+  temp_file = File.join(ENV["TEMP"], "astyletemp${$$}")
   File.open(temp_file, "w") { |f| f << content }
   options = ASTYLE_OPTIONS + [temp_file]
   system(ASTYLE_EXECUTABLE, *options)
   content = File.read(temp_file, :encoding => ENCODING)
+  File.unlink(temp_file)
 
   if orig_content != content
     if $opts.diff
@@ -44,34 +46,61 @@ def restyle(file)
 end
 
 # Restyle a chunk of code (our own rule set)
-def restyle_code(code)
+def restyle_code(code, path)
   # Adjust copyright year
-  year = Time.now.year
-  code.gsub!(/Copyright \S+ ((\d+)(-\d+)?)/) { |m| "Copyright © #{year}" }
+  year = Time.now.year.to_s
+  code.gsub!(/Copyright \S+ (?:(\d+)(-\d+)*)/) do |m|
+    old_start = $1
+    year = "#{old_start}-#{year}" if old_start != year
+    "Copyright © #{year}"
+  end
+
   # Exactly one newline at end of file
   code.gsub!(/(\S)\s*\z/m, "\\1\n")
+
   # Only 1 empty line between sections
   code.gsub!(/(\n[ \t]*\n)\s*\n/m, "\\1")
+
   # No empty lines after open-brace
   code.gsub!(/\{\s*\n/m, "{\n")
+
   # No empty lines before close-brace
   code.gsub!(/\s*(\n *\})/, "\\1")
+
   # Centre lines in file header
   code.sub!(/\A\s*\/\/={54}\n(\/\/(.*\n))+?\/\/-{54}/) { |x|
     x.split("\n").map { |ln|
-      ln.sub(/\A(\/\/)\s+(.*?)\s*\Z/) { 
-        $1 + " " * ((54 - $2.size)/2) + $2
+      ln.sub(/\A(\/\/)\s+(.*?)\s*\Z/) {
+        $1 + " " * [((54 - $2.size)/2),0].max + $2
       }
     }.join("\n")
   }
 
-  # /* comment */ to // comment
-  code.gsub!(/\/\*(.*?)\*\//) { "// " + $1.strip }
-  # Space after //
-  code.gsub!(/\/\/(\S)/, "// \\1")
+  # At least one space after C++ style comment markers (//)
+  code.gsub!(/(?:^| +)\/\/([a-z0-9])/i, "// \\1")
+  
   # Forward slashes in includes
   code.gsub!(/^(\s*#\s*include\s+["<])(.*?)([>"])/) { $1 + $2.tr('\\','/') + $3 }
+
+  # Changed include "" to include <> if file is not found locally
+  code.gsub!(/^(\s*#\s*include\s+)"(.*)"/) do
+    local = File.join(File.dirname(path), $2)
+    if File.exist?(local)
+      $&
+    else
+      "#{$1}<#{$2}>"
+    end
+  end
+
+  # Strip old CVS keywords
+  remove_tags = [ "Revision", "Date", "Author" ].join("|")
+  code.gsub!(/^.*\$(#{remove_tags}):.*$.*\n/, "")
+
+  # Remove duplicate //--- lines
+  code.gsub!(/(^\/\/-+\n)(^\/\/-+\n)+/, "\\1")
 end
+
+HEADER_GUARD_BREAK = /^(impl|src|include|plug-ins|3rdparty)$/
 
 def determine_headerguard(path)
   path = File.expand_path(path)
@@ -81,10 +110,10 @@ def determine_headerguard(path)
   while basedir != lastbasedir
     lastbasedir = basedir
     basename = File.basename(basedir)
-    if basename == "impl" or basename == "src" or basename == "include"
+    if basename =~ HEADER_GUARD_BREAK
       hgpath = path[basedir.size + 1 .. -1]
       break
-    elsif File.exist?(File.join(lastbasedir, "CMakeLists.txt")) 
+    elsif File.exist?(File.join(lastbasedir, "CMakeLists.txt")) or File.exist?(File.join(lastbasedir, "..", "changes.txt"))
       hgpath = path[File.dirname(basedir).size + 1 .. -1]
       break
     end
@@ -92,7 +121,7 @@ def determine_headerguard(path)
   end
   hgpath ||= File.basename(path)
   hgpath.downcase!
-  hg = "_" + hgpath.gsub(/[\/\\\.]/, "_")
+  hg = "_" + hgpath.gsub(/[^a-z0-9_]/, "_")
   return hg
 end
 
@@ -107,7 +136,7 @@ def restyle_headerguards(content, path)
       firstline ||= i
       stack.push [[i,$1]]
     when /^\s*\#\s*define (\w+)$/
-      stack.last[1] ||= [i,$1]
+      stack.last[1] ||= [i,$1] unless stack.empty?
     when /^\s*\#\s*endif\s*(.*)$/
       groups.push stack.pop + [[i,$1]]
     end
@@ -130,12 +159,8 @@ def restyle_headerguards(content, path)
   content.replace(lines.join("\n") + "\n")
 end
 
-def skip_file_if(&block)
-  @skip_file_if_handlers << block
-end
-
 def skip_file(content)
-  @skip_file_if_handlers.inject(false) { |skip, handler| skip || handler.call(content) }
+  content !~ CONDITION_PATTERN
 end
 
 def log(str)
@@ -154,6 +179,7 @@ class Options
   attr_accessor :verbose
   attr_accessor :diff
   attr_accessor :filelog
+  attr_accessor :edited
 end
 
 def get_options
@@ -163,10 +189,21 @@ def get_options
     case arg
     when '--force', '-f'
       opts.force = true
+    when '--edited', '-e'
+      opts.edited = true
     when '--verbose', '-v'
       opts.verbose = true
-    when '--diff', '-d-'
+    when '--diff', '-d'
       opts.diff = true
+    when '--help', '-h', '-?'
+      puts "Usage:"
+      puts "\t#{File.basename($0)} [options] files ..."
+      puts "\nOptions:"
+      puts "\t --force/-f    Force: restyle files that would normally be skipped"
+      puts "\t --verbose/-v  Be verbose"
+      puts "\t --diff/-d     Show the change that would be done, but don't actually write them"
+      puts "\t --help/-?/-h  Show this information"
+      exit
     when /^-/
       puts "Unknown option: #{arg}"
       exit
@@ -178,12 +215,15 @@ def get_options
 end
 
 if __FILE__ == $0
-  dot_restyle = File.expand_path("~/.restyle")
-  load dot_restyle if File.exist?(dot_restyle)
   $opts = get_options
   
   # Load tmpdir conditionally (bit more responsive in VS macro)
   require 'tmpdir' if $opts.diff
+
+  if $opts.edited
+    require File.join(File.dirname(__FILE__), "edited")
+    each_edited_file { |path| ARGV.push(path) if path =~ /\.(h|cpp|c)$/ }
+  end
   
   ARGV.each do |path|
     if not File.file?(path)
