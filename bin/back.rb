@@ -29,7 +29,8 @@ class CompressedDB
     @dictionary = readb("cm/acc/adapl/regm/regmf.cpp")
   end
   def [](key)
-    Zlib::Inflate.inflate(@db[key])
+    value = @db[key]
+    return value && Zlib::Inflate.inflate(value)
   end
   def []=(key, value)
     deflate = Zlib::Deflate.new
@@ -49,21 +50,29 @@ end
 @gdbm = GDBM.new(File.expand_path("~/back.db"))
 @db = CompressedDB.new(@gdbm)
 
-def store_tree 
-  tree = []
+def store_tree
+  list = []
   each_file do |path|
     digest = Digest::SHA1.file(path).digest
     @db[digest] = readb(path) unless @db.has_key?(digest)
-    tree << [path, digest]
+    list << [path, digest]
   end
+  tree = {
+    list: list,
+    time: Time.now,
+    parent: @db[Dir.pwd]
+  }
   treem = Marshal.dump(tree)
   treedigest = Digest::SHA1.digest(treem)
   @db[treedigest] = treem
+  @db[Dir.pwd] = treedigest
   return treedigest, tree
 end
 
 def load_tree(tag)
-  return Marshal.load(@db[tag])
+  treem = @db[tag]
+  raise "\"#{tag}\" not found" if treem.nil?
+  return Marshal.load(m)
 end
 
 def tree_delta(tree1, tree2)
@@ -97,8 +106,10 @@ while arg = ARGV.shift
     @db[tag] = digest
   when 'status'
     tag = ARGV.shift
-    otree = load_tree(@db[tag])
-    tree_delta(tree, otree) do |a, e1, e2|
+    digest = @db[tag]
+    raise "\"#{tag}\" not found" if digest.nil?
+    otree = load_tree(digest)
+    tree_delta(tree[:list], otree[:list]) do |a, e1, e2|
       puts "#{a} #{e1.first}"
     end
   when 'restore'

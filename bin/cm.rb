@@ -98,6 +98,18 @@ end
 
 orig_content = content.dup
 
+# Remove optional files from the default list
+optional_files = []
+content.scan(/\bset\((headers|sources)\s(.*?)\)/im) do |x|
+  var = x[0]
+  files = x[1].split(/\s+/)
+  if files.include?("${#{var}}")
+    optional_files.push(*files)
+  end
+end
+headers -= optional_files
+sources -= optional_files
+
 # Ensure we have a newline at the end of the file
 content.gsub!(/\n*\z/, "\n")
 
