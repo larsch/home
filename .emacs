@@ -22,6 +22,7 @@
 
 ;; Convenient buffer menu
 (global-set-key "\C-x\C-b" 'electric-buffer-list)
+(setq split-width-threshold 'nil)
 
 ;; ibs - MSVC like Ctrl-TAB buffer cycling
 ;; http://www.geekware.de/software/emacs/
@@ -104,6 +105,8 @@
 ;; Programming Modes
 ;;
 
+(add-to-list 'auto-mode-alist '("\\.y$" . text-mode))
+
 ;; ruby-mode
 (autoload 'ruby-mode "ruby-mode")
 (add-to-list 'auto-mode-alist '("\\.rbw?$" . ruby-mode))
@@ -165,6 +168,7 @@
    (c-offsets-alist . ((inline-open . 0)
                        (statement-case-open . +)
                        (inextern-lang . 0)
+		       (innamespace . 0)
                        ))))
 
 					; (shell-command (concat "ruby c:/user/lac/bin/jumptovc.rb " (buffer-name)))
@@ -195,7 +199,6 @@
   (local-set-key "\M-h" 'hs-hide-block)
   (local-set-key "\M-s" 'hs-show-block)
   (local-set-key "\M-]" 'toggle-source-header)
-  (make-local-variable 'compile-command)
   (if (string-equal "c:/user/gh/bps/tools/rncsim" (substring (buffer-file-name) 0 27))
       (set 'compile-command "msdev rncsim.dsw /make \"rncsim - win32 debug\""))
   (if (string-equal "c:/user/gh/bps/impl" (substring (buffer-file-name) 0 19))
@@ -316,10 +319,16 @@
 
 (global-set-key [M-up] 'find-tag-other-window)
 
+;; (defun my-build () "mybuild"
+;;   (interactive)
+;;   (save-some-buffers 1)
+;;   (compile "mingw32-make"))
 (defun my-build () "mybuild"
   (interactive)
-  (compile "mingw32-make"))
+  (save-some-buffers 1)
+  (compile compile-command))
 (global-set-key [f7] 'my-build)
+(global-set-key [f8] 'next-error)
 
 
 (defun my-run () "mybuild"
@@ -400,3 +409,18 @@
       (setq erlang-root-dir "C:/Program Files/erl5.8")
       (setq exec-path (cons "C:/Program Files/erl5.8/bin" exec-path))
       (require 'erlang-start)))
+
+
+(defun get-closest-pathname (&optional (file "Makefile"))
+  (interactive)
+  "Determine the pathname of the first instance of FILE starting from the current directory towards root.
+This may not do the correct thing in presence of links. If it does not find FILE, then it shall return the name
+of FILE in the current directory, suitable for creation"
+  (let ((root (expand-file-name "/"))) ; the win32 builds should translate this correctly
+    (expand-file-name file
+		      (loop 
+		       for d = default-directory then (expand-file-name ".." d)
+		       if (file-exists-p (expand-file-name file d))
+		       return d
+		       if (equal d root)
+		       return nil))))
