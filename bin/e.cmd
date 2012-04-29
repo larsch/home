@@ -1,1 +1,1 @@
-@c:\appl\EmacsW32\emacs\bin\emacsclient.exe -n %*
+@emacsclient.exe -n -a runemacs.exe %*
