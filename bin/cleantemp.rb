@@ -53,7 +53,7 @@ def clean(clean_path, max_age = MAX_AGE)
   puts "Removed #{file_count} files (#{total_size} bytes) and #{dir_count} directories from #{clean_path}."
 end
 clean(ENV['TEMP'])
-clean(ENV['USERPROFILE'] + '\My Documents\Downloads', 31*24*60*60)
+clean(ENV['USERPROFILE'] + '\Downloads', 31*24*60*60)
 system "net stop wuauserv"
 clean(ENV['SystemRoot'] + '\SoftwareDistribution\Download')
 system "net start wuauserv"

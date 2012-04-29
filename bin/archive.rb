@@ -25,4 +25,24 @@ def archive(path)
   end
 end
 
+if ARGV.include?('--register')
+  require 'win32/registry'
+  require 'rbconfig'
+  HKCR = Win32::Registry::HKEY_CLASSES_ROOT
+  ['*','Folder'].each do |cls|
+    HKCR.open("#{cls}\\shell") do |reg|
+      reg.create("archive") do |arch|
+        arch.write_s nil, "&Archive"
+        script = File.expand_path(__FILE__).tr('/','\\')
+        ruby = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['RUBY_INSTALL_NAME'] + RbConfig::CONFIG['EXEEXT'])
+        ruby.tr!('/','\\')
+        arch.create "command" do |cmd|
+          cmd.write_s nil, "\"#{ruby}\" \"#{script}\" \"%1\""
+        end
+      end
+    end
+  end
+  exit
+end
+
 ARGV.each { |path| archive(path) }
