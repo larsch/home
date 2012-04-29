@@ -53,16 +53,27 @@ while arg = ARGV.shift
   case arg
   when '-a'
     add(ARGV.shift)
+  when '-f'
+    $force = true      
   else
     puts "Unknown option: #{arg}"
     exit 1
   end
 end
 
+def has_cmakelists(path)
+  cmakelists = File.join(path, "CMakeLists.txt")
+  return false if path.empty? or path == "."
+  return true if File.exist?(cmakelists)
+  return has_cmakelists(File.dirname(path))
+end
+
 sources = Dir["**/*.{cpp,c,cxx}"].sort
 headers = Dir["**/*.{h,hpp,hxx}"].sort
 sources.delete_if { |fn| fn =~ /^test\// }
 headers.delete_if { |fn| fn =~ /^test\// }
+sources.delete_if { |path| has_cmakelists(path) }
+headers.delete_if { |path| has_cmakelists(path) }
 
 def set(var, list)
   files = list.join("\n  ")
@@ -71,7 +82,6 @@ end
 
 def source_group(group, list)
   files = list.map{|path| path.tr('\\','/')}.join("\n  ")
-  group = group.tr('\\','/')
   "source_group(#{group} FILES #{files})"
 end
   
@@ -83,10 +93,22 @@ else
     above = File.basename(File.dirname(File.expand_path(Dir.pwd)))
     project = "#{above}_#{project}"
   end
-  content = "cmake_minimum_required(VERSION 2.6)\nproject(#{project})\nset(sources)\nset(headers)\nadd_library(#{project} ${sources} ${headers})\n"
+  content = "cmake_minimum_required(VERSION 2.6)\nproject(#{project})\nset(sources)\nset(headers)\nadd_library(#{project} ${sources} ${headers})\nsource_groups_by_path(#{project})\n"
 end
 
 orig_content = content.dup
+
+# Remove optional files from the default list
+optional_files = []
+content.scan(/\bset\((headers|sources)\s(.*?)\)/im) do |x|
+  var = x[0]
+  files = x[1].split(/\s+/)
+  if files.include?("${#{var}}")
+    optional_files.push(*files)
+  end
+end
+headers -= optional_files
+sources -= optional_files
 
 # Ensure we have a newline at the end of the file
 content.gsub!(/\n*\z/, "\n")
@@ -107,25 +129,25 @@ all.each { |filename|
   if dirname == '.'
     sourcegroup = "\"\""
   else
-    sourcegroup = dirname.tr('/','\\')
+    sourcegroup = dirname.gsub('/') { "\\\\" }
   end
   sourcegroups[sourcegroup] ||= []
   sourcegroups[sourcegroup] << filename
 }
-sourcegroups.each do |group, files|
-  sg_cmd = source_group(group, files)
-  if not content.gsub!(/^source_group\(#{Regexp.escape group} FILES.*?\)/im, sg_cmd)
-    content << sg_cmd << "\n"
+
+Dir.foreach "." do |entry|
+  next if entry == "." or entry == ".."
+  if File.directory?(entry)
+    if File.exist?(File.join(entry, "CMakeLists.txt"))
+      if content !~ /add_subdirectory\(#{entry}\)/
+        content << "add_subdirectory(#{entry})\n"
+        puts "+ add_subdirectory(#{entry})"
+      end
+    end
   end
 end
 
-if File.exist?("test")
-  if content !~ /add_subdirectory\(test\)/
-    content << "add_subdirectory(test)\n"
-  end
-end
-
-if content != orig_content
+if $force or content != orig_content
   puts "Updating CMakeLists.txt"
   File.open("CMakeLists.txt", "w") do |cmakelist|
     cmakelist << content

@@ -1,5 +1,6 @@
 ;; .emacs - Lars Christensen <larsch@belunktum.dk>
 
+(setq w32-get-true-file-attributes nil)
 (add-to-list 'load-path "~/.elisp")
 
 					;(defun maximize-window ()
@@ -76,7 +77,7 @@
 (global-set-key "\M-p" 'jump-up)
 (global-set-key "\M-n" 'jump-down)
 
-					; avoid emacs being minimized when i press C-z
+;; avoid emacs being minimized when i press C-z
 (global-unset-key "\C-z")
 (global-set-key "\C-cg" 'goto-line)
 (global-set-key "\C-ct" 'todo-show)
@@ -410,7 +411,6 @@
       (setq exec-path (cons "C:/Program Files/erl5.8/bin" exec-path))
       (require 'erlang-start)))
 
-
 (defun get-closest-pathname (&optional (file "Makefile"))
   (interactive)
   "Determine the pathname of the first instance of FILE starting from the current directory towards root.
@@ -424,3 +424,4 @@ of FILE in the current directory, suitable for creation"
 		       return d
 		       if (equal d root)
 		       return nil))))
+(require 'vc-git)

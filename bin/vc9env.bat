@@ -1,1 +1,4 @@
-@call "%ProgramFiles%\Microsoft Visual Studio 9.0\VC\bin\vcvars32.bat"
+@call "%VS90COMNTOOLS%\vsvars32.bat"
+@title vc9env
+@color 3f
+
