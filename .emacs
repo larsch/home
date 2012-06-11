@@ -361,10 +361,10 @@
   (compile "make"))
 (global-set-key [C-return] 'compile-makefile-buffer)
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
  '(inhibit-startup-screen t)
  '(org-agenda-files (quote ("~/org/bre_test_workshop.org" "~/org/org.org"))))
 
@@ -403,3 +403,10 @@
       (require 'erlang-start)))
 
 (require 'vc-git)
+(custom-set-faces
+  ;; custom-set-faces was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(font-lock-comment-delimiter-face ((default (:inherit font-lock-comment-face :foreground "Firebrick")) (((class color) (min-colors 16)) nil)))
+ '(font-lock-comment-face ((((class color) (min-colors 88) (background light)) (:foreground "Firebrick" :slant italic)))))
