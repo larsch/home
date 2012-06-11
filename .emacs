@@ -190,6 +190,19 @@
 (global-set-key "\C-cr" 'run-buffer)
 (global-set-key [f5] 'run-buffer)
 
+(defun google-word-at-point ()
+  "Google word at point"
+  (interactive)
+  (browse-url (concat "http://google.com/search?q=" (thing-at-point 'word))))
+
+(defun google-feeling-lucky-word-at-point ()
+  "Google word at point"
+  (interactive)
+  (browse-url (concat "http://google.com/search?q=" (thing-at-point 'word) "&btnI")))
+
+(global-set-key [f1] 'google-word-at-point)
+(global-set-key [C-f1] 'google-feeling-lucky-word-at-point)
+
 ;; mode local settings
 (defun setup-c++-mode () "Setups Custom C++ mode settings" (interactive)
   (set 'comment-column 35)
@@ -425,3 +438,18 @@ of FILE in the current directory, suitable for creation"
 		       if (equal d root)
 		       return nil))))
 (require 'vc-git)
+
+
+(add-to-list
+ 'compilation-error-regexp-alist-alist
+ '(gcc-include-col
+   "^\\(?:In file included \\|                 \\|\t\\)from \
+\\(.+\\):\\([0-9]+\\):\\([0-9]+\\)\\(?:\\(:\\)\\|\\(,\\|$\\)\\)?" 1 2 3 (4 . 5)))
+
+
+;; the only system i want to support compiler output from is VMS
+(setq compilation-error-regexp-systems-list (list 'vms))
+
+(add-to-list
+ 'compilation-error-regexp-alist
+ 'gcc-include-col)
