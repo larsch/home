@@ -23,6 +23,7 @@
 
 ;; Convenient buffer menu
 (global-set-key "\C-x\C-b" 'electric-buffer-list)
+(setq split-width-threshold 'nil)
 
 ;; ibs - MSVC like Ctrl-TAB buffer cycling
 ;; http://www.geekware.de/software/emacs/
@@ -105,6 +106,8 @@
 ;; Programming Modes
 ;;
 
+(add-to-list 'auto-mode-alist '("\\.y$" . text-mode))
+
 ;; ruby-mode
 (autoload 'ruby-mode "ruby-mode")
 (add-to-list 'auto-mode-alist '("\\.rbw?$" . ruby-mode))
@@ -166,6 +169,7 @@
    (c-offsets-alist . ((inline-open . 0)
                        (statement-case-open . +)
                        (inextern-lang . 0)
+		       (innamespace . 0)
                        ))))
 
 					; (shell-command (concat "ruby c:/user/lac/bin/jumptovc.rb " (buffer-name)))
@@ -186,6 +190,19 @@
 (global-set-key "\C-cr" 'run-buffer)
 (global-set-key [f5] 'run-buffer)
 
+(defun google-word-at-point ()
+  "Google word at point"
+  (interactive)
+  (browse-url (concat "http://google.com/search?q=" (thing-at-point 'symbol))))
+
+(defun google-feeling-lucky-word-at-point ()
+  "Google word at point"
+  (interactive)
+  (browse-url (concat "http://google.com/search?q=" (thing-at-point 'symbol) "&btnI")))
+
+(global-set-key [f1] 'google-word-at-point)
+(global-set-key [C-f1] 'google-feeling-lucky-word-at-point)
+
 ;; mode local settings
 (defun setup-c++-mode () "Setups Custom C++ mode settings" (interactive)
   (set 'comment-column 35)
@@ -196,7 +213,6 @@
   (local-set-key "\M-h" 'hs-hide-block)
   (local-set-key "\M-s" 'hs-show-block)
   (local-set-key "\M-]" 'toggle-source-header)
-  (make-local-variable 'compile-command)
   (if (string-equal "c:/user/gh/bps/tools/rncsim" (substring (buffer-file-name) 0 27))
       (set 'compile-command "msdev rncsim.dsw /make \"rncsim - win32 debug\""))
   (if (string-equal "c:/user/gh/bps/impl" (substring (buffer-file-name) 0 19))
@@ -317,10 +333,16 @@
 
 (global-set-key [M-up] 'find-tag-other-window)
 
+;; (defun my-build () "mybuild"
+;;   (interactive)
+;;   (save-some-buffers 1)
+;;   (compile "mingw32-make"))
 (defun my-build () "mybuild"
   (interactive)
-  (compile "mingw32-make"))
+  (save-some-buffers 1)
+  (compile compile-command))
 (global-set-key [f7] 'my-build)
+(global-set-key [f8] 'next-error)
 
 
 (defun my-run () "mybuild"
@@ -403,6 +425,7 @@
       (require 'erlang-start)))
 
 (require 'vc-git)
+
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
@@ -410,3 +433,33 @@
   ;; If there is more than one, they won't work right.
  '(font-lock-comment-delimiter-face ((default (:inherit font-lock-comment-face :foreground "Firebrick")) (((class color) (min-colors 16)) nil)))
  '(font-lock-comment-face ((((class color) (min-colors 88) (background light)) (:foreground "Firebrick" :slant italic)))))
+
+(defun get-closest-pathname (&optional (file "Makefile"))
+  (interactive)
+  "Determine the pathname of the first instance of FILE starting from the current directory towards root.
+This may not do the correct thing in presence of links. If it does not find FILE, then it shall return the name
+of FILE in the current directory, suitable for creation"
+  (let ((root (expand-file-name "/"))) ; the win32 builds should translate this correctly
+    (expand-file-name file
+		      (loop 
+		       for d = default-directory then (expand-file-name ".." d)
+		       if (file-exists-p (expand-file-name file d))
+		       return d
+		       if (equal d root)
+		       return nil))))
+(require 'vc-git)
+
+
+(add-to-list
+ 'compilation-error-regexp-alist-alist
+ '(gcc-include-col
+   "^\\(?:In file included \\|                 \\|\t\\)from \
+\\(.+\\):\\([0-9]+\\):\\([0-9]+\\)\\(?:\\(:\\)\\|\\(,\\|$\\)\\)?" 1 2 3 (4 . 5)))
+
+
+;; the only system i want to support compiler output from is VMS
+(setq compilation-error-regexp-systems-list (list 'vms))
+
+(add-to-list
+ 'compilation-error-regexp-alist
+ 'gcc-include-col)
