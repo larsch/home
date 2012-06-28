@@ -1,40 +1,44 @@
 ;; .emacs - Lars Christensen <larsch@belunktum.dk>
 
-(setq w32-get-true-file-attributes nil)
+;; Personal elisp files
 (add-to-list 'load-path "~/.elisp")
 
-					;(defun maximize-window ()
-					;  ""
-					;  (interactive)
-					;  (w32-send-sys-command #xf030))
-;; (global-set-key [(meta f8)] 'maximize-window)
-					; (maximize-window)
+(require 'vc-git)
+(require 'iedit)
 
-;;
-;; general
-;;
+;; Work-around for slow-downs
+(setq w32-get-true-file-attributes nil)
 
+;; Shortcut to maximize window on Windows
+(defun maximize-window ()
+  ""
+  (interactive)
+  (w32-send-sys-command #xf030))
+(global-set-key [(meta f8)] 'maximize-window)
+;; (maximize-window)
+
+;; Server mode
 (require 'server)
 (defun server-ensure-safe-dir (dir) "Noop" t)
 (server-start)
 
-(setq make-backup-files 'nil)		; real men don't take backups
-(setq vc-cvs-stay-local 'nil) 		; ditto -- WTF!?
+(setq make-backup-files nil)		; real men don't take backups
+(setq vc-cvs-stay-local nil) 		; ditto
+(setq vc-annotate-color-map nil)	; No annotate color
+(setq vc-annotate-background nil)	; No annotate color
+(column-number-mode 't)			; Column numbers always
 
-;; Convenient buffer menu
 (global-set-key "\C-x\C-b" 'electric-buffer-list)
+(global-set-key "\C-c\C-c" 'comment-dwim)
 (setq split-width-threshold 'nil)
 
 ;; ibs - MSVC like Ctrl-TAB buffer cycling
 ;; http://www.geekware.de/software/emacs/
-(require 'ibs)
-					;(global-set-key [C-tab] 'next-buffer)
-					;(global-set-key [C-S-tab] 'previous-buffer)
+;; (require 'ibs)
+;; (global-set-key [C-tab] 'next-buffer)
+;; (global-set-key [C-S-tab] 'previous-buffer)
 
-;; Enable column-number-mode always
-(column-number-mode 't)
-
-;; enable grep under windows
+;; Enable grep under windows
 (setq grep-command "grep -n ")
 (setq grep-null-device "nul")
 
@@ -44,25 +48,22 @@
 (setq recentf-max-menu-items 500)
 (global-set-key "\C-x\C-r" 'recentf-open-files)
 
-;; revert my buffers when they change on disk
+;; Auto-revert my buffers when they change on disk
 (global-auto-revert-mode 1)
 
-;; revert all unedited files without asking
+;; Revert all unedited files without asking
 (setq revert-without-query ".*")
 
 ;; Visual settings
-(blink-cursor-mode 'nil)		;; stop blinking !
-(global-font-lock-mode 't)		;; highlighting always
-(menu-bar-mode 0)			;; remove useless feature
-(tool-bar-mode 0)			;; remove useless feature
-(set 'show-paren-delay 0.05)		;; Reduce the delay for showing matching parens
-(setq frame-title-format "%b - Emacs")	;; Show filename first in title bar
-(scroll-bar-mode 't)
-(setq mouse-wheel-progressive-speed 'nil)
-
-;;
-;; custom bindings
-;;
+(blink-cursor-mode 0)       		; stop blinking !
+(global-font-lock-mode 't)		; highlighting always
+(menu-bar-mode 0)			; remove useless feature
+(tool-bar-mode 0)			; remove useless feature
+(set 'show-paren-delay 0.05)		; Reduce the delay for showing matching parens
+(setq frame-title-format "%b - Emacs")	; Show filename first in title bar
+(scroll-bar-mode 't)			; Keep scroll bar
+(setq mouse-wheel-progressive-speed 'nil) ; No scroll acceleration
+(show-paren-mode 't)
 
 ;; Convinient buffer navigation that returns to same position if you
 ;; go down  and up X.
@@ -77,17 +78,16 @@
 (global-set-key "\M-p" 'jump-up)
 (global-set-key "\M-n" 'jump-down)
 
-;; avoid emacs being minimized when i press C-z
-(global-unset-key "\C-z")
-(global-set-key "\C-cg" 'goto-line)
-(global-set-key "\C-ct" 'todo-show)
-(global-set-key [?\C-.] 'kill-this-buffer)
+(global-unset-key "\C-z")		; dont minimize on C-z
+(global-set-key "\C-cg" 'goto-line)    	; goto-line
+(global-set-key "\C-ct" 'todo-show)	; todo-show
+(global-set-key [?\C-.] 'kill-this-buffer) ; quick buffer killing
 (global-set-key "\C-cs" 'shell)		; shell mode shortcut
 (global-set-key "\C-cc" 'compile)	; compile shortcut
-(global-set-key "\C-cn" 'next-error)
+(global-set-key "\C-cn" 'next-error)	; Jump to next error
 
 ;; fly-make
-(autoload 'flymake-mode "flymake" "Flymake editing mode" t)
+;; (autoload 'flymake-mode "flymake" "Flymake editing mode" t)
 
 ;; Put tag under cursor in kill ring for easy yanking (requires etags
 ;; to be loaded)
@@ -97,10 +97,6 @@
   (kill-new (find-tag-default)))
 (global-set-key "\M-c" 'kill-word-under-cursor)
 
-;; Version Control
-					;(setq vc-cvs-stay-local nil)		;; Run locally whenever possible. Speeds up things.
-					;(set 'vc-annotate-color-map nil)	;; Default cvs annotate colours are awful... remove them.
-					;(set 'vc-annotate-background nil)	;; Default cvs annotate colours are awful... remove them.
 
 ;; 
 ;; Programming Modes
@@ -190,49 +186,32 @@
 (global-set-key "\C-cr" 'run-buffer)
 (global-set-key [f5] 'run-buffer)
 
-(defun google-word-at-point ()
+;; Google stuff 
+(defun google-symbol-at-point ()
   "Google word at point"
   (interactive)
-  (browse-url (concat "http://google.com/search?q=" (thing-at-point 'word))))
-
-(defun google-feeling-lucky-word-at-point ()
+  (browse-url (concat "http://google.com/search?q=" (thing-at-point 'symbol))))
+(global-set-key [f1] 'google-symbol-at-point)
+(defun google-feeling-lucky-symbol-at-point ()
   "Google word at point"
   (interactive)
-  (browse-url (concat "http://google.com/search?q=" (thing-at-point 'word) "&btnI")))
+  (browse-url (concat "http://google.com/search?q=" (thing-at-point 'symbol) "&btnI")))
+(global-set-key [C-f1] 'google-feeling-lucky-symbol-at-point)
 
-(global-set-key [f1] 'google-word-at-point)
-(global-set-key [C-f1] 'google-feeling-lucky-word-at-point)
-
-;; mode local settings
+;; C/C++ Programming
 (defun setup-c++-mode () "Setups Custom C++ mode settings" (interactive)
   (set 'comment-column 35)
-  (set 'fill-column 70)		; default 70 gets a little crowded
-  (set 'indent-tabs-mode nil)		; dont use tabs
+  (set 'fill-column 70)
+  (set 'indent-tabs-mode nil)
   (local-set-key "\C-m" 'newline-and-indent)
-  (local-set-key "\C-cp" 'insert-private-copy-assign)
   (local-set-key "\M-h" 'hs-hide-block)
   (local-set-key "\M-s" 'hs-show-block)
   (local-set-key "\M-]" 'toggle-source-header)
-  (if (string-equal "c:/user/gh/bps/tools/rncsim" (substring (buffer-file-name) 0 27))
-      (set 'compile-command "msdev rncsim.dsw /make \"rncsim - win32 debug\""))
-  (if (string-equal "c:/user/gh/bps/impl" (substring (buffer-file-name) 0 19))
-      (set 'compile-command "msdev c:\\user\\gh\\bps\\impl\\samples\\console\\console.dsw /make \"console - win32 debug\""))
-  (show-paren-mode 't)
-  )
+  (c-toggle-hungry-state 1))
 (set 'c++-mode-hook 'setup-c++-mode)
 (set 'c-mode-hook 'setup-c++-mode)
-
-(global-set-key "\C-c\C-c" 'comment-region)
-
-;; Hungry deletion (deletes all continuos whitespace)
-(add-hook 'c-mode-common-hook (lambda () (c-toggle-hungry-state 1)))
-;; Don't insert tabs when indenting
-(add-hook 'c-mode-common-hook (lambda () (setq indent-tabs-mode nil)))
-
-;; completion: Case is significant.
-(setq dabbrev-case-fold-search nil)
-;; completion: comlete only symbols (avoids completing & or *)
-(setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_")
+(setq dabbrev-case-fold-search nil) ; case sensitive expansion
+(setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_") ; complete only symbols (avoids completing & or *)
 
 ;; Handy diff function which opens a diff between current file and cvs
 ;; version. Bound to C-c d.
@@ -253,17 +232,29 @@
 (defun insert-braces ()
   "Insert matching curly braces"
   (interactive)
+  (if (region-active-p) (insert-braces-region) (insert-braces-point)))
+(defun insert-braces-point () "Insert matching curly braces at point" (interactive)
   (set-mark-command 'nil)
   (insert "{\n\n}")
   (indent-region (- (line-beginning-position) 3) (line-end-position) nil)
   (previous-line 1)
   (c-indent-command))
+(defun insert-braces-region () "Insert matching curly braces around region" (interactive)
+  (let ((beginning (region-beginning))
+	(end (region-end)))
+    (goto-char end)
+    (insert "}\n")
+    (goto-char beginning)
+    (insert "{\n")
+    (indent-region (- beginning 2) (+ end 4))
+    (c-indent-command)
+    ))
 (global-set-key "\M-{" 'insert-braces)
 
 ;; M-[ keybinding to inserts matching brackets, indents the lines and
 ;; moves the cursor in between.
 (defun insert-brackets ()
-  "Insert matching curly brackets"
+  "Insert matching square brackets"
   (interactive)
   (set-mark-command 'nil)
   (insert "[]")
@@ -271,22 +262,14 @@
 (global-set-key "\M-[" 'insert-brackets)
 
 ;; Toggle Source and Header File (.cpp <-> .h)
-
-;; Default extension for c++ header files.
 (defvar c++-default-header-ext "hpp")
-;; Default extension for c++ source files.
 (defvar c++-default-source-ext "cpp")
-;; Default regexp for c++ header files.
 (defvar c++-header-ext-regexp "\\.\\(hpp\\|h\\|\hh\\|H\\)$")
-;; Default regexp for c++ source files.
 (defvar c++-source-ext-regexp "\\.\\(cpp\\|c\\|\cc\\|C\\)$")
-;; Default regexp for includes
 (defvar project-c++-include-regexp "#include[ \t]+\\(\\(<[^>]*>\\)\\|\\(\"[^\"]*\"\\)\\)[ \t]*\n")
-;; Default regexp for class declarations
 (defvar project-c++-class-decl-regexp "class[ \t]+\\([A-Za-z][A-Za-z0-9_]*\\);[ \t]*\n")
 (defvar c++-source-extension-list '("c" "cc" "C" "cpp" "c++"))
 (defvar c++-header-extension-list '("h" "hh" "H" "hpp"))
-
 (defun toggle-source-header()
   "Switches to the source buffer if currently in the header buffer and vice versa."
   (interactive)
@@ -322,57 +305,53 @@
               (if ok
                   (find-file (concat file "." ext)))))))))
 
-;;
 ;; Fly-make
-;;
+;; (require 'compile)
+;; (require 'flymake)
+;; (defun flymake-get-make-cmdline (source base-dir)
+;;   (list "mingw32-make" (list "-s" "-C" base-dir (concat "CHK_SOURCES=" source) "SYNTAX_CHECK_MODE=1" "check-syntax"))) 
 
-(require 'compile)
-(require 'flymake)
-(global-set-key [f4] 'flymake-goto-next-error)
-(global-set-key [M-down] 'flymake-display-err-menu-for-current-line)
+;; (global-set-key [f4] 'flymake-goto-next-error)
+;; (global-set-key [M-down] 'flymake-display-err-menu-for-current-line)
+;; (global-set-key [M-up] 'find-tag-other-window)
 
-(global-set-key [M-up] 'find-tag-other-window)
+;; (defun flymake-get-mingw32-make-cmdline (source base-dir)
+;;   (list "mingw32-make"
+;; 	(list "-s"
+;; 	      "-C"
+;; 	      base-dir
+;; 	      (concat "CHK_SOURCES=" source)
+;; 	      "SYNTAX_CHECK_MODE=1"
+;; 	      "check-syntax")))
 
-;; (defun my-build () "mybuild"
-;;   (interactive)
-;;   (save-some-buffers 1)
-;;   (compile "mingw32-make"))
-(defun my-build () "mybuild"
+
+;; (defun flymake-simple-mingw32-make-init ()
+;;   (flymake-simple-make-init-impl 'flymake-create-temp-inplace t t "Makefile" 'flymake-get-mingw32-make-cmdline)) 
+;; (add-to-list 'flymake-allowed-file-name-masks '("\\.\\(?:c\\(?:pp\\|xx\\|\\+\\+\\)?\\|CC\\)\\'" flymake-simple-mingw32-make-init))
+
+;; (defun flymake-master-mingw32-make-header-init ()
+;;   (flymake-master-mingw32-make-init
+;;    'flymake-get-include-dirs
+;;    '("\\.\\(?:c\\(?:pp\\|xx\\|\\+\\+\\)?\\|CC\\)\\'")
+;;    "[ \t]*#[ \t]*include[ \t]*\"\\([[:word:]0-9/\\_.]*%s\\)\""))
+;; (add-to-list 'flymake-allowed-file-name-masks '("\\.h\\'" flymake-master-mingw32-make-header-init flymake-master-cleanup))
+
+;; (add-hook 'find-file-hook 'flymake-find-file-hook)
+
+;; Compile without prompting
+(defun compile-no-prompt () "mybuild"
   (interactive)
   (save-some-buffers 1)
   (compile compile-command))
-(global-set-key [f7] 'my-build)
+(global-set-key [f7] 'compile-no-prompt)
 (global-set-key [f8] 'next-error)
 
-
-(defun my-run () "mybuild"
-  (interactive)
-  (compile "mingw32-make run"))
-(global-set-key [f5] 'my-run)
-
-;;
 ;; Insert date/time function
-;;
-
 (defun insert-date-time ()
   "Insert date and time at the current cursor position"
   (interactive)
   (insert (format-time-string "%Y/%m/%d %H:%M")))
 (global-set-key [f5] 'insert-date-time)
-
-;; Experiment with colorizing operators
-					;(let ((c-font-lock-extras
-					;       '(
-					;	 ;; assignment operators:
-					;	 ("->" . font-lock-warning-face)
-					;	 ("[-+*/%&^|]=" . font-lock-warning-face)       ; -= += *= %= &= ^= |=
-					;	 ("\\(>>\\|<<\\)=" . font-lock-warning-face)    ; <<= >>=
-					;	 ("[<>!=]=" . 'default)                         ; <= >= != ==
-					;	 ("=\\|\\+\\+\\|--" . font-lock-warning-face)   ; = ++ --
-					;	 ("[+-/*.!~^|&{};:?()<>]" . font-lock-warning-face)
-					;	 )))
-					;  (font-lock-add-keywords 'c-mode c-font-lock-extras)
-					;  (font-lock-add-keywords 'c++-mode c-font-lock-extras))
 
 ;; More convinent way to call make (find an open Makefile buffer and
 ;; runs make)
@@ -390,66 +369,19 @@
  '(inhibit-startup-screen t)
  '(org-agenda-files (quote ("~/org/bre_test_workshop.org" "~/org/org.org"))))
 
-;;
 ;; org-mode
-;;
-(require 'org-install)
-(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
-(define-key global-map "\C-cl" 'org-store-link)
-(define-key global-map "\C-ca" 'org-agenda)
-(setq org-log-done t)
-(defun find-default-org ()
-  (interactive)
-  (find-file "~/org/default.org"))
-(global-set-key [f12] 'find-default-org)
+;; (require 'org-install)
+;; (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+;; (define-key global-map "\C-cl" 'org-store-link)
+;; (define-key global-map "\C-ca" 'org-agenda)
+;; (setq org-log-done t)
+;; (defun find-default-org ()
+;;   (interactive)
+;;   (find-file "~/org/default.org"))
+;; (global-set-key [f12] 'find-default-org)
 
-;;
 ;; CMake
-;;
-(require 'cmake-mode)
 (setq auto-mode-alist
       (append '(("CMakeLists\\.txt\\'" . cmake-mode)
 		("\\.cmake\\'" . cmake-mode))
 	      auto-mode-alist))
-
-;;
-;; Erlang
-;;
-(if (file-exists-p "C:/Program Files/erl5.8")
-    '((set 'max-specpdl-size 2000)
-      (set 'max-lisp-eval-depth 1000)
-      (setq load-path (cons  "C:/Program Files/erl5.8/lib/tools-2.6.6/emacs"
-			     load-path))
-      (setq erlang-root-dir "C:/Program Files/erl5.8")
-      (setq exec-path (cons "C:/Program Files/erl5.8/bin" exec-path))
-      (require 'erlang-start)))
-
-(defun get-closest-pathname (&optional (file "Makefile"))
-  (interactive)
-  "Determine the pathname of the first instance of FILE starting from the current directory towards root.
-This may not do the correct thing in presence of links. If it does not find FILE, then it shall return the name
-of FILE in the current directory, suitable for creation"
-  (let ((root (expand-file-name "/"))) ; the win32 builds should translate this correctly
-    (expand-file-name file
-		      (loop 
-		       for d = default-directory then (expand-file-name ".." d)
-		       if (file-exists-p (expand-file-name file d))
-		       return d
-		       if (equal d root)
-		       return nil))))
-(require 'vc-git)
-
-
-(add-to-list
- 'compilation-error-regexp-alist-alist
- '(gcc-include-col
-   "^\\(?:In file included \\|                 \\|\t\\)from \
-\\(.+\\):\\([0-9]+\\):\\([0-9]+\\)\\(?:\\(:\\)\\|\\(,\\|$\\)\\)?" 1 2 3 (4 . 5)))
-
-
-;; the only system i want to support compiler output from is VMS
-(setq compilation-error-regexp-systems-list (list 'vms))
-
-(add-to-list
- 'compilation-error-regexp-alist
- 'gcc-include-col)
