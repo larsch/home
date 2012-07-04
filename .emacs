@@ -385,3 +385,34 @@
       (append '(("CMakeLists\\.txt\\'" . cmake-mode)
 		("\\.cmake\\'" . cmake-mode))
 	      auto-mode-alist))
+
+;; Auto-Insert
+(require 'autoinsert)
+(auto-insert-mode)
+(setq auto-insert-directory "~/.autoinsert/")
+(setq auto-insert-query nil)
+(setq auto-insert-alist
+      '(
+	("\\.cpp$" . ["template.cpp" auto-update-source-file])
+	("\\.h$"   . ["template.h" auto-update-source-file])
+	("\\.c$" . ["template.c" auto-update-source-file])
+	))
+
+(defun auto-update-source-file ()
+	 (save-excursion
+	   (while (search-forward "%guard%" nil t)
+	     (save-restriction
+	       (narrow-to-region (match-beginning 0) (match-end 0))
+	       (replace-match (concat "_" (downcase (file-name-nondirectory buffer-file-name))))
+	       (subst-char-in-region (point-min) (point-max) ?. ?_)
+	       ))
+	   (while (search-forward "%module%" nil t)
+	     (save-restriction
+	       (narrow-to-region (match-beginning 0) (match-end 0))
+	       (replace-match (file-name-sans-extension (file-name-nondirectory buffer-file-name)))
+	       )
+	     )
+	   )
+	 ;; Move cursor to %point%
+	 (while (search-forward "%point%" nil t) (replace-match ""))
+	 )
