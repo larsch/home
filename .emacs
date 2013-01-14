@@ -51,7 +51,7 @@
 (setq revert-without-query ".*")
 
 ;; Visual settings
-(blink-cursor-mode 'nil)		;; stop blinking !
+(blink-cursor-mode 0)	                ;; stop blinking !
 (global-font-lock-mode 't)		;; highlighting always
 (menu-bar-mode 0)			;; remove useless feature
 (tool-bar-mode 0)			;; remove useless feature
@@ -108,6 +108,10 @@
 
 (add-to-list 'auto-mode-alist '("\\.y$" . text-mode))
 
+(defun install-before-save-hook ()
+  (interactive)
+  (add-hook 'before-save-hook 'update-copyright))
+
 ;; ruby-mode
 (autoload 'ruby-mode "ruby-mode")
 (add-to-list 'auto-mode-alist '("\\.rbw?$" . ruby-mode))
@@ -116,6 +120,7 @@
 (set 'ruby-deep-arglist 'nil)
 (set 'ruby-deep-indent-paren 'nil)
 (set 'ruby-deep-indent-paren-style 'nil)
+(add-hook 'ruby-mode-hook 'install-before-save-hook)
 
 ;; javascript-mode
 (autoload 'javascript-mode "javascript" nil t)
@@ -136,6 +141,7 @@
 
 ;; c-mode for ttcn3 source
 (add-to-list 'auto-mode-alist '("\\.tt3$" . c-mode))
+(add-to-list 'auto-mode-alist '("\\.shader$" . c-mode))
 
 ;; c++-mode for .h files
 (add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
@@ -463,3 +469,70 @@ of FILE in the current directory, suitable for creation"
 (add-to-list
  'compilation-error-regexp-alist
  'gcc-include-col)
+
+(require 'iedit)
+
+
+(require 'autoinsert)
+(setq auto-insert-query nil)
+(auto-insert-mode)
+(setq auto-insert-directory (expand-file-name "~/.autoinsert/"))
+(setq auto-insert-alist
+      '(
+	("\\.cpp$" . ["template.cpp"])
+	("\\.c$" . ["template.c"])
+	("\\.h$" . ["template.h" auto-update-header-file])
+	))
+
+(defun auto-update-header-file ()
+	 (save-excursion
+	   (while (search-forward "@@@" nil t)
+	     (save-restriction
+	       (narrow-to-region (match-beginning 0) (match-end 0))
+	       (replace-match (concat "_" (downcase (file-name-nondirectory buffer-file-name))))
+	       (subst-char-in-region (point-min) (point-max) ?. ?_)
+	       ))
+	   )
+	 ;; Move cursor to $$$ mark
+	 (while (search-forward "$$$" nil t) (replace-match ""))
+	 )
+
+; (add-hook 'find-file-hook 'auto-insert)
+;; (setq auto-insert-alist
+;;       '(
+;; 	("\\.cpp$" . ["insert.cpp"])))
+;; ; (setq auto-insert 'other)
+
+;; (setq auto-insert-alist '((c++-mode . "Hello, World!")))
+
+(defun restyle-buffer ()
+  (save-excursion
+    (shell-command (concat "m:/gh/it/bin/w32/ghrestyle.rb " (buffer-file-name)))
+    (revert-buffer t t t)
+  ))
+
+(defun install-restyle-hook ()
+  (add-hook 'after-save-hook 'restyle-buffer))
+
+(add-hook 'c++-mode-hook 'install-restyle-hook)
+(add-hook 'c-mode-hook 'install-restyle-hook)
+
+(set 'copyright-regexp "Copyright [^ ]+ \\([[:digit:]]+\\)\\(-[[:digit:]]+\\)? by GateHouse")
+(defun find-copyright ()
+  (interactive)
+  (search-forward-regexp copyright-regexp))
+
+(defun update-copyright ()
+  (interactive)
+  (save-excursion
+    (replace-regexp
+     copyright-regexp
+     (concat "Copyright (C) \\1-" (format-time-string "%Y" (current-time)) " by GateHouse")
+     nil
+     (point-min)
+     (point-max)
+     )))
+
+
+  ;;  
+  ;; ))
