@@ -1,7 +1,0 @@
-[user]
-	name = Lars Christensen
-	email = larsch@belunktum.dk
-[core]
-	excludesfile = ~/.gitignore_global
-[push]
-	default = simple
