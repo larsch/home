@@ -22,22 +22,22 @@ def readb(path)
     f.read
   end
 end
+def writeb(path, content)
+  File.open(path, "wb") do |f|
+    f.write(content)
+  end
+end
 
 class CompressedDB
   def initialize(db)
     @db = db
-    @dictionary = readb("cm/acc/adapl/regm/regmf.cpp")
   end
   def [](key)
     value = @db[key]
     return value && Zlib::Inflate.inflate(value)
   end
   def []=(key, value)
-    deflate = Zlib::Deflate.new
-    #deflate.set_dictionary(@dictionary)
-    @db[key] = deflate.deflate(value, Zlib::FULL_FLUSH)
-    fl = deflate.flush
-    deflate.close
+    @db[key] = Zlib::Deflate.deflate(value)
   end
   def has_key?(key)
     @db.has_key?(key)
@@ -57,22 +57,18 @@ def store_tree
     @db[digest] = readb(path) unless @db.has_key?(digest)
     list << [path, digest]
   end
-  tree = {
-    list: list,
-    time: Time.now,
-    parent: @db[Dir.pwd]
-  }
-  treem = Marshal.dump(tree)
-  treedigest = Digest::SHA1.digest(treem)
-  @db[treedigest] = treem
-  @db[Dir.pwd] = treedigest
-  return treedigest, tree
+  tree = { list: list, time: Time.now, parent: @db[Dir.pwd] }
+  tree_dump = Marshal.dump(tree)
+  tree_digest = Digest::SHA1.digest(tree_dump)
+  @db[tree_digest] = tree_dump
+  @db[Dir.pwd] = tree_digest
+  return tree_digest, tree
 end
 
-def load_tree(tag)
-  treem = @db[tag]
-  raise "\"#{tag}\" not found" if treem.nil?
-  return Marshal.load(m)
+def load_tree(tree_digest)
+  tree_dump = @db[tree_digest]
+  raise "\"#{tag}\" not found" if tree_dump.nil?
+  return Marshal.load(tree_dump)
 end
 
 def tree_delta(tree1, tree2)
@@ -98,6 +94,12 @@ def tree_delta(tree1, tree2)
   tree2.each { |e| yield "-", e }
 end
 
+def lookup_tag(tag)
+  digest = @db[tag]
+  raise "Tag \"#{tag}\" not found" if digest.nil?
+  return digest
+end
+
 digest, tree = store_tree
 while arg = ARGV.shift
   case arg
@@ -106,15 +108,27 @@ while arg = ARGV.shift
     @db[tag] = digest
   when 'status'
     tag = ARGV.shift
-    digest = @db[tag]
-    raise "\"#{tag}\" not found" if digest.nil?
-    otree = load_tree(digest)
-    tree_delta(tree[:list], otree[:list]) do |a, e1, e2|
+    digest = lookup_tag(tag)
+    tagged_tree = load_tree(digest)
+    tree_delta(tree[:list], tagged_tree[:list]) do |a, e1, e2|
       puts "#{a} #{e1.first}"
     end
   when 'restore'
     tag = ARGV.shift
-    otree = load_tree(@db[tag])
+    digest = lookup_tag(tag)
+    tagged_tree = load_tree(digest)
+    tree_delta(tree[:list], tagged_tree[:list]) do |a, e1, e2|
+      case a
+      when "M"
+        writeb(e2.first, @db[e2.last])
+      when "+"
+        writeb(e1.first, @db[e1.last])
+      when "-"
+        File.unlink(e1.first)
+      end
+        
+      puts "#{a} #{e1.first}"
+    end
   else
     puts "Unknown command '#{arg}'"
   end
