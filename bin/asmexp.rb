@@ -16,7 +16,7 @@ class Comp < Wx::Frame
     super(nil, 0, "Assembly explorer", Wx::DEFAULT_POSITION, Wx::Size.new(800, 600))
     sizer = Wx::FlexGridSizer.new(1, 3)
     sizer.add_growable_row(0)
-    sizer.add_growable_row(2)
+    sizer.add_growable_row(4)
     sizer.add_growable_col(0)
     sizer.add_growable_col(1)
     text = "float f(float a) {\n  return a * 2.32323;\n}"
@@ -28,6 +28,15 @@ class Comp < Wx::Frame
     setup_sci
     sizer.add(@code, 1, Wx::EXPAND)
 
+    @b1 = Wx::RadioButton.new(self, 30, "GCC -S")
+    @b1.set_value(true)
+    sizer.add(@b1, 0)
+    evt_radiobutton(@b1) { |ev| @timer.start(1, true) }
+    
+    @b2 = Wx::RadioButton.new(self, 31, "GCC && objdump")
+    sizer.add(@b2, 0)
+    evt_radiobutton(@b2) { |ev| @timer.start(1, true) }
+
     @flags = Wx::TextCtrl.new(self, 1, "-masm=intel -O2")
     @flags.font = @font
     sizer.add(@flags, 1, Wx::EXPAND)
@@ -38,9 +47,8 @@ class Comp < Wx::Frame
     
     sizer.add(@assembly, 7, Wx::EXPAND)
     self.sizer = sizer
-    evt_stc_change(@code) { |*a|
-      @timer.start(500, true)
-    }
+    evt_stc_change(@code) { |*a|  @timer.start(500, true) }
+    evt_stc_key(@code) { @timer.start(500, true) }
     @timer = Wx::Timer.new(self)
     @error_list = {}
 
@@ -49,10 +57,18 @@ class Comp < Wx::Frame
       File.open("temp.cpp", "wb") { |f| f.write(text) }
       errors = nil
       begin
-        Open3.popen3("gcc -S #{@flags.value} -o - temp.cpp") { |input, output, error, id|
-          errors = error.read
-          @assembly.text = output.read + errors
-        }
+        if @b1.get_value
+          Open3.popen3("gcc #{@flags.value} -o - -S temp.cpp") { |input, output, error, id|
+            errors = error.read
+            @assembly.text = output.read + errors
+          }
+        elsif @b2.get_value
+          system("gcc #{@flags.value} -c temp.cpp")
+          Open3.popen3("objdump -d temp.o") { |input, output, error, id|
+            errors = error.read
+            @assembly.text = output.read + errors
+          }
+        end
       rescue Exception => e
         message = "#{e.backtrace.first}: #{e.message} (#{e.class})"
         message = [message,*e.backtrace[1..-1]].join("\n\t")
@@ -103,7 +119,9 @@ class Comp < Wx::Frame
       @assembly.call_tip_cancel
     }
     
+    sizer.layout
     maximize(true)
+    sizer.layout
     
     # sizer.fit(self)
   end
