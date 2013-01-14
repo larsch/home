@@ -1,6 +1,7 @@
 .emacs.d
 bin/*.exe
 .*
+!.elisp
 archive
 test
 WikidPad.config
