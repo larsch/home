@@ -388,6 +388,11 @@
 (add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
 (autoload 'cmake-mode "cmake-mode")
 
+;; Batch files
+(autoload 'batch-mode "batch-mode")
+(add-to-list 'auto-mode-alist '("\\.bat\\'" . batch-mode))
+(add-to-list 'auto-mode-alist '("\\.cmd\\'" . batch-mode))
+
 ;; Auto-Insert
 (require 'autoinsert)
 (auto-insert-mode)
