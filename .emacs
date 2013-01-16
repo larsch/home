@@ -384,10 +384,9 @@
 ;; (global-set-key [f12] 'find-default-org)
 
 ;; CMake
-(setq auto-mode-alist
-      (append '(("CMakeLists\\.txt\\'" . cmake-mode)
-		("\\.cmake\\'" . cmake-mode))
-	      auto-mode-alist))
+(add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
+(add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
+(autoload 'cmake-mode "cmake-mode")
 
 ;; Auto-Insert
 (require 'autoinsert)
