@@ -91,7 +91,7 @@
 (global-set-key "\M-c" 'kill-word-under-cursor)
 
 
-;; 
+;;
 ;; Programming Modes
 ;;
 
@@ -99,17 +99,28 @@
 
 (defun install-before-save-hook ()
   (interactive)
-  (add-hook 'before-save-hook 'update-copyright))
+  (add-hook 'before-save-hook 'update-copyright)
+  (add-hook 'before-save-hook 'delete-trailing-whitespace))
 
 ;; ruby-mode
 (autoload 'ruby-mode "ruby-mode")
 (add-to-list 'auto-mode-alist '("\\.rbw?$" . ruby-mode))
 (add-to-list 'auto-mode-alist '("Rakefile$" . ruby-mode))
+(add-to-list 'auto-mode-alist '("Cakefile$" . ruby-mode))
 (add-to-list 'auto-mode-alist '("\\.rake$" . ruby-mode))
 (set 'ruby-deep-arglist 'nil)
 (set 'ruby-deep-indent-paren 'nil)
 (set 'ruby-deep-indent-paren-style 'nil)
 (add-hook 'ruby-mode-hook 'install-before-save-hook)
+
+(autoload 'run-ruby "inf-ruby"
+  "Run an inferior Ruby process")
+(autoload 'inf-ruby-keys "inf-ruby"
+  "Set local key defs for inf-ruby in ruby-mode")
+(add-hook 'ruby-mode-hook
+	  '(lambda ()
+	     (inf-ruby-keys)
+	     ))
 
 ;; javascript-mode
 (autoload 'javascript-mode "javascript" nil t)
@@ -185,7 +196,7 @@
 (global-set-key "\C-cr" 'run-buffer)
 (global-set-key [f5] 'run-buffer)
 
-;; Google stuff 
+;; Google stuff
 (defun google-symbol-at-point ()
   "Google word at point"
   (interactive)
@@ -312,7 +323,7 @@
 ;; (require 'compile)
 ;; (require 'flymake)
 ;; (defun flymake-get-make-cmdline (source base-dir)
-;;   (list "mingw32-make" (list "-s" "-C" base-dir (concat "CHK_SOURCES=" source) "SYNTAX_CHECK_MODE=1" "check-syntax"))) 
+;;   (list "mingw32-make" (list "-s" "-C" base-dir (concat "CHK_SOURCES=" source) "SYNTAX_CHECK_MODE=1" "check-syntax")))
 
 ;; (global-set-key [f4] 'flymake-goto-next-error)
 ;; (global-set-key [M-down] 'flymake-display-err-menu-for-current-line)
@@ -329,7 +340,7 @@
 
 
 ;; (defun flymake-simple-mingw32-make-init ()
-;;   (flymake-simple-make-init-impl 'flymake-create-temp-inplace t t "Makefile" 'flymake-get-mingw32-make-cmdline)) 
+;;   (flymake-simple-make-init-impl 'flymake-create-temp-inplace t t "Makefile" 'flymake-get-mingw32-make-cmdline))
 ;; (add-to-list 'flymake-allowed-file-name-masks '("\\.\\(?:c\\(?:pp\\|xx\\|\\+\\+\\)?\\|CC\\)\\'" flymake-simple-mingw32-make-init))
 
 ;; (defun flymake-master-mingw32-make-header-init ()
@@ -364,24 +375,6 @@
   (set-buffer "Makefile")
   (compile "make"))
 (global-set-key [C-return] 'compile-makefile-buffer)
-(custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- '(inhibit-startup-screen t)
- '(org-agenda-files (quote ("~/org/bre_test_workshop.org" "~/org/org.org"))))
-
-;; org-mode
-;; (require 'org-install)
-;; (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
-;; (define-key global-map "\C-cl" 'org-store-link)
-;; (define-key global-map "\C-ca" 'org-agenda)
-;; (setq org-log-done t)
-;; (defun find-default-org ()
-;;   (interactive)
-;;   (find-file "~/org/default.org"))
-;; (global-set-key [f12] 'find-default-org)
 
 ;; CMake
 (add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
@@ -425,12 +418,6 @@
 	 (while (search-forward "%point%" nil t) (replace-match ""))
 	 )
 
-; (add-hook 'find-file-hook 'auto-insert)
-;; (setq auto-insert-alist
-;;       '(
-;; 	("\\.cpp$" . ["insert.cpp"])))
-;; ; (setq auto-insert 'other)
-
 ;; (setq auto-insert-alist '((c++-mode . "Hello, World!")))
 
 (defun restyle-buffer ()
@@ -461,6 +448,76 @@
      (point-max)
      )))
 
+;; source: http://steve.yegge.googlepages.com/my-dot-emacs-file
+(defun rename-file-and-buffer (new-name)
+  "Renames both current buffer and file it's visiting to NEW-NAME."
+  (interactive "sNew name: ")
+  (let ((name (buffer-name))
+        (filename (buffer-file-name)))
+    (if (not filename)
+        (message "Buffer '%s' is not visiting a file!" name)
+      (if (get-buffer new-name)
+          (message "A buffer named '%s' already exists!" new-name)
+        (progn
+          (rename-file name new-name 1)
+          (rename-buffer new-name)
+          (set-visited-file-name new-name)
+          (set-buffer-modified-p nil))))))
 
-  ;;  
-  ;; ))
+;; source: http://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emacs
+(defun move-text-internal (arg)
+  (cond
+   ((and mark-active transient-mark-mode)
+    (if (> (point) (mark))
+        (exchange-point-and-mark))
+    (let ((column (current-column))
+          (text (delete-and-extract-region (point) (mark))))
+      (forward-line arg)
+      (move-to-column column t)
+      (set-mark (point))
+      (insert text)
+      (exchange-point-and-mark)
+      (setq deactivate-mark nil)))
+   (t
+    (let ((column (current-column)))
+      (beginning-of-line)
+      (when (or (> arg 0) (not (bobp)))
+        (forward-line)
+        (when (or (< arg 0) (not (eobp)))
+          (transpose-lines arg))
+        (forward-line -1))
+      (move-to-column column t)))))
+
+(defun move-text-down (arg)
+  "Move region (transient-mark-mode active) or current line
+  arg lines down."
+  (interactive "*p")
+  (move-text-internal arg))
+
+(defun move-text-up (arg)
+  "Move region (transient-mark-mode active) or current line
+  arg lines up."
+  (interactive "*p")
+  (move-text-internal (- arg)))
+
+(global-set-key [M-S-up] 'move-text-up)
+(global-set-key [M-S-down] 'move-text-down)
+
+(custom-set-variables
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(blink-cursor-mode nil)
+ '(column-number-mode t)
+ '(inhibit-startup-screen t)
+ '(org-agenda-files (quote ("~/org/bre_test_workshop.org" "~/org/org.org")))
+ '(show-paren-mode t)
+ '(tool-bar-mode nil))
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:family "Consolas" :foundry "outline" :slant normal :weight normal :height 98 :width normal)))))
