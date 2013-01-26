@@ -90,14 +90,13 @@
   (kill-new (find-tag-default)))
 (global-set-key "\M-c" 'kill-word-under-cursor)
 
-
 ;;
 ;; Programming Modes
 ;;
 
 (add-to-list 'auto-mode-alist '("\\.y$" . text-mode))
 
-(defun install-before-save-hook ()
+(defun install-before-save-hooks-ruby ()
   (interactive)
   (add-hook 'before-save-hook 'update-copyright nil 't)
   (add-hook 'before-save-hook 'delete-trailing-whitespace nil 't))
@@ -111,7 +110,7 @@
 (set 'ruby-deep-arglist 'nil)
 (set 'ruby-deep-indent-paren 'nil)
 (set 'ruby-deep-indent-paren-style 'nil)
-(add-hook 'ruby-mode-hook 'install-before-save-hook)
+(add-hook 'ruby-mode-hook 'install-before-save-hooks-ruby)
 
 (autoload 'run-ruby "inf-ruby"
   "Run an inferior Ruby process")
@@ -241,6 +240,8 @@
   (local-set-key "q" 'kill-this-buffer))
 (global-set-key "\C-cd" 'diff-buffer)
 
+(set 'ediff-split-window-function 'split-window-horizontally)
+
 ;; M-{ keybinding to inserts matching braces, indents the lines and
 ;; moves the cursor in between.
 (defun insert-braces ()
@@ -338,7 +339,6 @@
 ;; 	      "SYNTAX_CHECK_MODE=1"
 ;; 	      "check-syntax")))
 
-
 ;; (defun flymake-simple-mingw32-make-init ()
 ;;   (flymake-simple-make-init-impl 'flymake-create-temp-inplace t t "Makefile" 'flymake-get-mingw32-make-cmdline))
 ;; (add-to-list 'flymake-allowed-file-name-masks '("\\.\\(?:c\\(?:pp\\|xx\\|\\+\\+\\)?\\|CC\\)\\'" flymake-simple-mingw32-make-init))
@@ -352,12 +352,21 @@
 
 ;; (add-hook 'find-file-hook 'flymake-find-file-hook)
 
+;; Compile with working directory set
+(defun compile-from-compile-directory()
+  (interactive)
+  (save-excursion
+    (setq dir-buffer(find-file-noselect compile-directory))
+    (set-buffer dir-buffer)
+    (compile compile-command)
+    (kill-buffer dir-buffer)))
+
 ;; Compile without prompting
 (defun compile-no-prompt () "mybuild"
   (interactive)
   (save-some-buffers 1)
   (compile compile-command))
-(global-set-key [f7] 'compile-no-prompt)
+(global-set-key [f7] 'compile-from-compile-directory)
 (global-set-key [f8] 'next-error)
 
 ;; Insert date/time function
@@ -420,14 +429,24 @@
 
 ;; (setq auto-insert-alist '((c++-mode . "Hello, World!")))
 
+(set 'restyle-command "ruby -S restyle.rb")
+
 (defun restyle-buffer ()
   (save-excursion
-    (shell-command (concat "m:/gh/it/bin/w32/ghrestyle.rb " (buffer-file-name)))
+    (message(concat restyle-command " "(buffer-file-name)))
+    (shell-command(concat restyle-command " "(buffer-file-name)))
     (revert-buffer t t t)
   ))
 
 (defun install-restyle-hook ()
   (add-hook 'after-save-hook 'restyle-buffer nil 't))
+
+(defun restyle-replace-buffer()
+  (interactive)
+  (let((original-line(line-number-at-pos)))
+    (shell-command-on-region(point-min)(point-max)(concat "ruby -S restyle.rb -s "(buffer-file-name)) 1 "*messages*" t)
+    (goto-line original-line)
+    ))
 
 (add-hook 'c++-mode-hook 'install-restyle-hook)
 (add-hook 'c-mode-hook 'install-restyle-hook)
@@ -503,6 +522,17 @@
 (global-set-key [M-S-up] 'move-text-up)
 (global-set-key [M-S-down] 'move-text-down)
 
+(when (> emacs-major-version 23)
+  (require 'package)
+  (package-initialize)
+  (add-to-list 'package-archives
+	       '("melpa" . "http:// melpa.milkbox.net/packages/")
+	       'APPEND))
+
+(require 'fuzzy-match)
+(require 'icicles)
+(icy-mode 1)
+
 (custom-set-variables
   ;; custom-set-variables was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
@@ -512,6 +542,7 @@
  '(column-number-mode t)
  '(inhibit-startup-screen t)
  '(org-agenda-files (quote ("~/org/bre_test_workshop.org" "~/org/org.org")))
+ '(safe-local-variable-values (quote ((compile-directory . "d:/src/train/src"))))
  '(show-paren-mode t)
  '(tool-bar-mode nil))
 
@@ -548,3 +579,5 @@
 (add-hook 'html-mode-hook
 	  (lambda()
 	    (setq indent-tabs-mode nil)))
+
+(set 'compile-directory nil)
