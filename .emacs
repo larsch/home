@@ -99,8 +99,8 @@
 
 (defun install-before-save-hook ()
   (interactive)
-  (add-hook 'before-save-hook 'update-copyright)
-  (add-hook 'before-save-hook 'delete-trailing-whitespace))
+  (add-hook 'before-save-hook 'update-copyright nil 't)
+  (add-hook 'before-save-hook 'delete-trailing-whitespace nil 't))
 
 ;; ruby-mode
 (autoload 'ruby-mode "ruby-mode")
@@ -427,7 +427,7 @@
   ))
 
 (defun install-restyle-hook ()
-  (add-hook 'after-save-hook 'restyle-buffer))
+  (add-hook 'after-save-hook 'restyle-buffer nil 't))
 
 (add-hook 'c++-mode-hook 'install-restyle-hook)
 (add-hook 'c-mode-hook 'install-restyle-hook)
@@ -516,8 +516,35 @@
  '(tool-bar-mode nil))
 
 (custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:family "Consolas" :foundry "outline" :slant normal :weight normal :height 98 :width normal)))))
+  ;; custom-set-faces was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(default ((t (:family "Consolas" :foundry "outline" :slant normal :weight normal :height 98 :width normal))))
+ '(font-lock-comment-face ((((class color) (min-colors 88) (background light)) (:foreground "Firebrick" :slant italic)))))
+
+(set 'inhibit-read-only t)
+
+(defun emacs-format-function ()
+   "Format the whole buffer."
+   (indent-region (point-min) (point-max) nil)
+   (untabify (point-min) (point-max))
+   (save-buffer)
+)
+
+(defun convert-hash-arg ()
+  "Search/replace for ruby hash argument and change style"
+  (interactive)
+  (query-replace-regexp ":\\(\\w+\\) =>" "\\1:"))
+
+(defun whitespace-cleanup-2 ()
+  "Clean up more whitespace"
+  (interactive)
+  (save-excursion
+    (whitespace-cleanup)
+    (replace-regexp "[[:space:]]+$" "")
+    (replace-regexp "^\\([[:space:]]*\n\\)\\{2,\\}" "\n") nil (point-min) (point-max)))
+
+(add-hook 'html-mode-hook
+	  (lambda()
+	    (setq indent-tabs-mode nil)))
