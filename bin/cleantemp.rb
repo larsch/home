@@ -34,11 +34,14 @@ def clean(clean_path, max_age = MAX_AGE)
   file_count = 0
   dir_count = 0
   files(clean_path) do |path|
-    age = Time.now - File.mtime(path)
-    if age > MAX_AGE
-      total_size += File.size(path)
-      file_count += 1
-      File.unlink(path) rescue nil
+    begin
+      age = Time.now - File.mtime(path)
+      if age > MAX_AGE
+        total_size += File.size(path)
+        file_count += 1
+        File.unlink(path) rescue nil
+      end
+    rescue Errno::ENOENT
     end
   end
   directories(clean_path) do |path|
