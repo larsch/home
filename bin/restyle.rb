@@ -98,6 +98,19 @@ def get_style_options(file)
   return opts
 end
 
+def restyle_content(content, filename, opts)
+  opts = merge_options(opts, get_content_options(content))
+  restyle_code(content, File.expand_path(filename))
+  restyle_headerguards(content, filename) if filename =~ /\.(h|hpp|hxx)$/
+  temp_file = File.join(ENV["TEMP"], "astyletemp${$$}")
+  File.open(temp_file, "w") { |f| f << content }
+  options = ASTYLE_OPTIONS + [opts["astyle"], temp_file]
+  system(ASTYLE_EXECUTABLE, *options)
+  content = File.read(temp_file, :encoding => ENCODING)
+  File.unlink(temp_file)
+  return content
+end
+
 # Restyle the contents of a file.
 def restyle_file(file)
   opts = get_style_options(file)
@@ -106,22 +119,9 @@ def restyle_file(file)
     log "Skipping #{file}"
     return
   end
-  opts = merge_options(opts, get_content_options(content))
-  
-  orig_content = content.dup
-<<<<<<< HEAD
-  restyle(content)
-=======
-  restyle_code(content, File.expand_path(file))
->>>>>>> 1e19e51456c9e3ce574794496c3c3acdf0c65cec
-  restyle_headerguards(content, file) if file =~ /\.(h|hpp|hxx)$/
 
-  temp_file = File.join(ENV["TEMP"], "astyletemp${$$}")
-  File.open(temp_file, "w") { |f| f << content }
-  options = ASTYLE_OPTIONS + [opts["astyle"], temp_file]
-  system(ASTYLE_EXECUTABLE, *options)
-  content = File.read(temp_file, :encoding => ENCODING)
-  File.unlink(temp_file)
+  orig_content = content.dup
+  content = restyle_content(content, file, opts)
 
   if orig_content != content
     if $opts.diff
@@ -140,11 +140,7 @@ end
 EMPTY_LINE = /^(?:\s*)\n/
 
 # Restyle a chunk of code (our own rule set)
-<<<<<<< HEAD
-def restyle(code)
-=======
 def restyle_code(code, path)
->>>>>>> 1e19e51456c9e3ce574794496c3c3acdf0c65cec
   # Adjust copyright year
   year = Time.now.year.to_s
   code.gsub!(/Copyright \S+ (?:(\d+)(-\d+)*)/) do |m|
@@ -158,20 +154,13 @@ def restyle_code(code, path)
 
   # Only 1 empty line between sections
   code.gsub!(/(\n[ \t]*\n)\s*\n/m, "\\1")
-<<<<<<< HEAD
+
   # No empty lines after open-brace (if something is indented after)
   code.gsub!(/\{\s*^(\s+\S)\n/m, "{\n\\1")
+
   # No empty lines before close-brace (if something was intended before)
   code.gsub!(/^( +\S.*?\n)\s*(\n *\})/, "\\1\\2")
-=======
 
-  # No empty lines after open-brace
-  code.gsub!(/\{\s*\n/m, "{\n")
-
-  # No empty lines before close-brace
-  code.gsub!(/\s*(\n *\})/, "\\1")
-
->>>>>>> 1e19e51456c9e3ce574794496c3c3acdf0c65cec
   # Centre lines in file header
   code.sub!(/\A\s*\/\/={54}\n(\/\/(.*\n))+?\/\/-{54}/) { |x|
     x.split("\n").map { |ln|
@@ -181,20 +170,22 @@ def restyle_code(code, path)
     }.join("\n")
   }
 
-<<<<<<< HEAD
   # /* comment */ to // comment
-  code.gsub!(/\/\*(.*?)\*\/ *$/) { "// " + $1.strip }
+  # code.gsub!(/\/\*(.*?)\*\/ *$/) { "// " + $1.strip }
+
   # Space after //
   code.gsub!(/\/\/([a-z0-9])/i, "// \\1")
+
   # Forward slashes in includes
+
   code.gsub!(/^(\s*#\s*include\s+["<])(.*?)([>"])/) { $1 + $2.tr('\\','/') + $3 }
+
   # At least one empty line before comments
   # code.gsub!(/#{EMPTY_LINE}*^(\s*\/(?:\/|\*))/, "\n\\1")
-  code
-=======
+
   # At least one space after C++ style comment markers (//)
   code.gsub!(/(?:^| +)\/\/([a-z0-9])/i, "// \\1")
-  
+
   # Forward slashes in includes
   code.gsub!(/^(\s*#\s*include\s+["<])(.*?)([>"])/) { $1 + $2.tr('\\','/') + $3 }
 
@@ -214,7 +205,6 @@ def restyle_code(code, path)
 
   # Remove duplicate //--- lines
   code.gsub!(/(^\/\/-+\n)(^\/\/-+\n)+/, "\\1")
->>>>>>> 1e19e51456c9e3ce574794496c3c3acdf0c65cec
 end
 
 HEADER_GUARD_BREAK = /^(impl|src|include|plug-ins|3rdparty)$/
@@ -297,6 +287,7 @@ class Options
   attr_accessor :diff
   attr_accessor :filelog
   attr_accessor :edited
+  attr_accessor :stdout
 end
 
 def get_options
@@ -312,6 +303,8 @@ def get_options
       opts.verbose = true
     when '--diff', '-d'
       opts.diff = true
+    when '--stdout', '-s'
+      opts.stdout = true
     when '--help', '-h', '-?'
       puts "Usage:"
       puts "\t#{File.basename($0)} [options] files ..."
@@ -333,7 +326,7 @@ end
 
 if __FILE__ == $0
   $opts = get_options
-  
+
   # Load tmpdir conditionally (bit more responsive in VS macro)
   require 'tmpdir' if $opts.diff
 
@@ -341,15 +334,22 @@ if __FILE__ == $0
     require File.join(File.dirname(__FILE__), "edited")
     each_edited_file { |path| ARGV.push(path) if path =~ /\.(h|cpp|c)$/ }
   end
-  
-  ARGV.each do |path|
-    if not File.file?(path)
-      puts "#{path} is not a file"
-      next
+
+  if $opts.stdout
+    raise "Expected exactly 1 file name" unless ARGV.size == 1
+    filename = ARGV.shift
+    opts = get_style_options(filename)
+    print restyle_content(STDIN.read, filename, opts)
+  else
+    ARGV.each do |path|
+      if not File.file?(path)
+        puts "#{path} is not a file"
+        next
+      end
+      if path =~ FILENAME_PATTERN
+        restyle_file(path)
+      end
     end
-    if path =~ FILENAME_PATTERN
-      restyle_file(path)
-    end
+    log "#{ARGV.size} file(s) processed"
   end
-  log "#{ARGV.size} file(s) processed"
 end
