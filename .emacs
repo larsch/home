@@ -98,14 +98,15 @@
 
 (defun install-before-save-hooks-ruby ()
   (interactive)
-  (add-hook 'before-save-hook 'update-copyright nil 't)
-  (add-hook 'before-save-hook 'delete-trailing-whitespace nil 't))
+  (add-hook 'write-contents-functions 'update-copyright)
+  (add-hook 'write-contents-functions 'delete-trailing-whitespace))
 
 ;; ruby-mode
 (autoload 'ruby-mode "ruby-mode")
 (add-to-list 'auto-mode-alist '("\\.rbw?$" . ruby-mode))
 (add-to-list 'auto-mode-alist '("Rakefile$" . ruby-mode))
 (add-to-list 'auto-mode-alist '("Cakefile$" . ruby-mode))
+(add-to-list 'auto-mode-alist '("Gemfile$" . ruby-mode))
 (add-to-list 'auto-mode-alist '("\\.rake$" . ruby-mode))
 (set 'ruby-deep-arglist 'nil)
 (set 'ruby-deep-indent-paren 'nil)
@@ -441,15 +442,30 @@
 (defun install-restyle-hook ()
   (add-hook 'after-save-hook 'restyle-buffer nil 't))
 
-(defun restyle-replace-buffer()
+(defun restyle-replace-buffer ()
   (interactive)
-  (let((original-line(line-number-at-pos)))
+  (let
+      ((original-line (line-number-at-pos))
+       (original-column (current-column)))
     (shell-command-on-region(point-min)(point-max)(concat "ruby -S restyle.rb -s "(buffer-file-name)) 1 "*messages*" t)
-    (goto-line original-line)
-    ))
+    (goto-char (min
+		(+ (line-beginning-position original-line) original-column)
+		(- (line-beginning-position (+ original-line 1)) 1)
+		)))
+    'nil
+    )
 
-(add-hook 'c++-mode-hook 'install-restyle-hook)
-(add-hook 'c-mode-hook 'install-restyle-hook)
+(defun install-restyle-hook ()
+  (add-hook 'write-contents-functions 'restyle-replace-buffer))
+
+;; (add-hook 'c++-mode-hook 'install-restyle-hook)
+;; (add-hook 'c-mode-hook 'install-restyle-hook)
+(add-hook 'compilation-mode-hook 'toggle-truncate-lines)
+(add-hook 'compilation-mode-hook
+          (lambda () (make-local-variable 'hl-line-sticky-flag)
+            (setq hl-line-sticky-flag t)
+            (hl-line-mode t)
+            ))
 
 (set 'copyright-regexp "Copyright [^ ]+ \\([[:digit:]]+\\)\\(-[[:digit:]]+\\)? by GateHouse")
 (defun find-copyright ()
@@ -529,9 +545,12 @@
 	       '("melpa" . "http:// melpa.milkbox.net/packages/")
 	       'APPEND))
 
-(require 'fuzzy-match)
-(require 'icicles)
-(icy-mode 1)
+;; (require 'fuzzy-match)
+;; (require 'icicles)
+;; (icy-mode 1)
+
+(require 'project-mode)
+(project-load-all)
 
 (custom-set-variables
   ;; custom-set-variables was added by Custom.
@@ -581,3 +600,14 @@
 	    (setq indent-tabs-mode nil)))
 
 (set 'compile-directory nil)
+
+
+(autoload 'haml-mode "haml-mode")
+(add-to-list 'auto-mode-alist '("\\.haml$" . haml-mode))
+
+(require 'flex-mode)
+(require 'bison-mode)
+(add-to-list 'auto-mode-alist '("\\.y$" . bison-mode))
+(add-to-list 'auto-mode-alist '("\\.yy$" . bison-mode))
+(add-to-list 'auto-mode-alist '("\\.l$" . flex-mode))
+(add-to-list 'auto-mode-alist '("\\.ll$" . flex-mode))
