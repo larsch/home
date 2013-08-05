@@ -467,20 +467,22 @@
             (hl-line-mode t)
             ))
 
-(set 'copyright-regexp "Copyright [^ ]+ \\([[:digit:]]+\\)\\(-[[:digit:]]+\\)? by GateHouse")
+(set 'copyright-regexp "Copyright [^ ]+ \\(\\([[:digit:]]+\\)\\(-[[:digit:]]+\\)? \\)?by GateHouse")
 (defun find-copyright ()
   (interactive)
   (search-forward-regexp copyright-regexp))
 
+(defun replace-regexp-in-buffer (regexp to-string)
+  (goto-char (point-min))
+  (while (re-search-forward regexp nil t)
+    (replace-match to-string nil nil)))
+
 (defun update-copyright ()
   (interactive)
   (save-excursion
-    (replace-regexp
+    (replace-regexp-in-buffer
      copyright-regexp
-     (concat "Copyright (C) \\1-" (format-time-string "%Y" (current-time)) " by GateHouse")
-     nil
-     (point-min)
-     (point-max)
+     (concat "Copyright (C) by GateHouse")
      )))
 
 ;; source: http://steve.yegge.googlepages.com/my-dot-emacs-file
@@ -578,7 +580,9 @@
 (defun emacs-format-function ()
    "Format the whole buffer."
    (indent-region (point-min) (point-max) nil)
+   (whitespace-cleanup-2)
    (untabify (point-min) (point-max))
+   (update-copyright)
    (save-buffer)
 )
 
@@ -592,8 +596,8 @@
   (interactive)
   (save-excursion
     (whitespace-cleanup)
-    (replace-regexp "[[:space:]]+$" "")
-    (replace-regexp "^\\([[:space:]]*\n\\)\\{2,\\}" "\n") nil (point-min) (point-max)))
+    (replace-regexp-in-buffer "[[:space:]]+$" "")
+    (replace-regexp-in-buffer "^\\([[:space:]]*\n\\)\\{2,\\}" "\n") nil (point-min) (point-max)))
 
 (add-hook 'html-mode-hook
 	  (lambda()
