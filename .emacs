@@ -551,8 +551,8 @@
 ;; (require 'icicles)
 ;; (icy-mode 1)
 
-(require 'project-mode)
-(project-load-all)
+;; (require 'project-mode)
+;; (project-load-all)
 
 (custom-set-variables
   ;; custom-set-variables was added by Custom.
