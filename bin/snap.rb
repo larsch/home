@@ -38,20 +38,6 @@ def writeb(path, content); File.open(path, "wb") { |f| f.write(content) }; end
 def parse_digest(digest); [digest].pack("H*"); end
 def format_digest(digest); digest && digest.unpack("H*").first; end
 
-# Recursively finds every file in a directory and below. Yields to the
-# passed block for each file.
-def each_file(path = nil, &block)
-  Dir.foreach(path || '.') do |entry|
-    next if entry == "." or entry == ".."
-    subpath = (path && File.join(path, entry)) || entry
-    if File.directory?(subpath)
-      each_file(subpath, &block)
-    else
-      block.call(subpath)
-    end
-  end
-end
-
 # Wrapper for key-value databases that compresses values.
 class CompressedDB
   def initialize(db); @db = db; end
@@ -102,7 +88,6 @@ end
 # previous commit digest is returned).
 def commit(path = File.expand_path("."))
   tree_digest = tree(path)
-  path_digest = @digest.digest(path)
   state = {}
   if state_digest = @db[Dir.pwd]
     state = load(state_digest)
@@ -128,8 +113,8 @@ def checkout_blob(path, digest)
 end
 
 # Check out a tree of files and subtrees
-def checkout_tree(digest, path)
-  tree = load(digest)
+def checkout_tree(tree_digest, path)
+  tree = load(tree_digest)
   Dir.mkdir(path) unless File.directory?(path)
   tree.each do |type, entry, digest, mode|
     full_path = File.join(path, entry)
