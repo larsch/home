@@ -54,7 +54,7 @@ while arg = ARGV.shift
   when '-a'
     add(ARGV.shift)
   when '-f'
-    $force = true      
+    $force = true
   else
     puts "Unknown option: #{arg}"
     exit 1
@@ -84,7 +84,7 @@ def source_group(group, list)
   files = list.map{|path| path.tr('\\','/')}.join("\n  ")
   "source_group(#{group} FILES #{files})"
 end
-  
+
 if File.exist?("CMakeLists.txt")
   content = File.read("CMakeLists.txt")
 else
@@ -155,4 +155,3 @@ if $force or content != orig_content
 else
   puts "No changes."
 end
-
