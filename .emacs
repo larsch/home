@@ -1,35 +1,47 @@
 ;; .emacs - Lars Christensen <larsch@belunktum.dk>
 
-(setq w32-get-true-file-attributes nil)
-;; Personal elisp files
-(add-to-list 'load-path "~/.elisp")
-
-(require 'iedit)
-
-;; Work-around for slow-downs
-(setq w32-get-true-file-attributes nil)
-
-;; Shortcut to maximize window on Windows
-(defun maximize-window ()
-  ""
-  (interactive)
-  (w32-send-sys-command #xf030))
-(global-set-key [(meta f8)] 'maximize-window)
-;; (maximize-window)
-
-;; Server mode
 (require 'server)
-(defun server-ensure-safe-dir (dir) "Noop" t)
 (server-start)
 
-(setq make-backup-files nil)		; real men don't take backups
-(setq vc-cvs-stay-local nil) 		; ditto
-(setq vc-annotate-color-map nil)	; No annotate color
-(setq vc-annotate-background nil)	; No annotate color
-(column-number-mode 't)			; Column numbers always
+(add-to-list 'load-path "~/.elisp")	; Personal elisp files
+(require 'iedit)
 
+;; Preferences
+(defun server-ensure-safe-dir (dir) "Noop" t)
+(blink-cursor-mode 0)       		; stop blinking !
+(menu-bar-mode 0)			; remove useless feature
+(scroll-bar-mode 't)			; Keep scroll bar
+(column-number-mode 't)			; Column numbers always
+(global-font-lock-mode 't)		; highlighting always
+(linum-mode 't)				; linum-mode
+(show-paren-mode 't)			; Highlight matching parens
+(tool-bar-mode 0)			; remove useless feature
+(set 'ediff-split-window-function 'split-window-horizontally)
+(set 'show-paren-delay 0.05)		; Reduce the delay for showing matching parens
+(setq frame-title-format "%b - Emacs")	; Show filename first in title bar
+(setq make-backup-files nil)		; real men don't take backups
+(setq mouse-wheel-progressive-speed 'nil) ; No scroll acceleration
+(setq split-width-threshold 'nil)       ; Sensible split-window-sensible
+(setq vc-annotate-background nil)	; No annotate color
+(setq vc-annotate-color-map nil)	; No annotate color
+(setq vc-cvs-stay-local nil) 		; ditto
+(setq w32-get-true-file-attributes nil)	; Work-around for slow-downs
+(global-auto-revert-mode 1)	        ; Auto-revert if change on disk
+(setq revert-without-query ".*")        ; Revert all unedited files
+(set 'compile-directory nil)
+(set 'inhibit-read-only t)		; Never open files in read-only mode
+
+;; Short-cuts
 (global-set-key "\C-x\C-b" 'electric-buffer-list)
-(setq split-width-threshold 'nil)
+(global-unset-key "\C-z")		   ; dont minimize on C-z
+(global-set-key "\C-cg" 'goto-line)	   ; goto-line
+(global-set-key "\C-ct" 'todo-show)	   ; todo-show
+(global-set-key [?\C-.] 'kill-this-buffer) ; quick buffer killing
+(global-set-key "\C-cs" 'shell)		   ; shell mode shortcut
+(global-set-key "\C-cc" 'compile)	   ; compile shortcut
+(global-set-key "\C-cn" 'next-error)	   ; Jump to next error
+(global-set-key "\C-cr" 'quickrun)	   ; Quick-run
+(global-set-key "\C-x\C-r" 'recentf-open-files)
 
 ;; Enable grep under windows
 (setq grep-command "grep -n ")
@@ -39,27 +51,9 @@
 (require 'recentf)
 (recentf-mode 1)
 (setq recentf-max-menu-items 500)
-(global-set-key "\C-x\C-r" 'recentf-open-files)
-
-;; Auto-revert my buffers when they change on disk
-(global-auto-revert-mode 1)
-
-;; Revert all unedited files without asking
-(setq revert-without-query ".*")
-
-;; Visual settings
-(blink-cursor-mode 0)       		; stop blinking !
-(global-font-lock-mode 't)		; highlighting always
-(menu-bar-mode 0)			; remove useless feature
-(tool-bar-mode 0)			; remove useless feature
-(set 'show-paren-delay 0.05)		; Reduce the delay for showing matching parens
-(setq frame-title-format "%b - Emacs")	; Show filename first in title bar
-(scroll-bar-mode 't)			; Keep scroll bar
-(setq mouse-wheel-progressive-speed 'nil) ; No scroll acceleration
-(show-paren-mode 't)
 
 ;; Convinient buffer navigation that returns to same position if you
-;; go down  and up X.
+;; go down and up X.
 (defun jump-up ()
   "Jumps 10 lines up"
   (interactive)
@@ -71,19 +65,8 @@
 (global-set-key "\M-p" 'jump-up)
 (global-set-key "\M-n" 'jump-down)
 
-(global-unset-key "\C-z")		; dont minimize on C-z
-(global-set-key "\C-cg" 'goto-line)    	; goto-line
-(global-set-key "\C-ct" 'todo-show)	; todo-show
-(global-set-key [?\C-.] 'kill-this-buffer) ; quick buffer killing
-(global-set-key "\C-cs" 'shell)		; shell mode shortcut
-(global-set-key "\C-cc" 'compile)	; compile shortcut
-(global-set-key "\C-cn" 'next-error)	; Jump to next error
-
-;; fly-make
-;; (autoload 'flymake-mode "flymake" "Flymake editing mode" t)
-
-;; Put tag under cursor in kill ring for easy yanking (requires etags
-;; to be loaded)
+;; kill-word-under-cursor: Put tag/symbol/word under cursor in kill
+;; ring for easy yanking (requires etags to be loaded)
 (defun kill-word-under-cursor ()
   "Kill word under cursor"
   (interactive)
@@ -94,14 +77,11 @@
 ;; Programming Modes
 ;;
 
-(add-to-list 'auto-mode-alist '("\\.y$" . text-mode))
-
+;; ruby-mode
 (defun install-before-save-hooks-ruby ()
   (interactive)
   (add-hook 'write-contents-functions 'update-copyright)
   (add-hook 'write-contents-functions 'delete-trailing-whitespace))
-
-;; ruby-mode
 (autoload 'ruby-mode "ruby-mode")
 (add-to-list 'auto-mode-alist '("\\.rbw?$" . ruby-mode))
 (add-to-list 'auto-mode-alist '("Rakefile$" . ruby-mode))
@@ -112,6 +92,8 @@
 (set 'ruby-deep-indent-paren 'nil)
 (set 'ruby-deep-indent-paren-style 'nil)
 (add-hook 'ruby-mode-hook 'install-before-save-hooks-ruby)
+(add-hook 'ruby-mode-hook 'which-function-mode)
+(add-hook 'ruby-mode-hook 'ruby-electric-mode)
 
 (autoload 'run-ruby "inf-ruby"
   "Run an inferior Ruby process")
@@ -121,6 +103,14 @@
 	  '(lambda ()
 	     (inf-ruby-keys)
 	     ))
+
+(defun convert-hash-arg ()
+  "Search/replace for ruby hash argument and change style"
+  (interactive)
+  (query-replace-regexp ":\\(\\w+\\) =>" "\\1:"))
+
+;; text-mode for bison grammars
+(add-to-list 'auto-mode-alist '("\\.y$" . text-mode))
 
 ;; javascript-mode
 (autoload 'javascript-mode "javascript" nil t)
@@ -146,6 +136,20 @@
 ;; c++-mode for .h files
 (add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
 
+;; haml-mode
+(autoload 'haml-mode "haml-mode")
+(add-to-list 'auto-mode-alist '("\\.haml$" . haml-mode))
+
+;; cmake-mode
+(add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
+(add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
+(autoload 'cmake-mode "cmake-mode")
+
+;; batch-mode
+(autoload 'batch-mode "batch-mode")
+(add-to-list 'auto-mode-alist '("\\.bat\\'" . batch-mode))
+(add-to-list 'auto-mode-alist '("\\.cmd\\'" . batch-mode))
+
 ;;
 ;; GH Style Settings
 ;;
@@ -164,10 +168,10 @@
 (add-to-list 'c-font-lock-extra-types "UINT")
 (add-to-list 'c-font-lock-extra-types "uint")
 
-					; indentation style based on k&r
 (setq c-default-style '((java-mode . "java") (other . "gh"))) ; indentation-style
 (set 'parens-require-spaces nil) 	;; dont insert space before parentheses
 
+;; indentation style based on k&r
 (c-add-style
  "gh"
  '("k&r"
@@ -177,24 +181,6 @@
                        (inextern-lang . 0)
 		       (innamespace . 0)
                        ))))
-
-					; (shell-command (concat "ruby c:/user/lac/bin/jumptovc.rb " (buffer-name)))
-
-(global-set-key [C-f7] 'jumptovc-and-build)
-(defun jumptovc ()
-  (interactive)
-  (shell-command (concat "jumptovc.rb " (buffer-file-name) " " (int-to-string (line-number-at-pos)))))
-
-(defun jumptovc-and-build ()
-  (interactive)
-  (shell-command (concat "jumptovcandbuild.rb " (buffer-file-name) " " (int-to-string (line-number-at-pos)))))
-
-(defun run-buffer ()
-  "Run Buffer"
-  (interactive)
-  (shell-command (concat (buffer-name) " &")))
-(global-set-key "\C-cr" 'run-buffer)
-(global-set-key [f5] 'run-buffer)
 
 ;; Google stuff
 (defun google-symbol-at-point ()
@@ -220,7 +206,7 @@
   (local-set-key "\C-m" 'newline-and-indent)
   (local-set-key "\M-h" 'hs-hide-block)
   (local-set-key "\M-s" 'hs-show-block)
-  (local-set-key "\M-]" 'toggle-source-header)
+  (local-set-key "\M-]" 'ff-find-other-file)
   (c-toggle-hungry-state 1))
 (set 'c++-mode-hook 'setup-c++-mode)
 (set 'c-mode-hook 'setup-c++-mode)
@@ -241,10 +227,9 @@
   (local-set-key "q" 'kill-this-buffer))
 (global-set-key "\C-cd" 'diff-buffer)
 
-(set 'ediff-split-window-function 'split-window-horizontally)
-
 ;; M-{ keybinding to inserts matching braces, indents the lines and
-;; moves the cursor in between.
+;; moves the cursor in between. If a region is selected, wrap it in
+;; braces.
 (defun insert-braces ()
   "Insert matching curly braces"
   (interactive)
@@ -276,50 +261,6 @@
   (insert "[]")
   (backward-char))
 (global-set-key "\M-[" 'insert-brackets)
-
-;; Toggle Source and Header File (.cpp <-> .h)
-(defvar c++-default-header-ext "hpp")
-(defvar c++-default-source-ext "cpp")
-(defvar c++-header-ext-regexp "\\.\\(hpp\\|h\\|\hh\\|H\\)$")
-(defvar c++-source-ext-regexp "\\.\\(cpp\\|c\\|\cc\\|C\\)$")
-(defvar project-c++-include-regexp "#include[ \t]+\\(\\(<[^>]*>\\)\\|\\(\"[^\"]*\"\\)\\)[ \t]*\n")
-(defvar project-c++-class-decl-regexp "class[ \t]+\\([A-Za-z][A-Za-z0-9_]*\\);[ \t]*\n")
-(defvar c++-source-extension-list '("c" "cc" "C" "cpp" "c++"))
-(defvar c++-header-extension-list '("h" "hh" "H" "hpp"))
-(defun toggle-source-header()
-  "Switches to the source buffer if currently in the header buffer and vice versa."
-  (interactive)
-  (let ((buf (current-buffer))
-        (name (file-name-nondirectory (buffer-file-name)))
-        file
-        offs)
-    (setq offs (string-match c++-header-ext-regexp name))
-    (if offs
-        (let ((lst c++-source-extension-list)
-              (ok nil)
-              ext)
-          (setq file (substring name 0 offs))
-          (while (and lst (not ok))
-            (setq ext (car lst))
-            (if (file-exists-p (concat file "." ext))
-		(setq ok t))
-            (setq lst (cdr lst)))
-          (if ok
-              (find-file (concat file "." ext))))
-      (let ()
-        (setq offs (string-match c++-source-ext-regexp name))
-        (if offs
-            (let ((lst c++-header-extension-list)
-                  (ok nil)
-                  ext)
-              (setq file (substring name 0 offs))
-              (while (and lst (not ok))
-                (setq ext (car lst))
-                (if (file-exists-p (concat file "." ext))
-                    (setq ok t))
-                (setq lst (cdr lst)))
-              (if ok
-                  (find-file (concat file "." ext)))))))))
 
 ;; Fly-make
 ;; (require 'compile)
@@ -385,16 +326,6 @@
   (set-buffer "Makefile")
   (compile "make"))
 (global-set-key [C-return] 'compile-makefile-buffer)
-
-;; CMake
-(add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
-(add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
-(autoload 'cmake-mode "cmake-mode")
-
-;; Batch files
-(autoload 'batch-mode "batch-mode")
-(add-to-list 'auto-mode-alist '("\\.bat\\'" . batch-mode))
-(add-to-list 'auto-mode-alist '("\\.cmd\\'" . batch-mode))
 
 ;; Auto-Insert
 (require 'autoinsert)
@@ -467,25 +398,25 @@
             (hl-line-mode t)
             ))
 
-(set 'copyright-regexp "Copyright [^ ]+ \\(\\([[:digit:]]+\\)\\(-[[:digit:]]+\\)? \\)?by GateHouse")
+;; Update copyright notice
+(set 'copyright-regexp "Copyright [^ ]+ \\(\\([[:digit:]]+\\)\\(-[[:digit:]]+\\)? \\)?by")
 (defun find-copyright ()
   (interactive)
   (search-forward-regexp copyright-regexp))
-
 (defun replace-regexp-in-buffer (regexp to-string)
   (goto-char (point-min))
   (while (re-search-forward regexp nil t)
     (replace-match to-string nil nil)))
-
 (defun update-copyright ()
   (interactive)
   (save-excursion
     (replace-regexp-in-buffer
      copyright-regexp
-     (concat "Copyright (C) by GateHouse")
+     (concat "Copyright (C) by")
      )))
 
-;; source: http://steve.yegge.googlepages.com/my-dot-emacs-file
+;; Rename file AND
+;; buffer. http://steve.yegge.googlepages.com/my-dot-emacs-file
 (defun rename-file-and-buffer (new-name)
   "Renames both current buffer and file it's visiting to NEW-NAME."
   (interactive "sNew name: ")
@@ -501,6 +432,7 @@
           (set-visited-file-name new-name)
           (set-buffer-modified-p nil))))))
 
+;; Move lines up/down using M-S-up/M-S-down
 ;; source: http://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emacs
 (defun move-text-internal (arg)
   (cond
@@ -540,27 +472,23 @@
 (global-set-key [M-S-up] 'move-text-up)
 (global-set-key [M-S-down] 'move-text-down)
 
+;; MELPA package repository
 (when (> emacs-major-version 23)
   (require 'package)
   (package-initialize)
   (add-to-list 'package-archives
-	       '("melpa" . "http:// melpa.milkbox.net/packages/")
+	       '("melpa" . "http://melpa.milkbox.net/packages/")
 	       'APPEND))
 
-;; (require 'fuzzy-match)
-;; (require 'icicles)
-;; (icy-mode 1)
-
-;; (require 'project-mode)
-;; (project-load-all)
-
 (custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(blink-cursor-mode nil)
  '(column-number-mode t)
+ '(custom-enabled-themes (quote (solarized-dark)))
+ '(custom-safe-themes (quote ("fc5fcb6f1f1c1bc01305694c59a1a861b008c534cae8d0e48e4d5e81ad718bc6" default)))
  '(inhibit-startup-screen t)
  '(org-agenda-files (quote ("~/org/bre_test_workshop.org" "~/org/org.org")))
  '(safe-local-variable-values (quote ((compile-directory . "d:/src/train/src"))))
@@ -568,28 +496,23 @@
  '(tool-bar-mode nil))
 
 (custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- '(default ((t (:family "Consolas" :foundry "outline" :slant normal :weight normal :height 98 :width normal))))
- '(font-lock-comment-face ((((class color) (min-colors 88) (background light)) (:foreground "Firebrick" :slant italic)))))
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :stipple nil :background "#2e3436" :foreground "#eeeeec" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 118 :width normal :foundry "outline" :family "Consolas"))))
+ '(font-lock-comment-face ((t (:foreground "#73d216" :slant italic)))))
 
-(set 'inhibit-read-only t)
 
+;; Indent, clean whitespace, untabify entire buffer, then update
+;; copyright notice.
 (defun emacs-format-function ()
    "Format the whole buffer."
    (indent-region (point-min) (point-max) nil)
    (whitespace-cleanup-2)
    (untabify (point-min) (point-max))
    (update-copyright)
-   (save-buffer)
-)
-
-(defun convert-hash-arg ()
-  "Search/replace for ruby hash argument and change style"
-  (interactive)
-  (query-replace-regexp ":\\(\\w+\\) =>" "\\1:"))
+   (save-buffer))
 
 (defun whitespace-cleanup-2 ()
   "Clean up more whitespace"
@@ -603,15 +526,4 @@
 	  (lambda()
 	    (setq indent-tabs-mode nil)))
 
-(set 'compile-directory nil)
-
-
-(autoload 'haml-mode "haml-mode")
-(add-to-list 'auto-mode-alist '("\\.haml$" . haml-mode))
-
-;; (require 'flex-mode)
-;; (require 'bison-mode)
-;; (add-to-list 'auto-mode-alist '("\\.y$" . bison-mode))
-;; (add-to-list 'auto-mode-alist '("\\.yy$" . bison-mode))
-;; (add-to-list 'auto-mode-alist '("\\.l$" . flex-mode))
-;; (add-to-list 'auto-mode-alist '("\\.ll$" . flex-mode))
+(add-to-list 'custom-theme-load-path "~/.elisp/color-theme-solarized")
