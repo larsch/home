@@ -1,19 +1,19 @@
 ;; .emacs - Lars Christensen <larsch@belunktum.dk>
 
 (require 'server)
+(defun server-ensure-safe-dir (dir) "Noop" t)
 (server-start)
 
 (add-to-list 'load-path "~/.elisp")	; Personal elisp files
 (require 'iedit)
 
 ;; Preferences
-(defun server-ensure-safe-dir (dir) "Noop" t)
 (blink-cursor-mode 0)       		; stop blinking !
 (menu-bar-mode 0)			; remove useless feature
 (scroll-bar-mode 't)			; Keep scroll bar
 (column-number-mode 't)			; Column numbers always
 (global-font-lock-mode 't)		; highlighting always
-(linum-mode 't)				; linum-mode
+(global-linum-mode 't)			; linum-mode
 (show-paren-mode 't)			; Highlight matching parens
 (tool-bar-mode 0)			; remove useless feature
 (set 'ediff-split-window-function 'split-window-horizontally)
@@ -525,5 +525,3 @@
 (add-hook 'html-mode-hook
 	  (lambda()
 	    (setq indent-tabs-mode nil)))
-
-(add-to-list 'custom-theme-load-path "~/.elisp/color-theme-solarized")
