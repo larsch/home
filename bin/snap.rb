@@ -43,8 +43,7 @@ class CompressedDB
   def initialize(db); @db = db; end
   def [](key); value = @db[key]; return value && Zlib::Inflate.inflate(value); end
   def []=(key, value); @db[key] = Zlib::Deflate.deflate(value); end
-  def has_key?(key); @db.has_key?(key); end
-  def close; @db.close; end
+  def method_missing(*args); @db.send(*args); end
 end
 
 # Save an object and return the digest
