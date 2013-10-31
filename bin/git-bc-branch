@@ -1,0 +1,43 @@
+#!/bin/sh
+
+function show_help() {
+    echo "Shows Beyond Compare of entire branch compared to the base (master by default)"
+    echo
+    echo "usage: git bc-branch [<branch> [<base>]]"
+    echo
+    echo "       default <branch> is the current branch"
+    echo "       default <base> is origin/master"
+    echo
+    echo "examples: git bc-branch"
+    echo "          git bc-branch feat-something"
+    echo "          git bc-branch feat-something v3.1"
+}
+
+while getopts "h?" opt; do
+    case "$opt" in
+	h|\?)
+	    show_help
+	    exit 0
+	    ;;
+    esac
+done
+
+branch="$1"
+[ -z "$branch" ] && branch=$(git rev-parse --abbrev-ref HEAD)
+
+trunk="$2"
+[ -z "$trunk" ] && trunk=origin/master
+
+function setbc() {
+    [ -e "$1" ] && bc="$1"
+}
+
+bc=bcomp
+setbc '/c/Program Files (x86)/Beyond Compare 2/BC2.exe'
+setbc '/c/Program Files (x86)/Beyond Compare 3/BComp.com'
+setbc '/c/Program Files/Beyond Compare 2/BC2.exe'
+setbc '/c/Program Files/Beyond Compare 3/BComp.com'
+mergebase=$(git merge-base $trunk $branch)
+git archive --format=zip --output=/tmp/branch.zip $branch || exit 1
+git archive --format=zip --output=/tmp/mergebase.zip $mergebase || exit 1
+"$bc" /tmp/mergebase.zip /tmp/branch.zip
