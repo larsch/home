@@ -37,9 +37,9 @@ end
 
 def add(fn)
   case fn
-  when /\.h(pp|xx)?$/
+  when /\.h(pp|xx|h)?$/
     create(fn, header_template(fn))
-  when /\.c(pp|xx)?$/
+  when /\.c(pp|xx|c)?$/
     create(fn, source_template(fn))
   when /\./
     create(fn)
@@ -68,8 +68,8 @@ def has_cmakelists(path)
   return has_cmakelists(File.dirname(path))
 end
 
-sources = Dir["**/*.{cpp,c,cxx}"].sort
-headers = Dir["**/*.{h,hpp,hxx}"].sort
+sources = Dir["**/*.{cpp,cc,c,cxx}"].sort
+headers = Dir["**/*.{h,hpp,hh,hxx}"].sort
 sources.delete_if { |fn| fn =~ /^test\// }
 headers.delete_if { |fn| fn =~ /^test\// }
 sources.delete_if { |path| has_cmakelists(path) }
