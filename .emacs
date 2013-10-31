@@ -471,6 +471,8 @@
 
 (global-set-key [M-S-up] 'move-text-up)
 (global-set-key [M-S-down] 'move-text-down)
+(global-set-key [M-P] 'move-text-up)
+(global-set-key [M-N] 'move-text-down)
 
 ;; MELPA package repository
 (when (> emacs-major-version 23)
@@ -492,6 +494,8 @@
  '(inhibit-startup-screen t)
  '(org-agenda-files (quote ("~/org/bre_test_workshop.org" "~/org/org.org")))
  '(safe-local-variable-values (quote ((compile-directory . "d:/src/train/src"))))
+ ;; '(scroll-down-aggressively 1.0)
+ ;; '(scroll-up-aggressively 0.0)
  '(show-paren-mode t)
  '(tool-bar-mode nil))
 
@@ -500,7 +504,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#2e3436" :foreground "#eeeeec" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 118 :width normal :foundry "outline" :family "Consolas"))))
+ '(default ((t (:inherit nil :stipple nil :background "#2e3436" :foreground "#eeeeec" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 108 :width normal :foundry "outline" :family "Consolas"))))
  '(font-lock-comment-face ((t (:foreground "#73d216" :slant italic)))))
 
 
