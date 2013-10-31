@@ -22,8 +22,8 @@
 (setq make-backup-files nil)		; real men don't take backups
 (setq mouse-wheel-progressive-speed 'nil) ; No scroll acceleration
 (setq split-width-threshold 'nil)       ; Sensible split-window-sensible
-(setq vc-annotate-background nil)	; No annotate color
-(setq vc-annotate-color-map nil)	; No annotate color
+;; (setq vc-annotate-background nil)	; No annotate color
+;; (setq vc-annotate-color-map nil)	; No annotate color
 (setq vc-cvs-stay-local nil) 		; ditto
 (setq w32-get-true-file-attributes nil)	; Work-around for slow-downs
 (global-auto-revert-mode 1)	        ; Auto-revert if change on disk
