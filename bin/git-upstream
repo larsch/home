@@ -1,0 +1,7 @@
+#!/bin/sh
+#
+# Displays the upstream for the current branch
+#
+
+branch=$(git rev-parse --abbrev-ref HEAD)
+git config -l | grep ^branch.$branch.
