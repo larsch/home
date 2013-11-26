@@ -529,3 +529,23 @@
 (add-hook 'html-mode-hook
 	  (lambda()
 	    (setq indent-tabs-mode nil)))
+
+(defun insert-double-quotes (&optional arg)
+  (interactive "P")
+  (insert-pair arg ?\" ?\"))
+(defun insert-quotes (&optional arg)
+  (interactive "P")
+  (insert-pair arg ?\' ?\'))
+(defun insert-braces-2 (&optional arg)
+  (interactive "P")
+  (insert-pair arg "{\n" "}\n"))
+(defun insert-do-end (&optional arg)
+  (interactive "P")
+  (insert-pair arg "do\n" "end\n"))
+(defun insert-brackets (&optional arg)
+  (interactive "P")
+  (insert-pair arg ?\[ ?\]))
+
+(global-set-key "\M-\"" 'insert-double-quotes)
+(global-set-key "\M-'" 'insert-quotes)
+(global-set-key (kbd "<M-return>") 'insert-do-end)
