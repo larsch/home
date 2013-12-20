@@ -25,6 +25,8 @@ done
 branch="$1"
 [ -z "$branch" ] && branch=$(git rev-parse --abbrev-ref HEAD)
 
+git rev-parse "$branch" 2> /dev/null || branch=origin/$branch
+
 trunk="$2"
 [ -z "$trunk" ] && trunk=origin/master
 
@@ -38,6 +40,9 @@ setbc '/c/Program Files (x86)/Beyond Compare 3/BComp.com'
 setbc '/c/Program Files/Beyond Compare 2/BC2.exe'
 setbc '/c/Program Files/Beyond Compare 3/BComp.com'
 mergebase=$(git merge-base $trunk $branch)
+echo "Comparing $branch to $trunk (at $mergebase)"
 git archive --format=zip --output=/tmp/branch.zip $branch || exit 1
 git archive --format=zip --output=/tmp/mergebase.zip $mergebase || exit 1
+ls -l /tmp/branch.zip
+ls -l /tmp/mergebase.zip
 "$bc" /tmp/mergebase.zip /tmp/branch.zip

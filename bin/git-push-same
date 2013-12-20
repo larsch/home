@@ -6,8 +6,9 @@
 function show_help() {
     echo "Pushes to same branch on the remote. Sets upstream"
     echo
-    echo "usage: git pushit [<remote>]"
+    echo "usage: git push-same [<remote>]"
 }
+
 while getopts "h?" opt; do
     case "$opt" in
 	h|\?)

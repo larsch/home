@@ -549,3 +549,5 @@
 (global-set-key "\M-\"" 'insert-double-quotes)
 (global-set-key "\M-'" 'insert-quotes)
 (global-set-key (kbd "<M-return>") 'insert-do-end)
+
+(setq ispell-program-name "c:/program files (x86)/aspell/bin/aspell.exe")
