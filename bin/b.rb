@@ -1,40 +1,39 @@
 #!/usr/bin/env ruby
 #
-# b - a cmake convinience tool
+# b - runs any command given to it in the build directory
 #
-# Runs build commands (e.g. cmake --build ., ctest, etc) in the
-# corresponding build directory, from the source directory. For
-# example, this command automatically starts a build in the associated
-# build directory:
+# Installation:
+#     Run: gem install trollop highline
+#     Copy b.rb to somewhere in your PATH
 #
-#   c:\source\git\repo> b
+# How it works:
 #
-#   c:\build\git\repo> cmake --build .  (Automatic)
+# The build directory is automatically created in the build root with
+# the name of the source directory. b assumes that the current
+# directory is the source directory, but will look for CMakeLists.txt
+# files in parent directories to find the source root. The default
+# command is "cmake --build .", which is run if no arguments are given
+# to b. The first time, b will run cmake to configure the project.
 #
-# Other commands can be run by passing them to 'b':
+# Options:
+#    --delete|-d       Delete build directory
+#    --open|-o         Open Visual Studio Solution
+#    --rerun|-r        Rerun CMake
+#    --config|-c       Show b's configuration
 #
-#   c:\source\git\repo> b ctest
-#
-#   c:\build\git\repo> ctest
+# Configuration:
+#    --set-build-root=<new build root>
+#    --set-default-command=<default command>
+#    --set-default-generator=<default cmake generator>
 
 require 'fileutils'
 require 'yaml'
 require 'trollop'
 require 'highline/import'
 
-def query(prompt, default)
-  print "#{prompt} [#{default}]: "
-  input = STDIN.gets.chomp
-  if input.empty?
-    return default
-  else
-    return input
-  end
-end
-
 def query_path(prompt, default)
   loop do
-    input = query(prompt, default)
+    input = ask("#{prompt}: ") { |q| q.default = default }
     if File.directory?(input)
       return input
     else
@@ -51,8 +50,7 @@ def make_config
     config = {}
   end
   @orig_config = config.dup
-  config["source_root"] ||= query_path("Source root", File.dirname(Dir.pwd))
-  config["build_root"] ||= query_path("Build root", "C:/build/git")
+  config["build_root"] ||= query_path("Build root", "C:/build")
   config["default_command"] ||= "cmake --build ."
   save_config(config)
   return config
@@ -73,9 +71,9 @@ end
 
 # Find the top level CMake project directory, i.e. the highest level
 # directory that contains a CMakeLists.txt.
-def find_root(path = Dir.pwd)
+def find_source_root(path = Dir.pwd)
   parent = File.dirname(path)
-  if parent != path && root = find_root(parent)
+  if parent != path && root = find_source_root(parent)
     return root
   end
   cmakelists = File.join(path, "CMakeLists.txt")
@@ -94,28 +92,29 @@ def generators
   return generators
 end
 
+# Select a generator
 def select_generator
-  gens = generators
-  gens.each_with_index do |gen, i|
-    printf "%2d) %s\n", i+1, gen
-  end
-  loop do
-    printf "> "
-    gen_i = STDIN.gets.to_i
-    if gen_i >= 1 || gen_i <= gens.size
-      return gens[gen_i-1]
-    else
-      puts "Out of range"
-    end
+  choose do |menu|
+    menu.prompt = "Choose a generator: "
+    menu.choices(*generators)
   end
 end
 
-def print_command(dir, command)
+# Get the generator to use
+def generator
+  config["default_generator"] || select_generator
+end
+
+# Print a command
+def print_command(command)
+  dir = Dir.pwd
+  command = command.map { |x| x =~ / / ? "\"#{x}\"" : x }
   puts "\n#{dir.tr('/','\\')}>#{command.join(' ')}"
 end
 
-def run_command(dir, *command)
-  print_command dir, command
+# Print and run a command
+def run_command(*command)
+  print_command command
   result = system *command
   if result.nil?
     puts "Execution failed."
@@ -123,6 +122,7 @@ def run_command(dir, *command)
   end
 end
 
+# Yes/no prompt
 def yesno(prompt = "Continue?", default = true)
   a = ''
   s = default ? '[Y/n]' : '[y/N]'
@@ -134,18 +134,15 @@ def yesno(prompt = "Continue?", default = true)
   a == 'y'
 end
 
-def delete_build(build_root)
-  source_dir = find_root
-  build_dir = File.join(build_root, File.basename(source_dir))
-  if yesno("Delete #{build_dir}?", false)
-    FileUtils.rm_rf(build_dir)
-  end
+# Delete build directory
+def delete_build
+  source_dir, build_dir = find_dirs
+  FileUtils.rm_rf(build_dir) if yesno("Delete #{build_dir}?", false)
 end
 
-def open_solution(build_root)
-  source_dir = find_root
-  build_dir = File.join(build_root, File.basename(source_dir))
-  Dir.chdir build_dir do
+# Open solution
+def open_solution
+  in_build do |source_dir|
     content = IO.read("CMakeCache.txt")
     project_name = content[/(?<=CMAKE_PROJECT_NAME:STATIC=).*$/]
     raise "Unable to identify project" unless project_name
@@ -155,23 +152,34 @@ def open_solution(build_root)
   end
 end
 
-def in_build(build_root, args)
-  source_dir = find_root
-  build_dir = File.join(build_root, File.basename(source_dir))
+# Find source and build directory
+def find_dirs
+  source_dir = find_source_root
+  raise "CMakeLists.txt not found" unless source_dir
+  build_dir = File.join(config["build_root"], File.basename(source_dir))
+  return source_dir, build_dir
+end
+
+# Switch to build directory and yield to block
+def in_build
+  source_dir, build_dir = find_dirs
   FileUtils.mkdir_p(build_dir) unless File.directory?(build_dir)
   Dir.chdir build_dir do
-    unless File.exist?("CMakeCache.txt")
-      run_command build_dir, "cmake", "-G", select_generator, source_dir
-    end
-    if args.empty?
-      args.push "cmake", "--build", "."
-    end
-    run_command build_dir, *args
+    yield(source_dir)
+  end
+end
+
+# Run command in build directory
+def run_in_build(*args)
+  in_build do |source_dir|
+    run_command("cmake", "-G", select_generator, source_dir) unless File.exist?("CMakeCache.txt")
+    args.push("cmake", "--build", ".") if args.empty?
+    run_command(*args)
   end
 end
 
 opts = Trollop.options do
-  version "b 0.1"
+  version "b 0.2"
   banner ""
   banner "Synopsis:"
   banner ""
@@ -180,12 +188,13 @@ opts = Trollop.options do
   banner "  b cmake -DENABLE_OPT=ON .   Run cmake to change option"
   banner ""
   banner "Options:"
-  opt :set_build_root, "Set build root (#{config["build_root"]})", type: String
-  opt :set_source_root, "Set source root (#{config["source_root"]})", type: String
-  opt :set_default_command, "Set default command (#{config["default_command"]})", type: String
-  opt :config, "Show configuration"
-  opt :delete, "Delete everything in build directory"
-  opt :open, "Open Solution"
+  opt :set_build_root, "Set build root (#{config["build_root"]})", type: String, short: :none
+  opt :set_default_command, "Set default command (#{config["default_command"]})", type: String, short: :none
+  opt :set_default_generator, "Set the default generator (#{config["default_generator"]}", type: String, short: :none
+  opt :config, "Show configuration", short: '-c'
+  opt :delete, "Delete everything in build directory", short: '-d'
+  opt :open, "Open Solution", short: '-o'
+  opt :rerun, "Rerun CMake", short: '-r'
   stop_on_unknown
 end
 
@@ -194,12 +203,12 @@ if root = opts[:set_build_root]
   config["build_root"] = root
   changed_opt = true
 end
-if root = opts[:set_source_root]
-  config["source_root"] = root
-  changed_opt = true
-end
 if command = opts[:set_default_command]
   config["default_command"] = command
+  changed_opt = true
+end
+if command = opts[:set_default_generator]
+  config["default_generator"] = command
   changed_opt = true
 end
 if opts.config
@@ -207,15 +216,17 @@ if opts.config
   exit
 end
 if changed_opt
-  p config
+  puts "Options changed"
   save_config
   exit
 end
 
 if opts[:delete]
-  delete_build(config["build_root"])
+  delete_build
 elsif opts[:open]
-  open_solution(config["build_root"])
+  open_solution
+elsif opts[:rerun]
+  rerun_cmake
 else
-  in_build(config["build_root"], ARGV)
+  run_in_build(*ARGV)
 end
