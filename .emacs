@@ -9,8 +9,8 @@
 
 ;; Preferences
 (blink-cursor-mode 0)       		; stop blinking !
-(menu-bar-mode 0)			; remove useless feature
-(scroll-bar-mode 't)			; Keep scroll bar
+(menu-bar-mode 0)			; Remove menu bar
+(scroll-bar-mode 0)			; Remove scroll bar
 (column-number-mode 't)			; Column numbers always
 (global-font-lock-mode 't)		; highlighting always
 (global-linum-mode 't)			; linum-mode
@@ -30,6 +30,8 @@
 (setq revert-without-query ".*")        ; Revert all unedited files
 (set 'compile-directory nil)
 (set 'inhibit-read-only t)		; Never open files in read-only mode
+(setq inhibit-startup-screen t)
+(setq inhibit-startup-echo-area-message "lac")
 
 ;; Short-cuts
 (global-set-key "\C-x\C-b" 'electric-buffer-list)
@@ -155,18 +157,18 @@
 ;;
 
 ;; highlight these words as types
-(load "cc-mode")
-(add-to-list 'c++-font-lock-extra-types "Tcl\\sw+")
-(add-to-list 'c++-font-lock-extra-types "Ten\\sw+")
-(add-to-list 'c++-font-lock-extra-types "Trec\\sw+")
-(add-to-list 'c-font-lock-extra-types "HANDLE")
-(add-to-list 'c-font-lock-extra-types "VOID")
-(add-to-list 'c-font-lock-extra-types "LPVOID")
-(add-to-list 'c-font-lock-extra-types "BOOL")
-(add-to-list 'c-font-lock-extra-types "HFILE")
-(add-to-list 'c-font-lock-extra-types "DWORD")
-(add-to-list 'c-font-lock-extra-types "UINT")
-(add-to-list 'c-font-lock-extra-types "uint")
+;; (load "cc-mode")
+;; (add-to-list 'c++-font-lock-extra-types "Tcl\\sw+")
+;; (add-to-list 'c++-font-lock-extra-types "Ten\\sw+")
+;; (add-to-list 'c++-font-lock-extra-types "Trec\\sw+")
+;; (add-to-list 'c-font-lock-extra-types "HANDLE")
+;; (add-to-list 'c-font-lock-extra-types "VOID")
+;; (add-to-list 'c-font-lock-extra-types "LPVOID")
+;; (add-to-list 'c-font-lock-extra-types "BOOL")
+;; (add-to-list 'c-font-lock-extra-types "HFILE")
+;; (add-to-list 'c-font-lock-extra-types "DWORD")
+;; (add-to-list 'c-font-lock-extra-types "UINT")
+;; (add-to-list 'c-font-lock-extra-types "uint")
 
 (setq c-default-style '((java-mode . "java") (other . "gh"))) ; indentation-style
 (set 'parens-require-spaces nil) 	;; dont insert space before parentheses
@@ -489,9 +491,8 @@
  ;; If there is more than one, they won't work right.
  '(blink-cursor-mode nil)
  '(column-number-mode t)
- '(custom-enabled-themes (quote (solarized-dark)))
+;; '(custom-enabled-themes (quote (solarized-dark)))
  '(custom-safe-themes (quote ("fc5fcb6f1f1c1bc01305694c59a1a861b008c534cae8d0e48e4d5e81ad718bc6" default)))
- '(inhibit-startup-screen t)
  '(org-agenda-files (quote ("~/org/bre_test_workshop.org" "~/org/org.org")))
  '(safe-local-variable-values (quote ((compile-directory . "d:/src/train/src"))))
  ;; '(scroll-down-aggressively 1.0)
@@ -551,3 +552,23 @@
 (global-set-key (kbd "<M-return>") 'insert-do-end)
 
 (setq ispell-program-name "c:/program files (x86)/aspell/bin/aspell.exe")
+
+(define-skeleton cmakelists-skeleton
+  "Inserts a CMakeLists.txt skeleton"
+  ""
+  "cmake_minimum_required(VERSION 2.8.12.2)\n"
+  "project(skeleton)\n"
+  "add_library(skeleton ...)\n")
+
+(defun unhtml (start end)
+  (interactive "r")
+  (save-excursion
+    (save-restriction
+      (narrow-to-region start end)
+      (goto-char (point-min))
+      (replace-string "&" "&amp;")
+      (goto-char (point-min))
+      (replace-string "<" "&lt;")
+      (goto-char (point-min))
+      (replace-string ">" "&gt;")
+      )))
