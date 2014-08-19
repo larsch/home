@@ -1,0 +1,1 @@
+@set PATH=C:\Program Files (x86)\Visual Leak Detector\bin\Win32;%PATH%
