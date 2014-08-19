@@ -18,8 +18,10 @@
 # Options:
 #    --delete|-d       Delete build directory
 #    --open|-o         Open Visual Studio Solution
-#    --rerun|-r        Rerun CMake
-#    --config|-c       Show b's configuration
+#    --cmake|-c        Rerun CMake
+#    --config|-C       Show b's configuration
+#    --test|-t         Run CTest
+#    --all|-a          Run Cmake, Build, and Test
 #
 # Configuration:
 #    --set-build-root=<new build root>
@@ -94,6 +96,7 @@ end
 
 # Select a generator
 def select_generator
+  return $DEFAULT_GENERATOR unless $DEFAULT_GENERATOR.nil?
   choose do |menu|
     menu.prompt = "Choose a generator: "
     menu.choices(*generators)
@@ -117,8 +120,10 @@ def run_command(*command)
   print_command command
   result = system *command
   if result.nil?
-    puts "Execution failed."
-    exit 1
+    puts "Failed to run command."
+    exit 255
+  elsif !result
+    exit $?.exitstatus
   end
 end
 
@@ -178,6 +183,9 @@ def run_in_build(*args)
   end
 end
 
+def rerun_cmake(*args)
+end
+
 opts = Trollop.options do
   version "b 0.2"
   banner ""
@@ -191,10 +199,14 @@ opts = Trollop.options do
   opt :set_build_root, "Set build root (#{config["build_root"]})", type: String, short: :none
   opt :set_default_command, "Set default command (#{config["default_command"]})", type: String, short: :none
   opt :set_default_generator, "Set the default generator (#{config["default_generator"]}", type: String, short: :none
-  opt :config, "Show configuration", short: '-c'
+  opt :b_config, "Show configuration", short: '-b'
   opt :delete, "Delete everything in build directory", short: '-d'
   opt :open, "Open Solution", short: '-o'
-  opt :rerun, "Rerun CMake", short: '-r'
+  opt :cmake, "Rerun CMake", short: '-c'
+  opt :all, "Rerun CMake, Build, Test", short: '-a'
+  opt :test, "Rerun CTest", short: '-t'
+  opt :generator, "Generator", short: '-G', type: String
+  opt :config, "Build configuration", short: "-C", type: String, default: "Debug"
   stop_on_unknown
 end
 
@@ -211,7 +223,7 @@ if command = opts[:set_default_generator]
   config["default_generator"] = command
   changed_opt = true
 end
-if opts.config
+if opts.b_config
   puts config.map { |pair| pair.join(': ') }.join("\n")
   exit
 end
@@ -221,12 +233,26 @@ if changed_opt
   exit
 end
 
+$DEFAULT_GENERATOR = opts.generator
+
 if opts[:delete]
   delete_build
 elsif opts[:open]
   open_solution
-elsif opts[:rerun]
-  rerun_cmake
+elsif opts[:cmake]
+  in_build do |source_dir|
+    run_command "cmake", "."
+  end
+elsif opts[:all]
+  in_build do
+    run_command "cmake", "."
+    run_command "cmake", "--build", "."
+    run_command "ctest", "-C", opts[:config]
+  end
+elsif opts[:test]
+  in_build do
+    run_command "ctest", "-C", opts[:config]
+  end
 else
   run_in_build(*ARGV)
 end
