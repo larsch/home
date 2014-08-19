@@ -95,7 +95,7 @@
 (set 'ruby-deep-indent-paren-style 'nil)
 (add-hook 'ruby-mode-hook 'install-before-save-hooks-ruby)
 (add-hook 'ruby-mode-hook 'which-function-mode)
-(add-hook 'ruby-mode-hook 'ruby-electric-mode)
+;; (add-hook 'ruby-mode-hook 'ruby-electric-mode)
 
 (autoload 'run-ruby "inf-ruby"
   "Run an inferior Ruby process")
@@ -572,3 +572,7 @@
       (goto-char (point-min))
       (replace-string ">" "&gt;")
       )))
+
+(setq ruby-insert-encoding-magic-comment 'nil)
+
+(modify-coding-system-alist 'file "\\.rst\\'" 'utf-8)
