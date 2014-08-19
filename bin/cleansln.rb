@@ -1,15 +1,15 @@
 #!/usr/bin/env ruby
-Dir["**/*.{sln,ncb,ilk}"].each do |path|
+Dir.each "**/*.{sln,ncb,ilk,ipch,suo,user,ncb,sbr,sdf}" do |path|
   if File.file?(path)
     case path
-    when /\.(ilk|ncb)$/
+    when /\.sln$/
+      puts "clean #{path}"
+      system "msbuild", "/nologo", path, "/target:Clean", "/p:Configuration=Debug"
+      system "msbuild", "/nologo", path, "/target:Clean", "/p:Configuration=Release"
+      system "msbuild", "/nologo", path, "/target:Clean", "/p:Configuration=RelWithDebInfo"
+    else
       puts "rm #{path}"
       File.unlink(path)
-    when /\.(sln)$/
-      puts "clean #{path}"
-      system "devenv", path, "/clean", "debug"
-      system "devenv", path, "/clean", "release"
-      system "devenv", path, "/clean", "relwithdebinfo"
     end
   end
 end
