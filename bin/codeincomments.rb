@@ -8,10 +8,17 @@ files = Dir["**/*.{cpp,c,h}"]
 
 def iscode(c)
   iscode = false
-  
+
   # doxygen is never code
   return false if c =~ /^\/(\*\*|\/\/|\*!)/
-  
+  return false if c =~ /^\/\/\//
+
+  # lint directive is never code
+  return false if c =~ /^\/\/lint\b/
+
+  # BPS text-debug is not code
+  return false if c =~ /BPS_TEXT_DEBUG/
+
   c.split(/\n/).each { |ln|
     # semi-colon at end of line indicates code
     iscode = true if ln =~ /;\s*$/
@@ -36,8 +43,8 @@ files.each { |fn|
 
     # Scan the file for comments (multiple lines of comments are
     # treated as one).
-    f.read.scan(/(\/\*(.*?)\*\/)|((^[ \t]*\/\/.*?\n)+)/m) { |c|
-      
+    f.read.scan(/(\/\*(.*?)\*\/)|((\/\/.*?\n)+)/m) { |c|
+
       # Get the number of lines in the comment
       lineno = $`.split(/\n/).length + 1
 
@@ -46,9 +53,10 @@ files.each { |fn|
 	puts "#{File.expand_path(fn)}(#{lineno}) : " + (c[0]||c[2])
 	linescount += (c[0]||c[2]).split(/\n/).length
 	commentcount += 1
+        $stdout.flush
       end
     }
-    
+
   }
 }
 puts
