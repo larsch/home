@@ -11,13 +11,13 @@
 # Example:
 #    c:/users/me/projects/foobar> b
 # Result:
-#    'b' creates c:/build/git/foobar and configures cmake
-#    'b' runs "cmake --build ." in c:/build/git/foobar
+#    'b' creates c:/build/foobar and configures cmake
+#    'b' runs "cmake --build ." in c:/build/foobar
 #
 # Example:
 #    c:/users/me/projects/foobar> b ctest -C Debug
 # Result:
-#    'b' runs "ctest -C Debug" in c:/build/git/foobar
+#    'b' runs "ctest -C Debug" in c:/build/foobar
 #
 # How it works:
 #
