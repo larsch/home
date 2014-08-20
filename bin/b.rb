@@ -1,19 +1,36 @@
 #!/usr/bin/env ruby
 #
-# b - runs any command given to it in the build directory
+# b - Build/source directory helper. Run any command from the source
+# directory, and 'b' will create/find the build directory and run the
+# command there.
 #
 # Installation:
 #     Run: gem install trollop highline
 #     Copy b.rb to somewhere in your PATH
 #
+# Example:
+#    c:/users/me/projects/foobar> b
+# Result:
+#    'b' creates c:/build/git/foobar and configures cmake
+#    'b' runs "cmake --build ." in c:/build/git/foobar
+#
+# Example:
+#    c:/users/me/projects/foobar> b ctest -C Debug
+# Result:
+#    'b' runs "ctest -C Debug" in c:/build/git/foobar
+#
 # How it works:
+#
+# 'b' runs the command given on the command line (or the default
+# command if none is given) in the build directories that corresponds
+# to the current directory (assumed to be a source directory).  The
+# default command is "cmake --build .", which is run if no arguments
+# are given to b.
 #
 # The build directory is automatically created in the build root with
 # the name of the source directory. b assumes that the current
 # directory is the source directory, but will look for CMakeLists.txt
-# files in parent directories to find the source root. The default
-# command is "cmake --build .", which is run if no arguments are given
-# to b. The first time, b will run cmake to configure the project.
+# files in parent directories to find the source root.
 #
 # Options:
 #    --delete|-d       Delete build directory
