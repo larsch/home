@@ -196,6 +196,8 @@ def run_in_build(*args)
   in_build do |source_dir|
     run_command("cmake", "-G", select_generator, source_dir) unless File.exist?("CMakeCache.txt")
     args.push("cmake", "--build", ".") if args.empty?
+    args.push("--target", $target) if $target
+    args.push("--config", $config) if $config
     run_command(*args)
   end
 end
@@ -224,6 +226,7 @@ opts = Trollop.options do
   opt :test, "Rerun CTest", short: '-t'
   opt :generator, "Generator", short: '-G', type: String
   opt :config, "Build configuration", short: "-C", type: String, default: "Debug"
+  opt :target, "Build target", type: String
   stop_on_unknown
 end
 
@@ -251,6 +254,8 @@ if changed_opt
 end
 
 $DEFAULT_GENERATOR = opts.generator
+$target = opts.target
+$config = opts.config
 
 if opts[:delete]
   delete_build
