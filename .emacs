@@ -8,7 +8,7 @@
 (require 'iedit)
 
 ;; Preferences
-(blink-cursor-mode 0)       		; stop blinking !
+(blink-cursor-mode 0)			; stop blinking !
 (menu-bar-mode 0)			; Remove menu bar
 (scroll-bar-mode 0)			; Remove scroll bar
 (column-number-mode 't)			; Column numbers always
@@ -24,9 +24,9 @@
 (setq split-width-threshold 'nil)       ; Sensible split-window-sensible
 ;; (setq vc-annotate-background nil)	; No annotate color
 ;; (setq vc-annotate-color-map nil)	; No annotate color
-(setq vc-cvs-stay-local nil) 		; ditto
+(setq vc-cvs-stay-local nil)		; ditto
 (setq w32-get-true-file-attributes nil)	; Work-around for slow-downs
-(global-auto-revert-mode 1)	        ; Auto-revert if change on disk
+(global-auto-revert-mode 1)		; Auto-revert if change on disk
 (setq revert-without-query ".*")        ; Revert all unedited files
 (set 'compile-directory nil)
 (set 'inhibit-read-only t)		; Never open files in read-only mode
@@ -93,6 +93,7 @@
 (set 'ruby-deep-arglist 'nil)
 (set 'ruby-deep-indent-paren 'nil)
 (set 'ruby-deep-indent-paren-style 'nil)
+(setq ruby-insert-encoding-magic-comment nil)
 (add-hook 'ruby-mode-hook 'install-before-save-hooks-ruby)
 (add-hook 'ruby-mode-hook 'which-function-mode)
 ;; (add-hook 'ruby-mode-hook 'ruby-electric-mode)
@@ -171,7 +172,7 @@
 ;; (add-to-list 'c-font-lock-extra-types "uint")
 
 (setq c-default-style '((java-mode . "java") (other . "gh"))) ; indentation-style
-(set 'parens-require-spaces nil) 	;; dont insert space before parentheses
+(set 'parens-require-spaces nil)	;; dont insert space before parentheses
 
 ;; indentation style based on k&r
 (c-add-style
@@ -179,10 +180,10 @@
  '("k&r"
    (c-basic-offset . 3)
    (c-offsets-alist . ((inline-open . 0)
-                       (statement-case-open . +)
-                       (inextern-lang . 0)
+		       (statement-case-open . +)
+		       (inextern-lang . 0)
 		       (innamespace . 0)
-                       ))))
+		       ))))
 
 ;; Google stuff
 (defun google-symbol-at-point ()
@@ -276,12 +277,12 @@
 
 ;; (defun flymake-get-mingw32-make-cmdline (source base-dir)
 ;;   (list "mingw32-make"
-;; 	(list "-s"
-;; 	      "-C"
-;; 	      base-dir
-;; 	      (concat "CHK_SOURCES=" source)
-;; 	      "SYNTAX_CHECK_MODE=1"
-;; 	      "check-syntax")))
+;;	(list "-s"
+;;	      "-C"
+;;	      base-dir
+;;	      (concat "CHK_SOURCES=" source)
+;;	      "SYNTAX_CHECK_MODE=1"
+;;	      "check-syntax")))
 
 ;; (defun flymake-simple-mingw32-make-init ()
 ;;   (flymake-simple-make-init-impl 'flymake-create-temp-inplace t t "Makefile" 'flymake-get-mingw32-make-cmdline))
@@ -395,10 +396,10 @@
 ;; (add-hook 'c-mode-hook 'install-restyle-hook)
 (add-hook 'compilation-mode-hook 'toggle-truncate-lines)
 (add-hook 'compilation-mode-hook
-          (lambda () (make-local-variable 'hl-line-sticky-flag)
-            (setq hl-line-sticky-flag t)
-            (hl-line-mode t)
-            ))
+	  (lambda () (make-local-variable 'hl-line-sticky-flag)
+	    (setq hl-line-sticky-flag t)
+	    (hl-line-mode t)
+	    ))
 
 ;; Update copyright notice
 (set 'copyright-regexp "Copyright [^ ]+ \\(\\([[:digit:]]+\\)\\(-[[:digit:]]+\\)? \\)?by")
@@ -423,16 +424,16 @@
   "Renames both current buffer and file it's visiting to NEW-NAME."
   (interactive "sNew name: ")
   (let ((name (buffer-name))
-        (filename (buffer-file-name)))
+	(filename (buffer-file-name)))
     (if (not filename)
-        (message "Buffer '%s' is not visiting a file!" name)
+	(message "Buffer '%s' is not visiting a file!" name)
       (if (get-buffer new-name)
-          (message "A buffer named '%s' already exists!" new-name)
-        (progn
-          (rename-file name new-name 1)
-          (rename-buffer new-name)
-          (set-visited-file-name new-name)
-          (set-buffer-modified-p nil))))))
+	  (message "A buffer named '%s' already exists!" new-name)
+	(progn
+	  (rename-file name new-name 1)
+	  (rename-buffer new-name)
+	  (set-visited-file-name new-name)
+	  (set-buffer-modified-p nil))))))
 
 ;; Move lines up/down using M-S-up/M-S-down
 ;; source: http://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emacs
@@ -440,9 +441,9 @@
   (cond
    ((and mark-active transient-mark-mode)
     (if (> (point) (mark))
-        (exchange-point-and-mark))
+	(exchange-point-and-mark))
     (let ((column (current-column))
-          (text (delete-and-extract-region (point) (mark))))
+	  (text (delete-and-extract-region (point) (mark))))
       (forward-line arg)
       (move-to-column column t)
       (set-mark (point))
@@ -453,10 +454,10 @@
     (let ((column (current-column)))
       (beginning-of-line)
       (when (or (> arg 0) (not (bobp)))
-        (forward-line)
-        (when (or (< arg 0) (not (eobp)))
-          (transpose-lines arg))
-        (forward-line -1))
+	(forward-line)
+	(when (or (< arg 0) (not (eobp)))
+	  (transpose-lines arg))
+	(forward-line -1))
       (move-to-column column t)))))
 
 (defun move-text-down (arg)
@@ -576,3 +577,36 @@
 (setq ruby-insert-encoding-magic-comment 'nil)
 
 (modify-coding-system-alist 'file "\\.rst\\'" 'utf-8)
+
+(custom-set-faces
+ '(j-verb-face ((t (:foreground "Red"))))
+ '(j-adverb-face ((t (:foreground "Green"))))
+ '(j-conjunction-face ((t (:foreground "Blue"))))
+ '(j-other-face ((t (:foreground "Gray")))))
+
+(defvar newline-and-indent t
+      "Modify the behavior of the open-*-line functions to cause them to autoindent.")
+
+;; Behave like vi's o command
+(defun open-next-line (arg)
+  "Move to the next line and then opens a line.
+    See also `newline-and-indent'."
+  (interactive "p")
+  (end-of-line)
+  (open-line arg)
+  (next-line 1)
+  (when newline-and-indent
+    (indent-according-to-mode)))
+
+;; Behave like vi's O command
+(defun open-previous-line (arg)
+  "Open a new line before the current one.
+     See also `newline-and-indent'."
+  (interactive "p")
+  (beginning-of-line)
+  (open-line arg)
+  (when newline-and-indent
+    (indent-according-to-mode)))
+
+(global-set-key (kbd "C-o") 'open-next-line)
+(global-set-key (kbd "M-o") 'open-previous-line)
