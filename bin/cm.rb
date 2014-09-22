@@ -1,4 +1,3 @@
-
 #!/usr/bin/env ruby
 #
 # CMakeLists.txt semi-auto-editor. Synchronizes the list of files in a
