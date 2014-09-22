@@ -2,6 +2,16 @@
 
 # Removes old files in temporary directorys.
 
+def human_size(n)
+  return "0 B" if n.zero?
+  sizes = %w{B KiB MiB GiB TiB PiB EiB ZiB YiB}
+  x = (Math.log(n) / Math.log(1024)).floor
+  n = n / (1024.0 ** x)
+  n = n.round(2)
+  n = n.to_i if n.round == n
+  "#{n} #{sizes[x]}"
+end
+
 def files(path, &block)
   Dir.entries(path).each do |entry|
     next if entry == "." or entry == ".."
@@ -53,10 +63,11 @@ def clean(clean_path, max_age = MAX_AGE)
       end
     end
   end
-  puts "Removed #{file_count} files (#{total_size} bytes) and #{dir_count} directories from #{clean_path}."
+  puts "Removed #{file_count} files (#{human_size total_size}) and #{dir_count} directories from #{clean_path}."
 end
-clean(ENV['TEMP'])
-clean(ENV['USERPROFILE'] + '\Downloads', 31*24*60*60)
+clean ENV['TEMP']
+clean ENV['USERPROFILE'] + '\Downloads', 31*24*60*60
 system "net stop wuauserv"
-clean(ENV['SystemRoot'] + '\SoftwareDistribution\Download')
+clean ENV['SystemRoot'] + '\SoftwareDistribution\Download'
+clean ENV['SystemRoot'] + '\Temp'
 system "net start wuauserv"
