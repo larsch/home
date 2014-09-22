@@ -2,7 +2,7 @@
 diff = ARGV.delete('--diff')
 dryrun = ARGV.delete('--dry-run')
 
-Dir.glob("**/{CMakeLists.txt,*.rst,*.rb}") do |path|
+Dir.glob("**/*.{txt,rst,c,cpp,h,rb,bat,cmd}") do |path|
   next if path =~ /3rdparty/
   content = IO.read(path)
   orig_content = content.dup
