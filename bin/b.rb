@@ -225,7 +225,7 @@ opts = Trollop.options do
   opt :all, "Rerun CMake, Build, Test", short: '-a'
   opt :test, "Rerun CTest", short: '-t'
   opt :generator, "Generator", short: '-G', type: String
-  opt :config, "Build configuration", short: "-C", type: String, default: "Debug"
+  opt :config, "Build configuration", short: "-C", type: String
   opt :target, "Build target", type: String
   stop_on_unknown
 end
@@ -269,11 +269,11 @@ elsif opts[:all]
   in_build do
     run_command "cmake", "."
     run_command "cmake", "--build", "."
-    run_command "ctest", "-C", opts[:config]
+    run_command "ctest", "-C", opts[:config] || "Debug"
   end
 elsif opts[:test]
   in_build do
-    run_command "ctest", "-C", opts[:config]
+    run_command "ctest", "-C", opts[:config] || "Debug"
   end
 else
   run_in_build(*ARGV)
