@@ -32,7 +32,6 @@
 (set 'inhibit-read-only t)		; Never open files in read-only mode
 (setq inhibit-startup-screen t)
 (setq inhibit-startup-echo-area-message "lac")
-(electric-indent-mode 0)
 
 ;; Short-cuts
 (global-set-key "\C-x\C-b" 'electric-buffer-list)
@@ -45,6 +44,7 @@
 (global-set-key "\C-cn" 'next-error)	   ; Jump to next error
 (global-set-key "\C-cr" 'quickrun)	   ; Quick-run
 (global-set-key "\C-x\C-r" 'recentf-open-files)
+(global-set-key "\C-j" 'newline-and-indent)
 
 ;; Enable grep under windows
 (setq grep-command "grep -n ")
