@@ -610,3 +610,24 @@
 
 (global-set-key (kbd "C-o") 'open-next-line)
 (global-set-key (kbd "M-o") 'open-previous-line)
+
+(unless (fboundp 'delete-consecutive-dups)
+  (defun delete-consecutive-dups (list &optional circular)
+    "Destructively remove `equal' consecutive duplicates from LIST.
+First and last elements are considered consecutive if CIRCULAR is
+non-nil."
+    (let ((tail list) last)
+      (while (consp tail)
+        (if (equal (car tail) (cadr tail))
+            (setcdr tail (cddr tail))
+          (setq last (car tail)
+                tail (cdr tail))))
+      (if (and circular
+               (cdr list)
+               (equal last (car list)))
+          (nbutlast list)
+        list))))
+
+(ido-mode t)
+(setq ido-enable-flex-matching t
+      ido-use-virtual-buffers t)
