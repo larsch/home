@@ -32,6 +32,7 @@
 (set 'inhibit-read-only t)		; Never open files in read-only mode
 (setq inhibit-startup-screen t)
 (setq inhibit-startup-echo-area-message "lac")
+(electric-indent-mode 0)
 
 ;; Short-cuts
 (global-set-key "\C-x\C-b" 'electric-buffer-list)
