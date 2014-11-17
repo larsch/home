@@ -19,7 +19,7 @@ HEADER_REGEXP = /\.(?:h|hpp|hxx|H)$/
 SOURCE_REGEXP = /\.(?:c|cpp|cxx|C)$/
 ANY_REGEXP = /\.(?:c|cpp|cxx|C|h|hpp|hxx|H)$/
 
-def quote(list)
+def cmake_quote(list)
   list.map do |x|
     if x =~ /[\" ]/
       '"' + x.gsub('"', '\\"') + '"'
@@ -29,8 +29,8 @@ def quote(list)
   end
 end
 
-def cmakejoin(list)
-  quote(list).join("\n  ")
+def cmake_join(list)
+  cmake_quote(list).join("\n  ")
 end
 
 class Item
@@ -54,7 +54,7 @@ class Item
   end
   def to_s
     sorted_list = list.sort_by { |x| x.downcase }
-    "#{command}(#{key} #{cmakejoin sorted_list})"
+    "#{command}(#{key} #{cmake_join sorted_list})"
   end
   def delete_missing(items)
     list.delete_if do |path|
@@ -69,6 +69,8 @@ class Item
   end
 end
 
+# Wrapper class for editing CMakeLists.txt. Creates a new
+# CMakelists.txt if one does not exist.
 class CMakeLists
 
   def initialize
@@ -209,15 +211,6 @@ class CMakeLists
     "_" + File.basename(fn).gsub(/[^0-9a-z]/i, '_')
   end
 
-  def header_comment(fn)
-    file = File.expand_path("~/.header_comment")
-    if File.exist?(file)
-      File.read(file)
-    else
-      ""
-    end
-  end
-
   def template(tmpl, filename)
     name = File.basename(filename, File.extname(filename))
     literalname = name.gsub(/([a-z])([A-Z])/, "\\1 \\2")
@@ -226,14 +219,21 @@ class CMakeLists
   end
 
   def header_template(fn)
-    template(IO.read(File.expand_path "~/.templates/file.h"), fn)
-    # hg = header_guard(fn)
-    # "#{header_comment(fn)}\n\n#ifndef #{hg}\n#define #{hg}\n\n\n#endif // #{hg}\n"
+    path = File.expand_path("~/.templates/file.h")
+    if File.exist?(path)
+      template(IO.read(path), fn)
+    else
+      template("#ifndef _<%=name%>_h\n#define _<%=name%>_h\n\n\n#endif // _<%=name%>\n", fn)
+    end
   end
 
   def source_template(fn)
-    template(IO.read(File.expand_path "~/.templates/file.cpp"), fn)
-    # "#{header_comment(fn)}\n\n#include \"#{headerfilename}\""
+    path = File.expand_path("~/.templates/file.h")
+    if File.exist?(path)
+      template(IO.read(path), fn)
+    else
+      template("#include \"<%= name %>.h\"\n", fn)
+    end
   end
 
   def create(fn, content = "")
@@ -294,6 +294,27 @@ class CMakeLists
   end
 end
 
+def usage
+  puts "cm.rb - Synchronize CMakeLists.txt 'sources' and 'headers' variables with contents of directory."
+  puts
+  puts "Synopsis:"
+  puts
+  puts "   cm                    - synchronize CMakeLists.txt with folder"
+  puts "   cm -a ClassName       - create source/header pair and synchronize CMakeLists.txt"
+  puts "   cm -a File.{h|cpp}    - create file and synchronize CMakeLists.txt"
+  puts "   cm -r ClassA ClassB   - rename source/header pair and synchronize CMakeLists.txt"
+  puts
+  puts "To create files, templates must exist here:"
+  puts ""
+  puts "   ~/.templates/file.h   - header file template"
+  puts "   ~/.templates/file.cpp - source file template"
+  puts
+  puts "Notes:"
+  puts
+  puts "   - Creates a new CMakeLists.txt if one does not exist in the current directory"
+  puts "   - Adds contents in subdirectories (unless another CMakeLists.txt is found there)"
+end
+
 cml = CMakeLists.new
 unless ARGV.empty?
   while arg = ARGV.shift
@@ -302,8 +323,13 @@ unless ARGV.empty?
       cml.smart_add(ARGV.shift)
     when "-r"
       cml.rename(ARGV.shift, ARGV.shift)
+    when "-?", "-h", "--help"
+      usage
+      exit
     else
-      raise "Unknown option #{arg}"
+      puts "Unknown option: #{arg}"
+      usage
+      exit
     end
   end
 end
