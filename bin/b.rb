@@ -263,7 +263,7 @@ elsif opts[:open]
   open_solution
 elsif opts[:cmake]
   in_build do |source_dir|
-    run_command "cmake", "."
+    run_command "cmake", source_dir
   end
 elsif opts[:all]
   in_build do
