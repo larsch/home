@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-Dir.each "**/*.{sln,ncb,ilk,ipch,suo,user,ncb,sbr,sdf}" do |path|
+Dir.glob "**/*.{sln,ncb,ilk,ipch,suo,user,ncb,sbr,sdf,dmp}" do |path|
   if File.file?(path)
     case path
     when /\.sln$/
