@@ -70,4 +70,5 @@ clean ENV['USERPROFILE'] + '\Downloads', 31*24*60*60
 system "net stop wuauserv"
 clean ENV['SystemRoot'] + '\SoftwareDistribution\Download'
 clean ENV['SystemRoot'] + '\Temp'
+clean ENV['USERPROFILE'] + '\AppData\Local\Microsoft\Windows\Temporary Internet Files'
 system "net start wuauserv"
