@@ -7,6 +7,10 @@
 (add-to-list 'load-path "~/.elisp")	; Personal elisp files
 (require 'iedit)
 
+(require 'git-gutter-fringe)
+(global-git-gutter-mode t)
+(powerline-center-theme)
+
 ;; Preferences
 (blink-cursor-mode 0)			; stop blinking !
 (menu-bar-mode 0)			; Remove menu bar
@@ -43,7 +47,7 @@
 (global-set-key "\C-cc" 'compile)	   ; compile shortcut
 (global-set-key "\C-cn" 'next-error)	   ; Jump to next error
 (global-set-key "\C-cr" 'quickrun)	   ; Quick-run
-(global-set-key "\C-x\C-r" 'recentf-open-files)
+(global-set-key "\C-x\C-r" 'ido-recentf-open)
 (global-set-key "\C-j" 'newline-and-indent)
 
 ;; Enable grep under windows
@@ -54,6 +58,12 @@
 (require 'recentf)
 (recentf-mode 1)
 (setq recentf-max-menu-items 500)
+(defun ido-recentf-open ()
+  "Use `ido-completing-read' to \\[find-file] a recent file"
+  (interactive)
+  (if (find-file (ido-completing-read "Find recent file: " recentf-list))
+      (message "Opening file...")
+    (message "Aborting")))
 
 ;; Convinient buffer navigation that returns to same position if you
 ;; go down and up X.
@@ -98,15 +108,6 @@
 (add-hook 'ruby-mode-hook 'install-before-save-hooks-ruby)
 (add-hook 'ruby-mode-hook 'which-function-mode)
 ;; (add-hook 'ruby-mode-hook 'ruby-electric-mode)
-
-(autoload 'run-ruby "inf-ruby"
-  "Run an inferior Ruby process")
-(autoload 'inf-ruby-keys "inf-ruby"
-  "Set local key defs for inf-ruby in ruby-mode")
-(add-hook 'ruby-mode-hook
-	  '(lambda ()
-	     (inf-ruby-keys)
-	     ))
 
 (defun convert-hash-arg ()
   "Search/replace for ruby hash argument and change style"
