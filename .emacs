@@ -5,56 +5,89 @@
 (server-start)
 
 (add-to-list 'load-path "~/.elisp")	; Personal elisp files
-(require 'iedit)
-
-(require 'git-gutter-fringe)
-(global-git-gutter-mode t)
-(powerline-center-theme)
+(when (> emacs-major-version 23)
+  (require 'package)
+  (package-initialize)
+  (add-to-list 'package-archives
+	       '("melpa" . "http://melpa.milkbox.net/packages/")
+	       'APPEND))
 
 ;; Preferences
-(blink-cursor-mode 0)			; stop blinking !
+(setq make-backup-files nil)		; Disable backup files
+(setq vc-cvs-stay-local nil)		; Disable VCS backup files
+(setq w32-get-true-file-attributes nil)	; Work-around for slow-downs
+
+;; Window Preferences
+(blink-cursor-mode 0)			; Stop cursor blinking
 (menu-bar-mode 0)			; Remove menu bar
 (scroll-bar-mode 0)			; Remove scroll bar
+(tool-bar-mode 0)			; Remove toolbar
 (column-number-mode 't)			; Column numbers always
-(global-font-lock-mode 't)		; highlighting always
-(global-linum-mode 't)			; linum-mode
+(setq mouse-wheel-progressive-speed 'nil) ; Disable scroll acceleration
+(setq split-width-threshold 'nil)       ; Sensible split-window-sensible
+(set 'inhibit-read-only t)		; Never open files in read-only mode
+(setq inhibit-startup-screen t)		; Inhibit startup screen
+(setq inhibit-startup-echo-area-message "lac") ; Inhibit startup echo area message
+(powerline-center-theme)		; Improved mode line
+
+;; Editor preferences
+(global-font-lock-mode 't)		; Highlighting always
+(global-linum-mode 't)			; Show line numbers
 (show-paren-mode 't)			; Highlight matching parens
-(tool-bar-mode 0)			; remove useless feature
-(set 'ediff-split-window-function 'split-window-horizontally)
 (set 'show-paren-delay 0.05)		; Reduce the delay for showing matching parens
 (setq frame-title-format "%b - Emacs")	; Show filename first in title bar
-(setq make-backup-files nil)		; real men don't take backups
-(setq mouse-wheel-progressive-speed 'nil) ; No scroll acceleration
-(setq split-width-threshold 'nil)       ; Sensible split-window-sensible
-;; (setq vc-annotate-background nil)	; No annotate color
-;; (setq vc-annotate-color-map nil)	; No annotate color
-(setq vc-cvs-stay-local nil)		; ditto
-(setq w32-get-true-file-attributes nil)	; Work-around for slow-downs
 (global-auto-revert-mode 1)		; Auto-revert if change on disk
 (setq revert-without-query ".*")        ; Revert all unedited files
-(set 'compile-directory nil)
-(set 'inhibit-read-only t)		; Never open files in read-only mode
-(setq inhibit-startup-screen t)
-(setq inhibit-startup-echo-area-message "lac")
 
-;; Short-cuts
+;; Other
+(set 'compile-directory nil)
+(set 'ediff-split-window-function 'split-window-horizontally)
+(require 'iedit)			; Interactive edit all occurences of symbols
+
+;; Shortcuts
 (global-set-key "\C-x\C-b" 'electric-buffer-list)
-(global-unset-key "\C-z")		   ; dont minimize on C-z
-(global-set-key "\C-cg" 'goto-line)	   ; goto-line
-(global-set-key "\C-ct" 'todo-show)	   ; todo-show
-(global-set-key [?\C-.] 'kill-this-buffer) ; quick buffer killing
-(global-set-key "\C-cs" 'shell)		   ; shell mode shortcut
-(global-set-key "\C-cc" 'compile)	   ; compile shortcut
-(global-set-key "\C-cn" 'next-error)	   ; Jump to next error
-(global-set-key "\C-cr" 'quickrun)	   ; Quick-run
 (global-set-key "\C-x\C-r" 'ido-recentf-open)
+(global-set-key "\C-cg" 'goto-line)
+(global-set-key "\C-ct" 'todo-show)
+(global-set-key [?\C-.] 'kill-this-buffer)
+(global-set-key "\C-cs" 'shell)
+(global-set-key "\C-cc" 'compile)
+(global-set-key "\C-cn" 'next-error)
+(global-set-key "\C-cr" 'quickrun)
 (global-set-key "\C-j" 'newline-and-indent)
+(global-unset-key "\C-z") ; dont minimize on C-z
+
+;; Shortcuts to custom functions
+(global-set-key "\M-p" 'jump-up)
+(global-set-key "\M-n" 'jump-down)
+(global-set-key "\M-w" 'kill-ring-save-region-or-word)
+(global-set-key [f1] 'google-symbol-at-point)
+(global-set-key [C-f1] 'google-feeling-lucky-symbol-at-point)
+(global-set-key [M-S-up] 'move-text-up)
+(global-set-key [M-S-down] 'move-text-down)
+(global-set-key [M-P] 'move-text-up)
+(global-set-key [M-N] 'move-text-down)
+(global-set-key "\C-cd" 'diff-buffer)
+(global-set-key (kbd "C-o") 'open-next-line)
+(global-set-key (kbd "M-o") 'open-previous-line)
+
+;; Shortcuts to insert pairs (some custom functions)
+(global-set-key "\M-\"" 'insert-double-quotes)
+(global-set-key "\M-'" 'insert-quotes)
+(global-set-key "\M-[" 'insert-brackets)
+(global-set-key "\M-{" 'insert-braces)
+(global-set-key (kbd "<M-return>") 'insert-do-end)
+
+;; Interactive-do stuff with buffers mode
+(ido-mode t)
+(setq ido-enable-flex-matching t)
+(setq ido-use-virtual-buffers t)
 
 ;; Enable grep under windows
 (setq grep-command "grep -n ")
 (setq grep-null-device "nul")
 
-;; Recent files
+;; Recent files (using ido-mode)
 (require 'recentf)
 (recentf-mode 1)
 (setq recentf-max-menu-items 500)
@@ -65,8 +98,8 @@
       (message "Opening file...")
     (message "Aborting")))
 
-;; Convinient buffer navigation that returns to same position if you
-;; go down and up X.
+;; Pseudo-scrolling (will return cursor to same position when jumping
+;; up, then down, contrary to PgUp/Dn scrolling).
 (defun jump-up ()
   "Jumps 10 lines up"
   (interactive)
@@ -75,16 +108,18 @@
   "Jumps 10 lines down"
   (interactive)
   (next-line 10))
-(global-set-key "\M-p" 'jump-up)
-(global-set-key "\M-n" 'jump-down)
 
-;; kill-word-under-cursor: Put tag/symbol/word under cursor in kill
-;; ring for easy yanking (requires etags to be loaded)
-(defun kill-word-under-cursor ()
+;; Put tag/symbol/word under cursor in kill ring for easy yanking.
+(defun kill-ring-save-symbol-at-point ()
   "Kill word under cursor"
   (interactive)
-  (kill-new (find-tag-default)))
-(global-set-key "\M-c" 'kill-word-under-cursor)
+  (kill-new (thing-at-point 'symbol)))
+
+;; Copy region or word under cursor (M-w alternative)
+(defun kill-ring-save-region-or-word ()
+  "Save the region as if killed, but don't kill it. If no region is active, kill the symbol at the cursor."
+  (interactive)
+  (if (use-region-p) (kill-ring-save (point) (mark t)) (kill-ring-save-symbol-at-point)))
 
 ;;
 ;; Programming Modes
@@ -107,7 +142,7 @@
 (setq ruby-insert-encoding-magic-comment nil)
 (add-hook 'ruby-mode-hook 'install-before-save-hooks-ruby)
 (add-hook 'ruby-mode-hook 'which-function-mode)
-;; (add-hook 'ruby-mode-hook 'ruby-electric-mode)
+(setq ruby-insert-encoding-magic-comment 'nil)
 
 (defun convert-hash-arg ()
   "Search/replace for ruby hash argument and change style"
@@ -155,23 +190,12 @@
 (add-to-list 'auto-mode-alist '("\\.bat\\'" . batch-mode))
 (add-to-list 'auto-mode-alist '("\\.cmd\\'" . batch-mode))
 
-;;
-;; GH Style Settings
-;;
+;; rst-mode
+(modify-coding-system-alist 'file "\\.rst\\'" 'utf-8)
 
-;; highlight these words as types
-;; (load "cc-mode")
-;; (add-to-list 'c++-font-lock-extra-types "Tcl\\sw+")
-;; (add-to-list 'c++-font-lock-extra-types "Ten\\sw+")
-;; (add-to-list 'c++-font-lock-extra-types "Trec\\sw+")
-;; (add-to-list 'c-font-lock-extra-types "HANDLE")
-;; (add-to-list 'c-font-lock-extra-types "VOID")
-;; (add-to-list 'c-font-lock-extra-types "LPVOID")
-;; (add-to-list 'c-font-lock-extra-types "BOOL")
-;; (add-to-list 'c-font-lock-extra-types "HFILE")
-;; (add-to-list 'c-font-lock-extra-types "DWORD")
-;; (add-to-list 'c-font-lock-extra-types "UINT")
-;; (add-to-list 'c-font-lock-extra-types "uint")
+;;
+;; C/C++ Style Settings
+;;
 
 (setq c-default-style '((java-mode . "java") (other . "gh"))) ; indentation-style
 (set 'parens-require-spaces nil)	;; dont insert space before parentheses
@@ -186,22 +210,6 @@
 		       (inextern-lang . 0)
 		       (innamespace . 0)
 		       ))))
-
-;; Google stuff
-(defun google-symbol-at-point ()
-  "Google word at point"
-  (interactive)
-  (browse-url (concat "http://google.com/search?q=" (thing-at-point 'symbol))))
-(global-set-key [f1] 'google-symbol-at-point)
-(defun google-feeling-lucky-word-at-point ()
-  "Google word at point"
-  (interactive)
-  (browse-url (concat "http://google.com/search?q=" (thing-at-point 'symbol) "&btnI")))
-(global-set-key [C-f1] 'google-feeling-lucky-symbol-at-point)
-(defun google-feeling-lucky-symbol-at-point ()
-  "Google word at point"
-  (interactive)
-  (browse-url (concat "http://google.com/search?q=" (thing-at-point 'symbol) "&btnI")))
 
 ;; C/C++ Programming
 (defun setup-c++-mode () "Setups Custom C++ mode settings" (interactive)
@@ -218,6 +226,20 @@
 (setq dabbrev-case-fold-search nil) ; case sensitive expansion
 (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_") ; complete only symbols (avoids completing & or *)
 
+;; Google stuff
+(defun google-symbol-at-point ()
+  "Google word at point"
+  (interactive)
+  (browse-url (concat "http://google.com/search?q=" (thing-at-point 'symbol))))
+(defun google-feeling-lucky-word-at-point ()
+  "Google word at point"
+  (interactive)
+  (browse-url (concat "http://google.com/search?q=" (thing-at-point 'symbol) "&btnI")))
+(defun google-feeling-lucky-symbol-at-point ()
+  "Google word at point"
+  (interactive)
+  (browse-url (concat "http://google.com/search?q=" (thing-at-point 'symbol) "&btnI")))
+
 ;; Handy diff function which opens a diff between current file and cvs
 ;; version. Bound to C-c d.
 (defun diff-buffer () "diff buffer"
@@ -230,13 +252,29 @@
   (goto-line 1)
   (toggle-read-only)
   (local-set-key "q" 'kill-this-buffer))
-(global-set-key "\C-cd" 'diff-buffer)
+
+;; Insert pairs of stuff using M-<key> (single and double quotes)
+(defun insert-double-quotes (&optional arg)
+  (interactive "P")
+  (insert-pair arg ?\" ?\"))
+(defun insert-quotes (&optional arg)
+  (interactive "P")
+  (insert-pair arg ?\' ?\'))
+(defun insert-braces-2 (&optional arg)
+  (interactive "P")
+  (insert-pair arg "{\n" "\n}\n"))
+(defun insert-do-end (&optional arg)
+  (interactive "P")
+  (insert-pair arg "do\n" "end\n"))
+(defun insert-brackets (&optional arg)
+  (interactive "P")
+  (insert-pair arg ?\[ ?\]))
 
 ;; M-{ keybinding to inserts matching braces, indents the lines and
 ;; moves the cursor in between. If a region is selected, wrap it in
 ;; braces.
 (defun insert-braces ()
-  "Insert matching curly braces"
+  "Insert matching curly braces or wrap a region with braces"
   (interactive)
   (if (region-active-p) (insert-braces-region) (insert-braces-point)))
 (defun insert-braces-point () "Insert matching curly braces at point" (interactive)
@@ -253,51 +291,7 @@
     (goto-char beginning)
     (insert "{\n")
     (indent-region (- beginning 2) (+ end 4))
-    (c-indent-command)
-    ))
-(global-set-key "\M-{" 'insert-braces)
-
-;; M-[ keybinding to inserts matching brackets, indents the lines and
-;; moves the cursor in between.
-(defun insert-brackets ()
-  "Insert matching square brackets"
-  (interactive)
-  (set-mark-command 'nil)
-  (insert "[]")
-  (backward-char))
-(global-set-key "\M-[" 'insert-brackets)
-
-;; Fly-make
-;; (require 'compile)
-;; (require 'flymake)
-;; (defun flymake-get-make-cmdline (source base-dir)
-;;   (list "mingw32-make" (list "-s" "-C" base-dir (concat "CHK_SOURCES=" source) "SYNTAX_CHECK_MODE=1" "check-syntax")))
-
-;; (global-set-key [f4] 'flymake-goto-next-error)
-;; (global-set-key [M-down] 'flymake-display-err-menu-for-current-line)
-;; (global-set-key [M-up] 'find-tag-other-window)
-
-;; (defun flymake-get-mingw32-make-cmdline (source base-dir)
-;;   (list "mingw32-make"
-;;	(list "-s"
-;;	      "-C"
-;;	      base-dir
-;;	      (concat "CHK_SOURCES=" source)
-;;	      "SYNTAX_CHECK_MODE=1"
-;;	      "check-syntax")))
-
-;; (defun flymake-simple-mingw32-make-init ()
-;;   (flymake-simple-make-init-impl 'flymake-create-temp-inplace t t "Makefile" 'flymake-get-mingw32-make-cmdline))
-;; (add-to-list 'flymake-allowed-file-name-masks '("\\.\\(?:c\\(?:pp\\|xx\\|\\+\\+\\)?\\|CC\\)\\'" flymake-simple-mingw32-make-init))
-
-;; (defun flymake-master-mingw32-make-header-init ()
-;;   (flymake-master-mingw32-make-init
-;;    'flymake-get-include-dirs
-;;    '("\\.\\(?:c\\(?:pp\\|xx\\|\\+\\+\\)?\\|CC\\)\\'")
-;;    "[ \t]*#[ \t]*include[ \t]*\"\\([[:word:]0-9/\\_.]*%s\\)\""))
-;; (add-to-list 'flymake-allowed-file-name-masks '("\\.h\\'" flymake-master-mingw32-make-header-init flymake-master-cleanup))
-
-;; (add-hook 'find-file-hook 'flymake-find-file-hook)
+    (c-indent-command)))
 
 ;; Compile with working directory set
 (defun compile-from-compile-directory()
@@ -345,26 +339,27 @@
 	))
 
 (defun auto-update-source-file ()
-	 (save-excursion
-	   (while (search-forward "%guard%" nil t)
-	     (save-restriction
-	       (narrow-to-region (match-beginning 0) (match-end 0))
-	       (replace-match (concat "_" (downcase (file-name-nondirectory buffer-file-name))))
-	       (subst-char-in-region (point-min) (point-max) ?. ?_)
-	       ))
-	   )
-	 ;; Move cursor to $$$ mark
-	 (while (search-forward "%module%" nil t)
-	   (save-restriction
-	       (narrow-to-region (match-beginning 0) (match-end 0))
-	       (replace-match (file-name-sans-extension (file-name-nondirectory buffer-file-name)))
-	       )
-	   )
-	 ;; Move cursor to %point%
-	 (while (search-forward "%point%" nil t) (replace-match ""))
-	 )
+  (save-excursion
+    (while (search-forward "%guard%" nil t)
+      (save-restriction
+	(narrow-to-region (match-beginning 0) (match-end 0))
+	(replace-match (concat "_" (downcase (file-name-nondirectory buffer-file-name))))
+	(subst-char-in-region (point-min) (point-max) ?. ?_)
+	))
+    )
+  ;; Move cursor to $$$ mark
+  (while (search-forward "%module%" nil t)
+    (save-restriction
+      (narrow-to-region (match-beginning 0) (match-end 0))
+      (replace-match (file-name-sans-extension (file-name-nondirectory buffer-file-name)))
+      )
+    )
+  ;; Move cursor to %point%
+  (while (search-forward "%point%" nil t) (replace-match "")))
 
-;; (setq auto-insert-alist '((c++-mode . "Hello, World!")))
+;;
+;; Source code restyling on save
+;;
 
 (set 'restyle-command "ruby -S restyle.rb")
 
@@ -417,11 +412,10 @@
   (save-excursion
     (replace-regexp-in-buffer
      copyright-regexp
-     (concat "Copyright (C) by")
-     )))
+     (concat "Copyright (C) by"))))
 
-;; Rename file AND
-;; buffer. http://steve.yegge.googlepages.com/my-dot-emacs-file
+;; Rename file AND buffer.
+;; http://steve.yegge.googlepages.com/my-dot-emacs-file
 (defun rename-file-and-buffer (new-name)
   "Renames both current buffer and file it's visiting to NEW-NAME."
   (interactive "sNew name: ")
@@ -474,55 +468,19 @@
   (interactive "*p")
   (move-text-internal (- arg)))
 
-(global-set-key [M-S-up] 'move-text-up)
-(global-set-key [M-S-down] 'move-text-down)
-(global-set-key [M-P] 'move-text-up)
-(global-set-key [M-N] 'move-text-down)
-
-;; MELPA package repository
-(when (> emacs-major-version 23)
-  (require 'package)
-  (package-initialize)
-  (add-to-list 'package-archives
-	       '("melpa" . "http://melpa.milkbox.net/packages/")
-	       'APPEND))
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(blink-cursor-mode nil)
- '(column-number-mode t)
-;; '(custom-enabled-themes (quote (solarized-dark)))
- '(custom-safe-themes (quote ("fc5fcb6f1f1c1bc01305694c59a1a861b008c534cae8d0e48e4d5e81ad718bc6" default)))
- '(org-agenda-files (quote ("~/org/bre_test_workshop.org" "~/org/org.org")))
- '(safe-local-variable-values (quote ((compile-directory . "d:/src/train/src"))))
- ;; '(scroll-down-aggressively 1.0)
- ;; '(scroll-up-aggressively 0.0)
- '(show-paren-mode t)
- '(tool-bar-mode nil))
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#2e3436" :foreground "#eeeeec" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 108 :width normal :foundry "outline" :family "Consolas"))))
- '(font-lock-comment-face ((t (:foreground "#73d216" :slant italic)))))
-
-
 ;; Indent, clean whitespace, untabify entire buffer, then update
 ;; copyright notice.
 (defun emacs-format-function ()
    "Format the whole buffer."
    (indent-region (point-min) (point-max) nil)
-   (whitespace-cleanup-2)
+   (whitespace-cleanup-extra)
    (untabify (point-min) (point-max))
    (update-copyright)
    (save-buffer))
 
-(defun whitespace-cleanup-2 ()
+;; Cleanup some whitespace problems (whitespace-cleanup), plus some
+;; extra whitespace.
+(defun whitespace-cleanup-extra ()
   "Clean up more whitespace"
   (interactive)
   (save-excursion
@@ -533,26 +491,6 @@
 (add-hook 'html-mode-hook
 	  (lambda()
 	    (setq indent-tabs-mode nil)))
-
-(defun insert-double-quotes (&optional arg)
-  (interactive "P")
-  (insert-pair arg ?\" ?\"))
-(defun insert-quotes (&optional arg)
-  (interactive "P")
-  (insert-pair arg ?\' ?\'))
-(defun insert-braces-2 (&optional arg)
-  (interactive "P")
-  (insert-pair arg "{\n" "}\n"))
-(defun insert-do-end (&optional arg)
-  (interactive "P")
-  (insert-pair arg "do\n" "end\n"))
-(defun insert-brackets (&optional arg)
-  (interactive "P")
-  (insert-pair arg ?\[ ?\]))
-
-(global-set-key "\M-\"" 'insert-double-quotes)
-(global-set-key "\M-'" 'insert-quotes)
-(global-set-key (kbd "<M-return>") 'insert-do-end)
 
 (setq ispell-program-name "c:/program files (x86)/aspell/bin/aspell.exe")
 
@@ -575,16 +513,6 @@
       (goto-char (point-min))
       (replace-string ">" "&gt;")
       )))
-
-(setq ruby-insert-encoding-magic-comment 'nil)
-
-(modify-coding-system-alist 'file "\\.rst\\'" 'utf-8)
-
-(custom-set-faces
- '(j-verb-face ((t (:foreground "Red"))))
- '(j-adverb-face ((t (:foreground "Green"))))
- '(j-conjunction-face ((t (:foreground "Blue"))))
- '(j-other-face ((t (:foreground "Gray")))))
 
 (defvar newline-and-indent t
       "Modify the behavior of the open-*-line functions to cause them to autoindent.")
@@ -610,9 +538,6 @@
   (when newline-and-indent
     (indent-according-to-mode)))
 
-(global-set-key (kbd "C-o") 'open-next-line)
-(global-set-key (kbd "M-o") 'open-previous-line)
-
 (unless (fboundp 'delete-consecutive-dups)
   (defun delete-consecutive-dups (list &optional circular)
     "Destructively remove `equal' consecutive duplicates from LIST.
@@ -630,6 +555,21 @@ non-nil."
           (nbutlast list)
         list))))
 
-(ido-mode t)
-(setq ido-enable-flex-matching t
-      ido-use-virtual-buffers t)
+;;
+;; Customization
+;;
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :stipple nil :background "#2e3436" :foreground "#eeeeec" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 108 :width normal :foundry "outline" :family "Consolas"))))
+ '(font-lock-comment-face ((t (:foreground "#73d216" :slant italic)))))
+
+(custom-set-faces
+ '(j-verb-face ((t (:foreground "Red"))))
+ '(j-adverb-face ((t (:foreground "Green"))))
+ '(j-conjunction-face ((t (:foreground "Blue"))))
+ '(j-other-face ((t (:foreground "Gray")))))
+
