@@ -50,6 +50,8 @@ else
         dte.ExecuteCommand("Build.Cancel")
         sleep 0.125 while dte.Solution.SolutionBuild.BuildState == WIN32OLE::VsBuildStateInProgress
       end
+      puts "== Saving all documents"
+      dte.Documents.SaveAll
       puts "== Closing solution (#{solution_path})"
       dte.Solution.Close
       puts "== Running CMake"
