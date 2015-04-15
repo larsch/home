@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # encoding: ISO-8859-1
 #
-# Restyle C++ code using AStyle and some additional cleaning up of
+# Restyle C/C++ code using AStyle and some additional cleaning up of
 # whitespace, copyright notice, etc.
 #
 
@@ -123,24 +123,42 @@ def restyle_file(file)
   orig_content = content.dup
   content = restyle_content(content, file, opts)
 
+  temp_file = File.join(Dir.tmpdir, "astyletemp#{$$}")
+  File.open(temp_file, "w") { |f| f << content }
+  astyle_options = Shellwords.shellwords(options["astyle_options"])
+  argv = astyle_options + [temp_file]
+  astyle = options["astyle_executable"]
+  system(astyle, *argv) or fail "Failed to execute #{astyle} #{options.inspect} #{$?}"
+
+  content = File.read(temp_file, :encoding => options["encoding"])
+  File.unlink(temp_file)
+
+  post_restyle_code(content, File.expand_path(file))
+
   if orig_content != content
+    update_copyright_without_year(content) unless $opts.check or options["leave_copyright"]
+    @changed_files += 1
     if $opts.diff
       Dir.mktmpdir do |tmppath|
         tempfile = File.join(tmppath, File.basename(file))
         File.open(tempfile, "w") { |f| f << content }
-        system("diff", file, tempfile)
+        system "diff", "-u", file, tempfile
       end
+    elsif $opts.check
+      puts "X #{file}"
     else
       File.open(file, "w") { |f| f << content }
       log "Restyled #{file}"
     end
+  else
+    @unchanged_files += 1
   end
 end
 
 EMPTY_LINE = /^(?:\s*)\n/
 
 # Restyle a chunk of code (our own rule set)
-def restyle_code(code, path)
+def restyle_code(code, path, options)
   # Adjust copyright year
   year = Time.now.year.to_s
   code.gsub!(/Copyright \S+ (?:(\d+)(-\d+)*)/) do |m|
@@ -155,11 +173,11 @@ def restyle_code(code, path)
   # Only 1 empty line between sections
   code.gsub!(/(\n[ \t]*\n)\s*\n/m, "\\1")
 
-  # No empty lines after open-brace (if something is indented after)
-  code.gsub!(/\{\s*^(\s+\S)\n/m, "{\n\\1")
+  # No empty lines after open-brace
+  code.gsub!(/(?<!@){\s*\n/m, "{\n")
 
-  # No empty lines before close-brace (if something was intended before)
-  code.gsub!(/^( +\S.*?\n)\s*(\n *\})/, "\\1\\2")
+  # No empty lines before close-brace
+  code.gsub!(/\s*(\n *\})/, "\\1")
 
   # Centre lines in file header
   code.sub!(/\A\s*\/\/={54}\n(\/\/(.*\n))+?\/\/-{54}/) { |x|
@@ -170,32 +188,27 @@ def restyle_code(code, path)
     }.join("\n")
   }
 
-  # /* comment */ to // comment
-  # code.gsub!(/\/\*(.*?)\*\/ *$/) { "// " + $1.strip }
-
-  # Space after //
-  code.gsub!(/\/\/([a-z0-9])/i, "// \\1")
-
-  # Forward slashes in includes
-
-  code.gsub!(/^(\s*#\s*include\s+["<])(.*?)([>"])/) { $1 + $2.tr('\\','/') + $3 }
-
-  # At least one empty line before comments
-  # code.gsub!(/#{EMPTY_LINE}*^(\s*\/(?:\/|\*))/, "\n\\1")
+  # Remove empty lines and whitespace before file header
+  code.sub!(/\A\s*/, '')
 
   # At least one space after C++ style comment markers (//)
-  code.gsub!(/(?:^| +)\/\/([a-z0-9])/i, "// \\1")
+  code.gsub!(/(^| +)\/\/(?!lint)([a-z0-9])/i, "\\1// \\2")
 
   # Forward slashes in includes
   code.gsub!(/^(\s*#\s*include\s+["<])(.*?)([>"])/) { $1 + $2.tr('\\','/') + $3 }
 
+  # One empty line after } at outermost level
+  code.gsub!(/^}\n(\w)/, "}\n\n\\1")
+
   # Changed include "" to include <> if file is not found locally
-  code.gsub!(/^(\s*#\s*include\s+)"(.*)"/) do
-    local = File.join(File.dirname(path), $2)
-    if File.exist?(local)
-      $&
-    else
-      "#{$1}<#{$2}>"
+  unless $opts.single
+    code.gsub!(/^(\s*#\s*include\s+)"(.*)"/) do
+      local = File.join(File.dirname(path), $2)
+      if File.exist?(local)
+        $&
+      else
+        "#{$1}<#{$2}>"
+      end
     end
   end
 
@@ -205,6 +218,48 @@ def restyle_code(code, path)
 
   # Remove duplicate //--- lines
   code.gsub!(/(^\/\/-+\n)(^\/\/-+\n)+/, "\\1")
+end
+
+def post_restyle_code(code, path)
+  # Fix Astyle 2.02/2.03 bad indentation of comments in enums
+  code.replace enum_fix(code.lines).join
+end
+
+# Fix Astyle 2.02/2.03 bad indentation of comments in enums.
+def enum_fix(lines)
+  indent = enum_indent = nil
+  lines.map do |ln|
+    if ln =~ /^(\s*)$/
+    elsif ln =~ /^(\s*)enum\s*/
+      indent = $1
+    elsif indent && ln =~ /^#{indent}{/
+      enum_indent = indent + "   "
+      indent = nil
+    elsif enum_indent && ln.sub!(/^#{enum_indent}\s*/, enum_indent)
+      # Edited
+    else
+      indent = enum_indent = nil
+    end
+    ln
+  end
+end
+
+def update_copyright_with_year(code)
+  # Adjust copyright year
+  year = Time.now.year.to_s
+  code.gsub!(/Copyright \S+ (?:(\d+)(-\d+)*)/) do |m|
+    old_start = $1
+    year = "#{old_start}-#{year}" if old_start != year
+    "Copyright (C) #{year}"
+  end
+end
+
+def update_copyright_without_year(code)
+  # Adjust copyright year
+  year = Time.now.year.to_s
+  code.gsub!(/Copyright \S+ (?:(\d+)(-\d+)*)/) do |m|
+    "Copyright (C)"
+  end
 end
 
 HEADER_GUARD_BREAK = /^(impl|src|include|plug-ins|3rdparty)$/
@@ -261,13 +316,24 @@ def restyle_headerguards(content, path)
     else
       lines[last[2][0]] = "#endif // #{hg}"
     end
+
+    # Adjust empty lines before and after header guards
+    before = lines[0...last[0][0]]
+    guard1 = lines[last[0][0] .. last[1][0]]
+    middle = lines[last[1][0]+1 ... last[2][0]]
+    guard2 = lines[last[2][0], 1]
+    after = lines[last[2][0] + 1..-1]
+    before.pop while middle.last && before.last.strip.empty?; before.push ""
+    middle.shift while middle.first && middle.first.strip.empty?; middle.unshift ""
+    middle.pop while middle.last && middle.last.strip.empty?; middle.push ""
+    lines = [before,guard1,middle,guard2,after].flatten
   else
   end
   content.replace(lines.join("\n") + "\n")
 end
 
 def skip_file(content)
-  content !~ CONDITION_PATTERN
+  content !~ @source_pattern
 end
 
 def log(str)
@@ -286,70 +352,188 @@ class Options
   attr_accessor :verbose
   attr_accessor :diff
   attr_accessor :filelog
-  attr_accessor :edited
-  attr_accessor :stdout
+  attr_accessor :dirty
+  attr_accessor :cached
+  attr_accessor :check
+  attr_accessor :single
 end
 
-def get_options
+def print_usage
+  puts "Usage: #{File.basename($0)} [OPTION]... [FILE-PATTERN] ..."
+  puts "Restyle GateHouse source code"
+  puts "Example: #{File.basename($0)} --dirty"
+  puts
+  puts "Files:"
+  puts "  --all/-a       Restyle all files (cpp,c,h) found in current directory and below"
+  puts "  --dirty        Restyle all dirty files that are in CVS or tracked in Git"
+  puts "  --cached       Restyle all cached file in the Git index"
+  puts "  path/*.{c,h}   All c,h files in path"
+  puts "  path/**/*.cpp  All cpp files in path and below (recursively)."
+  puts
+  puts "Behaviour:"
+  puts "  --check/-c     Check that all source files are formatted properly"
+  puts "  --diff/-d      Show the change that would be done, but don't actually write them"
+  puts "  --force/-f     Force: restyle files that would normally be skipped"
+  puts "  --pattern/-p   Only process files that contain this pattern (Default: #{@source_pattern.inspect})"
+  puts "  --single/-s    Check only a single file, do not look for other files in file system"
+  puts "  --leave-copy   Leave copyright mark untouched"
+  puts
+  puts "Miscellaneous:"
+  puts "  --help/-?/-h   Show this information"
+  puts "  --show-options Show current options"
+  puts "  --verbose/-v   Be verbose"
+  puts
+end
+
+def get_options(options)
   opts = Options.new
-  ARGV.size.times do
-    arg = ARGV.shift
+  files = []
+  while arg = ARGV.shift
     case arg
+    when '--check', '-c'
+      opts.check = true
     when '--force', '-f'
       opts.force = true
-    when '--edited', '-e'
-      opts.edited = true
+    when '--edited', '-e', '--dirty'
+      opts.dirty = true
+    when '--cached'
+      opts.cached = true
+    when '--all', '-a'
+      files.push options["all"]
     when '--verbose', '-v'
       opts.verbose = true
     when '--diff', '-d'
       opts.diff = true
-    when '--stdout', '-s'
-      opts.stdout = true
+    when '--pattern', '-p'
+      options["source_pattern"] = eval(ARGV.shift)
+    when '--single', '-s'
+      opts.single = true
+    when '--leave-copy'
+      options["leave_copyright"] = true
+    when '--show-options'
+      puts options.to_yaml
+      exit 0
     when '--help', '-h', '-?'
-      puts "Usage:"
-      puts "\t#{File.basename($0)} [options] files ..."
-      puts "\nOptions:"
-      puts "\t --force/-f    Force: restyle files that would normally be skipped"
-      puts "\t --verbose/-v  Be verbose"
-      puts "\t --diff/-d     Show the change that would be done, but don't actually write them"
-      puts "\t --help/-?/-h  Show this information"
-      exit
+      print_usage
+      exit 1
     when /^-/
       puts "Unknown option: #{arg}"
-      exit
+      exit 1
     else
-      ARGV.push(arg)
+      files.push(arg)
     end
   end
+  ARGV.replace(files)
   return opts
 end
 
+def git_status
+  statuses = `git status -z`.split("\x00")
+  while status = statuses.shift
+    mode = status[0..1]
+    path = status[3..-1]
+    old_path = statuses.shift if mode[0] == "R"
+    yield mode, path
+  end
+end
+
+def git_status_files
+  files = []
+  git_status do |mode, path|
+    files << path if yield(mode, path)
+  end
+  return files
+end
+
+def git_dirty_files
+  git_status_files { |mode, path| path =~ @filename_pattern && mode[1] == "M" || mode[1] == "R" }
+end
+
+def git_cached_files
+  git_status_files { |mode, path| path =~ @filename_pattern && mode[0] == "M" || mode[0] == "R" }
+end
+
+def find_dot_ghstyle(path = Dir.pwd)
+  loop do
+    ghstyle_path = File.join(path, ".ghstyle")
+    return ghstyle_path if File.file?(ghstyle_path)
+    next_path = File.dirname(path)
+    break if next_path == path
+    path = next_path
+  end
+end
+
 if __FILE__ == $0
-  $opts = get_options
+  $opts = get_options(@options)
+
+  @filename_pattern = eval(@options["filename_pattern"])
+  @source_pattern = eval(@options["source_pattern"])
 
   # Load tmpdir conditionally (bit more responsive in VS macro)
   require 'tmpdir' if $opts.diff
 
-  if $opts.edited
-    require File.join(File.dirname(__FILE__), "edited")
-    each_edited_file { |path| ARGV.push(path) if path =~ /\.(h|cpp|c)$/ }
+  if $opts.dirty
+    if File.exist?("CVS")
+      require File.join(File.dirname(__FILE__), "edited")
+      each_edited_file { |path| ARGV.push(path) if path =~ /\.(h|cpp|c)$/ }
+    elsif File.exist?(".git")
+      ARGV.push(*git_dirty_files)
+    end
   end
 
-  if $opts.stdout
-    raise "Expected exactly 1 file name" unless ARGV.size == 1
-    filename = ARGV.shift
-    opts = get_style_options(filename)
-    print restyle_content(STDIN.read, filename, opts)
-  else
-    ARGV.each do |path|
-      if not File.file?(path)
-        puts "#{path} is not a file"
-        next
-      end
-      if path =~ FILENAME_PATTERN
-        restyle_file(path)
-      end
+  if $opts.cached
+    if File.exist? ".git"
+      ARGV.push(*git_cached_files)
     end
-    log "#{ARGV.size} file(s) processed"
+  end
+
+  files = ARGV.map do |glob|
+    result = Dir.glob(glob.tr('\\','/'))
+    if result.empty?
+      puts "#{glob} does not exist."
+      exit 1
+    end
+    result
+  end.flatten
+
+  if files.empty?
+    puts "No files to process."
+    exit 1
+  end
+
+  # Replace directory names with their contents
+  files.map! do |path|
+    if File.directory?(path)
+      Dir.glob(File.join(path, @options["all"]))
+    else
+      path
+    end
+  end
+  files.flatten!
+
+  orig_options = @options.dup
+  path_option_cache = {}
+
+  files.sort.each do |path|
+    if ghstyle_path = find_dot_ghstyle(File.dirname(path))
+      path_options = (path_option_cache[ghstyle_path] ||= YAML.load_file(ghstyle_path))
+      options = orig_options.merge(path_options)
+    else
+      options = orig_options
+    end
+
+    puts path if $opts.verbose
+    if not File.file?(path)
+      puts "#{path} is not a file"
+      next
+    end
+    if path =~ @filename_pattern
+      restyle(path, options)
+    end
+  end
+
+  log "#{ARGV.size} file(s) processed"
+  if $opts.check || $opts.diff
+    exit(@changed_files == 0 ? 0 : 1)
   end
 end
