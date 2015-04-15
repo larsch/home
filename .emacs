@@ -1,7 +1,7 @@
 ;; .emacs - Lars Christensen <larsch@belunktum.dk>
 
 (require 'server)
-(defun server-ensure-safe-dir (dir) "Noop" t)
+; (defun server-ensure-safe-dir (dir) "Noop" t)
 (server-start)
 
 (add-to-list 'load-path "~/.elisp")	; Personal elisp files
@@ -12,6 +12,10 @@
 	       '("melpa" . "http://melpa.milkbox.net/packages/")
 	       'APPEND))
 
+(require 'ensure-package)
+;; (ensure-package-installed 'iedit 'magit)
+(package-initialize)
+
 ;; Preferences
 (setq make-backup-files nil)		; Disable backup files
 (setq vc-cvs-stay-local nil)		; Disable VCS backup files
@@ -20,15 +24,19 @@
 ;; Window Preferences
 (blink-cursor-mode 0)			; Stop cursor blinking
 (menu-bar-mode 0)			; Remove menu bar
-(scroll-bar-mode 0)			; Remove scroll bar
-(tool-bar-mode 0)			; Remove toolbar
+
+(if window-system
+    ((scroll-bar-mode 0)		; Remove scroll bar
+     (tool-bar-mode 0)			; Remove toolbar
+     (powerline-center-theme))		; Improved mode line
+  )
+
 (column-number-mode 't)			; Column numbers always
 (setq mouse-wheel-progressive-speed 'nil) ; Disable scroll acceleration
 (setq split-width-threshold 'nil)       ; Sensible split-window-sensible
 (set 'inhibit-read-only t)		; Never open files in read-only mode
 (setq inhibit-startup-screen t)		; Inhibit startup screen
 (setq inhibit-startup-echo-area-message "lac") ; Inhibit startup echo area message
-(powerline-center-theme)		; Improved mode line
 
 ;; Editor preferences
 (global-font-lock-mode 't)		; Highlighting always
