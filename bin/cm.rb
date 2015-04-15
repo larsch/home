@@ -228,7 +228,7 @@ class CMakeLists
   end
 
   def source_template(fn)
-    path = File.expand_path("~/.templates/file.h")
+    path = File.expand_path("~/.templates/file.cpp")
     if File.exist?(path)
       template(IO.read(path), fn)
     else
