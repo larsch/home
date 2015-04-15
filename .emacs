@@ -51,6 +51,7 @@
 (set 'compile-directory nil)
 (set 'ediff-split-window-function 'split-window-horizontally)
 (require 'iedit)			; Interactive edit all occurences of symbols
+(winner-mode 't)
 
 ;; Shortcuts
 (global-set-key "\C-x\C-b" 'electric-buffer-list)
@@ -63,6 +64,7 @@
 (global-set-key "\C-cn" 'next-error)
 (global-set-key "\C-cr" 'quickrun)
 (global-set-key "\C-j" 'newline-and-indent)
+(global-set-key "\C-cw" 'whitespace-cleanup-extra)
 (global-unset-key "\C-z") ; dont minimize on C-z
 
 ;; Shortcuts to custom functions
@@ -553,15 +555,15 @@ First and last elements are considered consecutive if CIRCULAR is
 non-nil."
     (let ((tail list) last)
       (while (consp tail)
-        (if (equal (car tail) (cadr tail))
-            (setcdr tail (cddr tail))
-          (setq last (car tail)
-                tail (cdr tail))))
+	(if (equal (car tail) (cadr tail))
+	    (setcdr tail (cddr tail))
+	  (setq last (car tail)
+		tail (cdr tail))))
       (if (and circular
-               (cdr list)
-               (equal last (car list)))
-          (nbutlast list)
-        list))))
+	       (cdr list)
+	       (equal last (car list)))
+	  (nbutlast list)
+	list))))
 
 ;;
 ;; Customization
