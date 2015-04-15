@@ -3,6 +3,7 @@ diff_mode = ARGV.delete("-d")
 search_text = Regexp.new(ARGV.shift)
 replace_text = ARGV.shift
 files = ARGV
+files << "**/*" if files.empty?
 ARGV.each do |glob|
   Dir.glob(glob) do |path|
     path = File.expand_path(path)
@@ -11,7 +12,7 @@ ARGV.each do |glob|
     newcontent = content.gsub(search_text, replace_text)
     if content != newcontent or targetpath != path
       if diff_mode
-        File.popen("diff \"#{path}\" -", "w") do |io|
+        File.popen("diff -u \"#{path}\" -", "w") do |io|
           io.write(newcontent)
         end
       else
