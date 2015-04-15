@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 require 'pp'
+require 'set'
+require 'getoptlong'
 
 module CppRegexp
   CPP_COMMENT = /\/\/.*/
@@ -25,7 +27,7 @@ module CppRegexp
   # end
   # p OPERATOR
 
-  PREPROCESSOR = /\#(?:\w+).*$/
+  PREPROCESSOR = /\#\s*(?:\w+).*$/
   WHITESPACE = /[\n\t ]+|(?:\\$)/
   IDENTIFIER = /[A-Za-z_][A-Za-z0-9_]*/
   CHARLITERAL = /\'[^\']+\'/
@@ -143,21 +145,22 @@ def to_html(content)
 end
 
 def count_equal(a, b)
-  equal = 0
-  begin
-  until equal == a.size || equal == b.size
-    if a[equal].first == b[equal].first
-      equal += 1
+  count = 0
+  mismatches = 0
+  mismatch = Set.new
+  until count == a.size || count == b.size
+    a_token = a[count].token
+    b_token = b[count].token
+    if a[count].token == b[count].token
+      count += 1
     else
-      break
+      mismatch.add a_token
+      mismatch.add b_token
+      break if mismatch.size > 2
+      count += 1
     end
   end
-  rescue NoMethodError => e
-      pp a[0,10]
-  pp b[0,10]
-    raise
-  end
-  return equal
+  return count
 end
 
 def map_chars(a)
@@ -167,8 +170,6 @@ end
 def ppp(a)
   pp(map_chars(a))
 end
-
-THRESHOLD = 50
 
 class FilePosition
   attr_accessor :file, :pos
@@ -181,78 +182,197 @@ class FilePosition
   end
 end
 
+module Cache
+  @contents = {}
+  def self.read(filename)
+    @contents[filename] ||= IO.read(filename)
+  end
+end
+
 class FileRange < FilePosition
   attr_accessor :length
   def initialize(file, pos, length)
     @length = length
     super(file, pos)
   end
+  def content
+    Cache.read(@file)
+  end
   def behind
     @pos + @length
   end
   def inspect
-    "<#{@file}:#{@pos}+#{@length}>"
-  end
-  def <=>(other)
-    0
+    "<#{@file}:#{line}(#{length})>"
   end
   def include?(range)
     range.pos >= @pos && range.behind <= behind
   end
-end
-
-all_tokens = []
-sub_strings = []
-ARGV.each do |glob|
-  Dir.glob(glob) do |filename|
-    puts filename
-    content = File.read(filename)
-    tokens = tokenize_named(content).reject { |m,type,a,b| type == :whitespace || type == :comment }
-    tokens.map! { |token, type, start, behind| [token, FileRange.new(filename, start, behind-start)]}
-    # Generate all sub-strings
-    size = tokens.size
-    tokens.size.times { |i| sub_strings.push(tokens.drop(i)) }
+  def line
+    @line ||= content[0, @pos].count("\n") + 1
+  end
+  def location
+    "#{File.expand_path file}(#{line})"
+  end
+  def overlaps?(other)
+    @file == other.file &&
+      (pos < other.pos && other.pos < behind) ||
+      (other.pos < pos && pos < other.behind)
+  end
+  def lines
+    @lines ||= content[@pos, @length].count("\n") + 1
+  end
+  def <=>(other)
+    v = @file <=> other.file
+    if v == 0
+      @pos <=> other.pos
+    else
+      v
+    end
   end
 end
-puts "#{sub_strings.size}"
 
-# sub_strings.each do |subtr|
-#   subtr.each do |a, b|
-#     raise "hell" unless a.is_a?(String)
-#     raise "hell" unless b.is_a?(FileRange)
-#   end
-# end
+class SpecificToken
+  attr_reader :token, :range
+  def initialize(token, range)
+    @token = token
+    @range = range
+  end
+  def <=>(other)
+    token <=> other.token
+  end
+  def range_to(other)
+    range.range_to(other.range)
+  end
+end
 
-# pp tokens.size
-# size = tokens.size
-# pp GC.stat
+@verbose = false
+@min_tokens = 50
+@min_lines = 1
+@max_substitutions = 1
+@max_copy_paste = 50
 
-# pp sub_strings.map { |a| a.map { |b| b[0] } }
-puts "Sorting substrings"
+opts = GetoptLong.new(
+  [ '--help', '-h', '-?', GetoptLong::NO_ARGUMENT ],
+  [ '--tokens', '-t', GetoptLong::REQUIRED_ARGUMENT ],
+  [ '--lines', '-l', GetoptLong::REQUIRED_ARGUMENT ],
+  [ '--sub', '-s', GetoptLong::REQUIRED_ARGUMENT ],
+  [ '--max', '-m', GetoptLong::REQUIRED_ARGUMENT ],
+  [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ])
+opts.each do |opt, arg|
+  case opt
+  when '--help'
+    puts "findcopypaste [--options] [path | glob] ..."
+    puts
+
+    puts "Paths can be directories names. All source files will be searched."
+    puts
+    puts "Glob patterns can be ruby-esque Dir.glob patterns, for example:"
+    puts
+    puts "    *.cpp"
+    puts "    src/**/*.cpp"
+    puts
+    puts "Options:"
+    puts
+    puts "    --help -h -?     Show this information"
+    puts "    --tokens=n|-t n  Find only copy/paste of <n> or more token (default 50)"
+    puts "    --lines=n|-l n   Find only copy/paste spanning <n> or more lines (default 1)"
+    puts "    --sub=n|-s n     Find only copy/paste with up to <n> identifier substitutions (default 1)"
+    puts "    --max=n|-m n     Limit output to biggest <n> copy/paste chunks (default 50)"
+    puts "    --verbose|-v     Be verbose"
+    exit
+  when '--tokens'
+    @min_tokens = arg.to_i
+    if @min_tokens <= 0
+      puts "The minimum number of tokens must be a non-zero positive number"
+      exit 1
+    end
+  when '--lines'
+    @min_lines = arg.to_i
+    if @min_lines <= 0
+      puts "The minimum number of lines must be a non-zero positive number"
+      exit 1
+    end
+  when '--sub'
+    @max_substitutions = arg.to_i
+    if @max_substitutions <= 0
+      puts "The maximum number of substitution must be a non-zero positive number"
+      exit 1
+    end
+  when '--max'
+    @max_copy_paste = arg.to_i
+    if @max_copy_paste <= 0
+      puts "The maximum number of reported copy/paste chunks must be a non-zero positive number"
+      exit 1
+    end
+  end
+end
+
+DEFAULT_GLOB = "**/*.{cpp,cc,c,cxx,h,hxx,hpp,java,cs}"
+
+# Search the default pattern for directories that are specified on the
+# command line.
+argv = ARGV.map do |glob|
+  if File.directory?(glob)
+    File.join(glob, DEFAULT_GLOB)
+  else
+    glob
+  end
+end
+
+# By default, search the default pattern in the current directory if
+# no path or pattern is specified.
+argv.push(DEFAULT_GLOB) if argv.empty?
+
+# Fix up paths (Dir.glob does not work with mixed forward and
+# backwards slashes)
+argv = argv.map { |arg| arg.tr('\\','/') }
+
+sub_strings = []
+Dir.glob(argv) do |filename|
+  puts filename if @verbose
+  # Read content of file
+  content = Cache.read(filename)
+  # Find pertinent tokens (non-whitespace, non-comment)
+  tokens = tokenize_named(content).reject { |m,type,a,b| type == :whitespace || type == :comment }
+  # Translate to tuples of token and references to the file and character range
+  tokens.map! { |token, type, start, behind| SpecificToken.new(token, FileRange.new(filename, start, behind-start)) }
+  # Generate all sub-strings
+  tokens.size.times { |i| sub_strings.push(tokens.drop(i)) }
+end
+puts "Sorting #{sub_strings.size} substrings" if @verbose
 sub_strings.sort!
 
 # Find common substrings longer than threshold
 common_substrings = []
-sub_strings.each_cons(2) do |a, b|
-  eq = count_equal(a, b)
-  if eq > THRESHOLD
-    common_substrings << [
-      a.first[1].range_to(a[eq-1][1]),
-      b.first[1].range_to(b[eq-1][1]) ]
-    # common_substrings << [start, behind, b.first[2], b[eq-1][3]]
+sub_strings.each_cons 2 do |a, b|
+  length = count_equal(a, b)
+  if length >= @min_tokens
+    # common_pair = [ a.first[1].range_to(a[length-1][1]), b.first[1].range_to(b[length-1][1]) ]
+    common_pair = [ a.first.range_to(a[length-1]), b.first.range_to(b[length-1]) ].sort
+    common_pair << length
+    common_substrings << common_pair
   end
 end
+
+# Sort by longs common substring
 common_substrings.sort_by! { |suba, subb| -suba.length }
 
+# Eliminate partial common substrings
 unique_common_substrings = []
 until common_substrings.empty?
   first = common_substrings.shift
   unique_common_substrings.push(first)
-  common_substrings.delete_if { |suba, subb| suba.include?(first[0]) }
+  common_substrings.delete_if { |suba, subb|
+    (first[0].overlaps?(suba) && first[1].overlaps?(subb)) ||
+    (first[0].overlaps?(subb) && first[1].overlaps?(suba)) }
 end
-unique_common_substrings.each do |suba, subb|
-  puts suba.inspect
-  puts subb.inspect
-  puts IO.read(suba.file)[suba.pos, suba.length]
+
+
+unique_common_substrings.each do |suba, subb, length|
+  break if @max_copy_paste == 0
+  if suba.lines >= @min_lines || subb.lines >= @min_lines
+    puts "#{suba.location}: Found #{length} tokens spanning #{suba.lines} lines"
+    puts "#{subb.location}: Duplicate location (#{subb.lines} lines)"
+    @max_copy_paste -= 1
+  end
 end
-# pp sub_strings.map { |a| a.map { |b| b[0] } }
