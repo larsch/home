@@ -1,7 +1,7 @@
 ;; .emacs - Lars Christensen <larsch@belunktum.dk>
 
 (require 'server)
-; (defun server-ensure-safe-dir (dir) "Noop" t)
+(if (equal window-system 'w32) (defun server-ensure-safe-dir (dir) "Noop" t))
 (server-start)
 
 (add-to-list 'load-path "~/.elisp")	; Personal elisp files
@@ -26,9 +26,10 @@
 (menu-bar-mode 0)			; Remove menu bar
 
 (if window-system
-    ((scroll-bar-mode 0)		; Remove scroll bar
-     (tool-bar-mode 0)			; Remove toolbar
-     (powerline-center-theme))		; Improved mode line
+    (progn
+      (scroll-bar-mode 0)		; Remove scroll bar
+      (tool-bar-mode 0)			; Remove toolbar
+      (powerline-center-theme))		; Improved mode line
   )
 
 (column-number-mode 't)			; Column numbers always
@@ -497,6 +498,8 @@
     (whitespace-cleanup)
     (replace-regexp-in-buffer "[[:space:]]+$" "")
     (replace-regexp-in-buffer "^\\([[:space:]]*\n\\)\\{2,\\}" "\n") nil (point-min) (point-max)))
+(set 'whitespace-style '(face tabs spaces trailing lines space-before-tab newline indentation::space empty space-after-tab space-mark tab-mark newline-mark))
+(global-whitespace-cleanup-mode)
 
 (add-hook 'html-mode-hook
 	  (lambda()
@@ -569,13 +572,10 @@ non-nil."
 ;; Customization
 ;;
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#2e3436" :foreground "#eeeeec" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 108 :width normal :foundry "outline" :family "Consolas"))))
- '(font-lock-comment-face ((t (:foreground "#73d216" :slant italic)))))
+(if window-system
+    (custom-set-faces
+     '(default ((t (:inherit nil :stipple nil :background "#2e3436" :foreground "#eeeeec" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 108 :width normal :foundry "outline" :family "Consolas"))))
+     '(font-lock-comment-face ((t (:foreground "#73d216" :slant italic))))))
 
 (custom-set-faces
  '(j-verb-face ((t (:foreground "Red"))))
@@ -583,3 +583,4 @@ non-nil."
  '(j-conjunction-face ((t (:foreground "Blue"))))
  '(j-other-face ((t (:foreground "Gray")))))
 
+(set 'markdown-command "pandoc -f markdown_github-hard_line_breaks --template=default.html5 -M css:file:///m:/projects/doc-md/doc.css")
