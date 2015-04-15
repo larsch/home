@@ -197,6 +197,8 @@ opts.each do |opt, arg|
       puts "The maximum number of reported copy/paste chunks must be a non-zero positive number"
       exit 1
     end
+  when '--verbose'
+    @verbose = true
   end
 end
 
