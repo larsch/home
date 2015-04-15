@@ -2,7 +2,9 @@
 diff = ARGV.delete('--diff')
 dryrun = ARGV.delete('--dry-run')
 
-Dir.glob("**/*.{txt,rst,c,cpp,h,rb,bat,cmd}") do |path|
+path = ARGV[0] || "**/*.{txt,rst,c,cpp,h,rb,bat,cmd,cs,resx,gitignore}"
+Dir.glob(path, File::FNM_DOTMATCH) do |path|
+  next unless File.file?(path)
   next if path =~ /3rdparty/
   content = IO.read(path)
   orig_content = content.dup
