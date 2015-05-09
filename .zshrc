@@ -12,3 +12,4 @@ zstyle :compinstall filename '/home/larsch/.zshrc'
 autoload -Uz compinit
 compinit
 # End of lines added by compinstall
+alias dgit='git --work-tree=$HOME --git-dir=$HOME/home.git'
