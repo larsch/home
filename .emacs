@@ -13,7 +13,7 @@
 	       'APPEND))
 
 (require 'ensure-package)
-;; (ensure-package-installed 'iedit 'magit)
+(ensure-package-installed 'whitespace-cleanup-mode)
 (package-initialize)
 
 ;; Preferences
