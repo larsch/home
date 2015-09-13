@@ -5,11 +5,8 @@ SAVEHIST=1000
 setopt appendhistory autocd extendedglob nomatch notify
 unsetopt beep correct
 bindkey -e
-# End of lines configured by zsh-newuser-install
-# The following lines were added by compinstall
+bindkey -r "^Ed" # Leave my end-of-line key alone
 zstyle :compinstall filename '/home/larsch/.zshrc'
-
 autoload -Uz compinit
 compinit
-# End of lines added by compinstall
 alias dgit='git --work-tree=$HOME --git-dir=$HOME/home.git'
