@@ -14,8 +14,19 @@
 
 (require 'ensure-package)
 (ensure-package-installed 'whitespace-cleanup-mode)
+(ensure-package-installed 'powerline)
+(ensure-package-installed 'visual-regexp)
+(ensure-package-installed 'visual-regexp-steroids)
+(ensure-package-installed 'pcre2el)
 (package-initialize)
 
+;; visual-regexp
+(setq vr/engine 'pcre2el)
+(require 'visual-regexp-steroids)
+(global-set-key (kbd "C-M-r") 'vr/isearch-backward)
+(global-set-key (kbd "C-M-s") 'vr/isearch-forward)
+(global-set-key (kbd "C-M-%") 'vr/query-replace)
+;; (define-key global-map (kbd "C-c m") 'vr/mc-mark)
 ;; Preferences
 (setq make-backup-files nil)		; Disable backup files
 (setq vc-cvs-stay-local nil)		; Disable VCS backup files
@@ -578,9 +589,15 @@ non-nil."
      '(font-lock-comment-face ((t (:foreground "#73d216" :slant italic))))))
 
 (custom-set-faces
- '(j-verb-face ((t (:foreground "Red"))))
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :stipple nil :background "#2e3436" :foreground "#eeeeec" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 108 :width normal :foundry "outline" :family "Consolas"))))
+ '(font-lock-comment-face ((t (:foreground "#73d216" :slant italic))))
  '(j-adverb-face ((t (:foreground "Green"))))
  '(j-conjunction-face ((t (:foreground "Blue"))))
- '(j-other-face ((t (:foreground "Gray")))))
+ '(j-other-face ((t (:foreground "Gray"))))
+ '(j-verb-face ((t (:foreground "Red")))))
 
 (set 'markdown-command "pandoc -f markdown_github-hard_line_breaks --template=default.html5 -M css:file:///m:/projects/doc-md/doc.css")
