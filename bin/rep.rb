@@ -1,11 +1,29 @@
 #!/usr/bin/env ruby
-diff_mode = ARGV.delete("-d")
+if ARGV.delete("-?") || ARGV.delete("--help")
+  puts "#{$0} [-d|--diff] search-regexp replace-expr [path-glob[ ...]]"
+  puts
+  puts "  -d | --diff   Show changes that are going to be made without making them"
+  puts
+  puts "Examples:"
+  puts "  rep myMispeling myCorrectSpelling"
+  puts "  rep \"prefix(\\w+)\" \"newPrefix\\1\""
+  exit
+end
+diff_mode = ARGV.delete("-d") || ARGV.delete("--diff")
+if argv = ARGV.find { |arg| arg[0] == '-' }
+  puts "Unknown option: #{argv}"
+  exit
+end
+if ARGV.size < 2
+  puts "Missing arguments. Try --help."
+end
 search_text = Regexp.new(ARGV.shift)
 replace_text = ARGV.shift
 files = ARGV
 files << "**/*" if files.empty?
 ARGV.each do |glob|
   Dir.glob(glob) do |path|
+    next unless File.file?(path)
     path = File.expand_path(path)
     targetpath = File.join(File.dirname(path), File.basename(path).gsub(search_text, replace_text))
     content = File.read(path)
