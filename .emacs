@@ -18,6 +18,7 @@
 (ensure-package-installed 'visual-regexp)
 (ensure-package-installed 'visual-regexp-steroids)
 (ensure-package-installed 'pcre2el)
+(ensure-package-installed 'jade-mode)
 (package-initialize)
 
 ;; visual-regexp
@@ -174,11 +175,17 @@
 ;; text-mode for bison grammars
 (add-to-list 'auto-mode-alist '("\\.y$" . text-mode))
 
-;; javascript-mode
-(autoload 'javascript-mode "javascript" nil t)
-(add-to-list 'auto-mode-alist '("\\.js?$" . javascript-mode))
-(add-to-list 'auto-mode-alist '("\\.as$" . javascript-mode))
-(add-to-list 'auto-mode-alist '("\\.json$" . javascript-mode))
+;; js2-mode
+(autoload 'js2-mode "js2-mode" nil t)
+(add-to-list 'auto-mode-alist '("\\.js?$" . js2-mode))
+(add-to-list 'auto-mode-alist '("\\.as$" . js2-mode))
+(add-to-list 'auto-mode-alist '("\\.json$" . js2-mode))
+(setq js2-basic-offset 3)
+(defun setup-js2-mode () "js2-mode setup" (interactive)
+  (set 'indent-tabs-mode nil))
+(setq js2-mode-hook 'setup-js2-mode)
+
+(add-to-list 'auto-mode-alist '("\\.jade?$" . jade-mode))
 
 ;; css-mode
 (autoload 'css-mode "css-mode")
