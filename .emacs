@@ -132,6 +132,14 @@
   (interactive)
   (next-line 10))
 
+;; Macro to search for the next instance of the symbol/word at the
+;; cursor. Can be repeated multiple times.
+(defun search-symbol-forward ()
+  "Search forward for symbol at point"
+  (interactive)
+  (search-forward (thing-at-point 'symbol)))
+(global-set-key (kbd "C-S-S") 'search-symbol-forward)
+
 ;; Put tag/symbol/word under cursor in kill ring for easy yanking.
 (defun kill-ring-save-symbol-at-point ()
   "Kill word under cursor"
