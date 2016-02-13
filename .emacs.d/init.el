@@ -13,6 +13,7 @@
                'APPEND))
 
 (require 'ensure-package)
+(package-initialize)
 (ensure-package-installed 'whitespace-cleanup-mode)
 (ensure-package-installed 'powerline)
 (ensure-package-installed 'visual-regexp)
@@ -120,6 +121,10 @@
 (setq grep-command "grep -n ")
 (setq grep-null-device "nul")
 
+;; Tramp mode
+(setq tramp-shell-prompt-pattern "\\(?:^\\|
+\\)[^]#$%>\n]*#?[]#$%>].* *\\(\\[[0-9;]*[a-zA-Z] *\\)*")
+
 ;; Recent files (using ido-mode)
 (require 'recentf)
 (recentf-mode 1)
@@ -223,6 +228,7 @@
 
 ;; c++-mode for .h files
 (add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
+(add-to-list 'auto-mode-alist '("\\.ino$" . c++-mode))
 
 ;; haml-mode
 (autoload 'haml-mode "haml-mode")
