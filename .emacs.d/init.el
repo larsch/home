@@ -578,10 +578,33 @@ non-nil."
 ;; Customization
 ;;
 
+(defun font-exists-p (font) "check if font exists" (if (null (x-list-fonts font)) nil t))
+
+(defun pick-a-font (list) (find-if 'font-exists-p list))
+
+(defun preferred-font () "get the preferred font" (pick-a-font '("Consolas-12" "Inconsolata-12")))
+
+(preferred-font)
+
+(let ((font (preferred-font)))
+     (set-face-attribute 'default nil :font font)
+     (set-frame-font font nil t))
+
 (if window-system
     (custom-set-faces
-     '(default ((t (:inherit nil :stipple nil :background "#2e3436" :foreground "#eeeeec" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 108 :width normal :foundry "outline" :family "Monaco"))))
-     '(font-lock-comment-face ((t (:foreground "#73d216" :slant italic))))))
+     '(default ((t (:inherit nil
+			     :stipple nil
+			     :background "#2e3436"
+			     :foreground "#eeeeec"
+			     ;; :slant normal
+			     ;; :weight normal
+			     ;; :height 108
+			     ;; :width normal
+			     ;; :foundry "outline"
+			     ;; :family (or (preferred-font) (font-at (point)))
+			     ))))
+     '(font-lock-comment-face ((t (:foreground "#73d216" :slant italic)))))
+  )
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
