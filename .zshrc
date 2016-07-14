@@ -12,3 +12,9 @@ compinit
 alias dgit='git --work-tree=$HOME --git-dir=$HOME/home.git'
 alias arch-checkout-community='svn checkout --depth=empty svn://svn.archlinux.org/community'
 alias arch-checkout-packages='svn checkout --depth=empty svn://svn.archlinux.org/packages'
+
+whence ruby > /dev/null
+if [ $? = 0 ]; then
+  PATH="$(ruby -e 'print Gem.user_dir')/bin:$PATH"
+  export PATH
+fi
