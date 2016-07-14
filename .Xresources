@@ -1,4 +1,7 @@
 XTerm*metaSendsEscape: true
 xterm*faceName: Inconsolata:size=12:antialias=on
 xterm*font: 7x13
+XTerm*colorBDMode: true
+XTerm*utf8: 1
+XTerm*cursorBlink: false
 #include ".Xresources.sexy"
