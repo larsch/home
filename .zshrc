@@ -12,6 +12,7 @@ compinit
 alias dgit='git --work-tree=$HOME --git-dir=$HOME/home.git'
 alias arch-checkout-community='svn checkout --depth=empty svn://svn.archlinux.org/community'
 alias arch-checkout-packages='svn checkout --depth=empty svn://svn.archlinux.org/packages'
+function aur-download() { curl -OLf https://aur.archlinux.org/cgit/aur.git/snapshot/$1.tar.gz }
 
 whence ruby > /dev/null
 if [ $? = 0 ]; then
