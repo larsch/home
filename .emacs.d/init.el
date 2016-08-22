@@ -586,9 +586,9 @@ non-nil."
 
 (preferred-font)
 
-(let ((font (preferred-font)))
-     (set-face-attribute 'default nil :font font)
-     (set-frame-font font nil t))
+;; (let ((font (preferred-font)))
+;;      (set-face-attribute 'default nil :font font)
+;;      (set-frame-font font nil t))
 
 (if window-system
     (custom-set-faces

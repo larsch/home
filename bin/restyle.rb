@@ -1,23 +1,19 @@
 #!/usr/bin/env ruby
-# encoding: ISO-8859-1
+# encoding: iso-8859-1
 #
 # Restyle C/C++ code using AStyle and some additional cleaning up of
 # whitespace, copyright notice, etc.
 #
+
+require 'yaml'
 
 FILENAME_PATTERN = /\.(h|c|cpp|hpp|cxx|hxx|c++|h++)$/
 ENCODING = 'ISO-8859-1'
 ASTYLE_EXECUTABLE = "astyle"
 ASTYLE_OPTIONS =  ["-q", "-A1Os3YHUjck1M60Km0" ]
 CONDITION_PATTERN = /Copyright/
-
 ASTYLE_RE = /x?[a-zA-Z]\d*/
 ASTYLE_FLAGS = "A1Os3YHUjck1M60EK".scan(ASTYLE_RE)
-
-DEFAULT_OPTIONS = {
-  "astyle" => "-A1Os3YHUjck1M60EK",
-  "restyle" => "",
-}
 
 def replace_or_add(a, opt)
   opt =~ /^x?[a-zA-Z]/i
@@ -356,6 +352,22 @@ class Options
   attr_accessor :cached
   attr_accessor :check
   attr_accessor :single
+
+
+  def initialize
+    @force = false
+    @verbose = false
+    @diff = false
+    @filelog = false
+    @dirty = false
+    @cached = false
+    @check = false
+    @single = false
+  end
+  def inspect
+    pp instance_variables
+    instance_variables.join(',')
+  end
 end
 
 def print_usage
@@ -453,10 +465,10 @@ def git_cached_files
   git_status_files { |mode, path| path =~ @filename_pattern && mode[0] == "M" || mode[0] == "R" }
 end
 
-def find_dot_ghstyle(path = Dir.pwd)
+def find_dot_style(path = Dir.pwd)
   loop do
-    ghstyle_path = File.join(path, ".ghstyle")
-    return ghstyle_path if File.file?(ghstyle_path)
+    style_path = File.join(path, ".style")
+    return style_path if File.file?(style_path)
     next_path = File.dirname(path)
     break if next_path == path
     path = next_path
@@ -465,6 +477,8 @@ end
 
 if __FILE__ == $0
   $opts = get_options(@options)
+  require 'pp'
+  pp $opts
 
   @filename_pattern = eval(@options["filename_pattern"])
   @source_pattern = eval(@options["source_pattern"])
@@ -515,8 +529,8 @@ if __FILE__ == $0
   path_option_cache = {}
 
   files.sort.each do |path|
-    if ghstyle_path = find_dot_ghstyle(File.dirname(path))
-      path_options = (path_option_cache[ghstyle_path] ||= YAML.load_file(ghstyle_path))
+    if style_path = find_dot_style(File.dirname(path))
+      path_options = (path_option_cache[style_path] ||= YAML.load_file(style_path))
       options = orig_options.merge(path_options)
     else
       options = orig_options
