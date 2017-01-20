@@ -14,3 +14,8 @@ Xft.hinting: 1
 Xft.hintstyle: hintfull
 Xft.rgba: none
 Xft.autohint: 1
+
+Rxvt.font: xft:Monaco:size=11
+Rxvt.boldFont: xft:Monaco:size=11
+Rxvt.transparent: true
+Rxvt.scrollBar: false
