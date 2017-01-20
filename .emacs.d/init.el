@@ -511,7 +511,8 @@
           (lambda()
             (setq indent-tabs-mode nil)))
 
-(setq ispell-program-name "c:/program files (x86)/aspell/bin/aspell.exe")
+;; (setq ispell-program-name "c:/program files (x86)/aspell/bin/aspell.exe")
+(setq ispell-program-name "aspell")
 
 (define-skeleton cmakelists-skeleton
   "Inserts a CMakeLists.txt skeleton"
@@ -611,6 +612,7 @@ non-nil."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :stipple nil :background "#2e3436" :foreground "#eeeeec"))))
  '(font-lock-comment-face ((t (:foreground "#73d216" :slant italic))))
  '(j-adverb-face ((t (:foreground "Green"))))
  '(j-conjunction-face ((t (:foreground "Blue"))))
@@ -658,11 +660,13 @@ non-nil."
    (thing-at-point 'symbol)
    (file-name-directory (buffer-file-name))))
 (global-set-key (kbd "M-F") 'poor-mans-find-references)
-=======
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
->>>>>>> Hack font:.emacs
+ '(package-selected-packages
+   (quote
+    (scad-mode dokuwiki-mode markdown-mode hungry-delete whitespace-cleanup-mode visual-regexp-steroids powerline pcre2el json-mode jade-mode))))
