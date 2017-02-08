@@ -93,8 +93,6 @@
 (global-set-key "\M-w" 'kill-ring-save-region-or-word)
 (global-set-key [f1] 'google-symbol-at-point)
 (global-set-key [C-f1] 'google-feeling-lucky-symbol-at-point)
-(global-set-key [M-up] 'move-text-up)
-(global-set-key [M-down] 'move-text-down)
 (global-set-key "\C-cd" 'diff-buffer)
 (global-set-key (kbd "C-o") 'open-next-line)
 (global-set-key (kbd "M-o") 'open-previous-line)
@@ -107,6 +105,11 @@
 (global-set-key [C-M-S-f] 'insert-js-function)
 
 (global-set-key (kbd "<M-return>") 'insert-do-end)
+
+;; move-lines
+(require 'move-lines)
+(global-set-key [M-up] 'move-lines-up)
+(global-set-key [M-down] 'move-lines-down)
 
 ;; Interactive-do stuff with buffers mode
 (ido-mode t)
@@ -249,7 +252,7 @@
 (c-add-style
  "gh"
  '("k&r"
-   (c-basic-offset . 3)
+   (c-basic-offset . 2)
    (c-offsets-alist . ((inline-open . 0)
 		       (statement-case-open . +)
 		       (inextern-lang . 0)
@@ -475,43 +478,6 @@
           (rename-buffer new-name)
           (set-visited-file-name new-name)
           (set-buffer-modified-p nil))))))
-
-;; Move lines up/down using M-S-up/M-S-down
-;; source: http://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emacs
-(defun move-text-internal (arg)
-  (cond
-   ((and mark-active transient-mark-mode)
-    (if (> (point) (mark))
-        (exchange-point-and-mark))
-    (let ((column (current-column))
-          (text (delete-and-extract-region (point) (mark))))
-      (forward-line arg)
-      (move-to-column column t)
-      (set-mark (point))
-      (insert text)
-      (exchange-point-and-mark)
-      (setq deactivate-mark nil)))
-   (t
-    (let ((column (current-column)))
-      (beginning-of-line)
-      (when (or (> arg 0) (not (bobp)))
-        (forward-line)
-        (when (or (< arg 0) (not (eobp)))
-          (transpose-lines arg))
-        (forward-line -1))
-      (move-to-column column t)))))
-
-(defun move-text-down (arg)
-  "Move region (transient-mark-mode active) or current line
-  arg lines down."
-  (interactive "*p")
-  (move-text-internal arg))
-
-(defun move-text-up (arg)
-  "Move region (transient-mark-mode active) or current line
-  arg lines up."
-  (interactive "*p")
-  (move-text-internal (- arg)))
 
 ;; Indent, clean whitespace, untabify entire buffer, then update
 ;; copyright notice.
