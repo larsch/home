@@ -18,8 +18,13 @@
 (ensure-package-installed 'visual-regexp)
 (ensure-package-installed 'visual-regexp-steroids)
 (ensure-package-installed 'pcre2el)
+(ensure-package-installed 'js2-mode)
 (ensure-package-installed 'jade-mode)
+(ensure-package-installed 'json-mode)
+(ensure-package-installed 'editorconfig)
 (package-initialize)
+
+(editorconfig-mode)
 
 ;; visual-regexp
 (setq vr/engine 'pcre2el)
@@ -52,6 +57,8 @@
 (setq inhibit-startup-echo-area-message "lac") ; Inhibit startup echo area message
 
 ;; Editor preferences
+;; (global-hl-line-mode 't)		; highlight current line
+(prefer-coding-system 'utf-8)
 (global-font-lock-mode 't)		; Highlighting always
 (global-linum-mode 't)			; Show line numbers
 (show-paren-mode 't)			; Highlight matching parens
@@ -86,10 +93,8 @@
 (global-set-key "\M-w" 'kill-ring-save-region-or-word)
 (global-set-key [f1] 'google-symbol-at-point)
 (global-set-key [C-f1] 'google-feeling-lucky-symbol-at-point)
-(global-set-key [M-S-up] 'move-text-up)
-(global-set-key [M-S-down] 'move-text-down)
-(global-set-key [M-P] 'move-text-up)
-(global-set-key [M-N] 'move-text-down)
+(global-set-key [M-up] 'move-text-up)
+(global-set-key [M-down] 'move-text-down)
 (global-set-key "\C-cd" 'diff-buffer)
 (global-set-key (kbd "C-o") 'open-next-line)
 (global-set-key (kbd "M-o") 'open-previous-line)
@@ -99,6 +104,8 @@
 (global-set-key "\M-'" 'insert-quotes)
 (global-set-key "\M-[" 'insert-brackets)
 (global-set-key "\M-{" 'insert-braces)
+(global-set-key [C-M-S-f] 'insert-js-function)
+
 (global-set-key (kbd "<M-return>") 'insert-do-end)
 
 ;; Interactive-do stuff with buffers mode
@@ -185,9 +192,10 @@
 
 ;; js2-mode
 (autoload 'js2-mode "js2-mode" nil t)
+(autoload 'json-mode "json-mode" nil t)
 (add-to-list 'auto-mode-alist '("\\.js?$" . js2-mode))
-(add-to-list 'auto-mode-alist '("\\.as$" . js2-mode))
-(add-to-list 'auto-mode-alist '("\\.json$" . js2-mode))
+(add-to-list 'auto-mode-alist '("\\.json$" . json-mode))
+(setq js-indent-level 2)
 (setq js2-basic-offset 3)
 (defun setup-js2-mode () "js2-mode setup" (interactive)
   (set 'indent-tabs-mode nil))
@@ -322,7 +330,7 @@
   (c-indent-command))
 (defun insert-braces-region () "Insert matching curly braces around region" (interactive)
   (let ((beginning (region-beginning))
-	(end (region-end)))
+        (end (region-end)))
     (goto-char end)
     (insert "}\n")
     (goto-char beginning)
@@ -370,19 +378,19 @@
 (setq auto-insert-query nil)
 (setq auto-insert-alist
       '(
-	("\\.cpp$" . ["template.cpp" auto-update-source-file])
-	("\\.h$"   . ["template.h" auto-update-source-file])
-	("\\.c$" . ["template.c" auto-update-source-file])
-	))
+        ("\\.cpp$" . ["template.cpp" auto-update-source-file])
+        ("\\.h$"   . ["template.h" auto-update-source-file])
+        ("\\.c$" . ["template.c" auto-update-source-file])
+        ))
 
 (defun auto-update-source-file ()
   (save-excursion
     (while (search-forward "%guard%" nil t)
       (save-restriction
-	(narrow-to-region (match-beginning 0) (match-end 0))
-	(replace-match (concat "_" (downcase (file-name-nondirectory buffer-file-name))))
-	(subst-char-in-region (point-min) (point-max) ?. ?_)
-	))
+        (narrow-to-region (match-beginning 0) (match-end 0))
+        (replace-match (concat "_" (downcase (file-name-nondirectory buffer-file-name))))
+        (subst-char-in-region (point-min) (point-max) ?. ?_)
+        ))
     )
   ;; Move cursor to $$$ mark
   (while (search-forward "%module%" nil t)
@@ -417,9 +425,9 @@
        (original-column (current-column)))
     (shell-command-on-region(point-min)(point-max)(concat "ruby -S restyle.rb -s "(buffer-file-name)) 1 "*messages*" t)
     (goto-char (min
-		(+ (line-beginning-position original-line) original-column)
-		(- (line-beginning-position (+ original-line 1)) 1)
-		)))
+                (+ (line-beginning-position original-line) original-column)
+                (- (line-beginning-position (+ original-line 1)) 1)
+                )))
     'nil
     )
 
@@ -430,10 +438,10 @@
 ;; (add-hook 'c-mode-hook 'install-restyle-hook)
 (add-hook 'compilation-mode-hook 'toggle-truncate-lines)
 (add-hook 'compilation-mode-hook
-	  (lambda () (make-local-variable 'hl-line-sticky-flag)
-	    (setq hl-line-sticky-flag t)
-	    (hl-line-mode t)
-	    ))
+          (lambda () (make-local-variable 'hl-line-sticky-flag)
+            (setq hl-line-sticky-flag t)
+            (hl-line-mode t)
+            ))
 
 ;; Update copyright notice
 (set 'copyright-regexp "Copyright [^ ]+ \\(\\([[:digit:]]+\\)\\(-[[:digit:]]+\\)? \\)?by")
@@ -457,16 +465,16 @@
   "Renames both current buffer and file it's visiting to NEW-NAME."
   (interactive "sNew name: ")
   (let ((name (buffer-name))
-	(filename (buffer-file-name)))
+        (filename (buffer-file-name)))
     (if (not filename)
-	(message "Buffer '%s' is not visiting a file!" name)
+        (message "Buffer '%s' is not visiting a file!" name)
       (if (get-buffer new-name)
-	  (message "A buffer named '%s' already exists!" new-name)
-	(progn
-	  (rename-file name new-name 1)
-	  (rename-buffer new-name)
-	  (set-visited-file-name new-name)
-	  (set-buffer-modified-p nil))))))
+          (message "A buffer named '%s' already exists!" new-name)
+        (progn
+          (rename-file name new-name 1)
+          (rename-buffer new-name)
+          (set-visited-file-name new-name)
+          (set-buffer-modified-p nil))))))
 
 ;; Move lines up/down using M-S-up/M-S-down
 ;; source: http://stackoverflow.com/questions/2423834/move-line-region-up-and-down-in-emacs
@@ -474,9 +482,9 @@
   (cond
    ((and mark-active transient-mark-mode)
     (if (> (point) (mark))
-	(exchange-point-and-mark))
+        (exchange-point-and-mark))
     (let ((column (current-column))
-	  (text (delete-and-extract-region (point) (mark))))
+          (text (delete-and-extract-region (point) (mark))))
       (forward-line arg)
       (move-to-column column t)
       (set-mark (point))
@@ -487,10 +495,10 @@
     (let ((column (current-column)))
       (beginning-of-line)
       (when (or (> arg 0) (not (bobp)))
-	(forward-line)
-	(when (or (< arg 0) (not (eobp)))
-	  (transpose-lines arg))
-	(forward-line -1))
+        (forward-line)
+        (when (or (< arg 0) (not (eobp)))
+          (transpose-lines arg))
+        (forward-line -1))
       (move-to-column column t)))))
 
 (defun move-text-down (arg)
@@ -528,8 +536,8 @@
 (global-whitespace-cleanup-mode)
 
 (add-hook 'html-mode-hook
-	  (lambda()
-	    (setq indent-tabs-mode nil)))
+          (lambda()
+            (setq indent-tabs-mode nil)))
 
 (setq ispell-program-name "c:/program files (x86)/aspell/bin/aspell.exe")
 
@@ -584,15 +592,15 @@ First and last elements are considered consecutive if CIRCULAR is
 non-nil."
     (let ((tail list) last)
       (while (consp tail)
-	(if (equal (car tail) (cadr tail))
-	    (setcdr tail (cddr tail))
-	  (setq last (car tail)
-		tail (cdr tail))))
+        (if (equal (car tail) (cadr tail))
+            (setcdr tail (cddr tail))
+          (setq last (car tail)
+                tail (cdr tail))))
       (if (and circular
-	       (cdr list)
-	       (equal last (car list)))
-	  (nbutlast list)
-	list))))
+               (cdr list)
+               (equal last (car list)))
+          (nbutlast list)
+        list))))
 
 ;;
 ;; Customization
@@ -600,7 +608,7 @@ non-nil."
 
 (if window-system
     (custom-set-faces
-     '(default ((t (:inherit nil :stipple nil :background "#2e3436" :foreground "#eeeeec" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 108 :width normal :foundry "outline" :family "Consolas"))))
+     '(default ((t (:inherit nil :stipple nil :background "#2e3436" :foreground "#eeeeec" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 108 :width normal :foundry "outline" :family "Monaco"))))
      '(font-lock-comment-face ((t (:foreground "#73d216" :slant italic))))))
 
 (custom-set-faces
@@ -608,7 +616,7 @@ non-nil."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#2e3436" :foreground "#eeeeec" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 108 :width normal :foundry "outline" :family "Consolas"))))
+ '(default ((t (:inherit nil :stipple nil :background "#2e3436" :foreground "#eeeeec" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 108 :width normal :foundry "outline" :family "Monaco"))))
  '(font-lock-comment-face ((t (:foreground "#73d216" :slant italic))))
  '(j-adverb-face ((t (:foreground "Green"))))
  '(j-conjunction-face ((t (:foreground "Blue"))))
@@ -616,3 +624,43 @@ non-nil."
  '(j-verb-face ((t (:foreground "Red")))))
 
 (set 'markdown-command "pandoc -f markdown_github-hard_line_breaks --template=default.html5 -M css:file:///m:/projects/doc-md/doc.css")
+
+;; org-mode
+(require 'org)
+(define-key global-map "\C-cl" 'org-store-link)
+(define-key global-map "\C-ca" 'org-agenda)
+(setq org-log-done t)
+(setq org-agenda-files (list "~/org/work.org"
+                             "~/org/personal.org"))
+
+;; cc-mode enum class work-around
+(defun inside-class-enum-p (pos)
+  "Checks if POS is within the braces of a C++ \"enum class\"."
+  (ignore-errors
+    (save-excursion
+      (goto-char pos)
+      (up-list -1)
+      (backward-sexp 1)
+      (looking-back "enum[ \t]+class[ \t]+[^}]*"))))
+(defun align-enum-class (langelem)
+  (if (inside-class-enum-p (c-langelem-pos langelem))
+      0
+    (c-lineup-topmost-intro-cont langelem)))
+(defun align-enum-class-closing-brace (langelem)
+  (if (inside-class-enum-p (c-langelem-pos langelem))
+      '-
+    '+))
+(defun fix-enum-class ()
+  "Setup `c++-mode' to better handle \"class enum\"."
+  (add-to-list 'c-offsets-alist '(topmost-intro-cont . align-enum-class))
+  (add-to-list 'c-offsets-alist
+               '(statement-cont . align-enum-class-closing-brace)))
+(add-hook 'c++-mode-hook 'fix-enum-class)
+
+(defun poor-mans-find-references ()
+  ""
+  (interactive)
+  (ag
+   (thing-at-point 'symbol)
+   (file-name-directory (buffer-file-name))))
+(global-set-key (kbd "M-F") 'poor-mans-find-references)
