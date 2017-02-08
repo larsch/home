@@ -9,8 +9,8 @@
   (require 'package)
   (package-initialize)
   (add-to-list 'package-archives
-	       '("melpa" . "http://melpa.milkbox.net/packages/")
-	       'APPEND))
+               '("melpa" . "https://stable.melpa.org/packages/")
+               'APPEND))
 
 (require 'ensure-package)
 (ensure-package-installed 'whitespace-cleanup-mode)
