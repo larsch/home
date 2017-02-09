@@ -1,6 +1,9 @@
 ;; .emacs.d/init.el - Lars Christensen <larsch@belunktum.dk>
 
+; (package-initialize)
+
 ;; Turn off mouse interface early in startup to avoid momentary display
+
 (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
 (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
@@ -32,7 +35,13 @@
    js2-mode
    jade-mode
    json-mode
+   yaml-mode
    editorconfig))
+
+(require 'sane-defaults)
+(require 'appearance)
+(require 'behaviour)
+(require 'mode-mappings)
 
 ;;
 ;; Below this point: Here be Dragons
@@ -57,32 +66,13 @@
 (setq w32-get-true-file-attributes nil)	; Work-around for slow-downs
 
 ;; Window Preferences
-(blink-cursor-mode 0)			; Stop cursor blinking
 (menu-bar-mode 0)			; Remove menu bar
 
-(if window-system
-    (progn
-      (scroll-bar-mode 0)		; Remove scroll bar
-      (tool-bar-mode 0)			; Remove toolbar
-      (powerline-center-theme))		; Improved mode line
-  )
-
 (column-number-mode 't)			; Column numbers always
-(setq mouse-wheel-progressive-speed 'nil) ; Disable scroll acceleration
-(setq split-width-threshold 'nil)       ; Sensible split-window-sensible
-(set 'inhibit-read-only t)		; Never open files in read-only mode
-(setq inhibit-startup-screen t)		; Inhibit startup screen
-(setq inhibit-startup-echo-area-message "lac") ; Inhibit startup echo area message
 
 ;; Editor preferences
 ;; (global-hl-line-mode 't)		; highlight current line
 (prefer-coding-system 'utf-8)
-(global-font-lock-mode 't)		; Highlighting always
-(global-linum-mode 't)			; Show line numbers
-(show-paren-mode 't)			; Highlight matching parens
-(set 'show-paren-delay 0.05)		; Reduce the delay for showing matching parens
-(setq frame-title-format "%b - Emacs")	; Show filename first in title bar
-(global-auto-revert-mode 1)		; Auto-revert if change on disk
 (setq revert-without-query ".*")        ; Revert all unedited files
 
 ;; Other
@@ -169,6 +159,7 @@
 (defun search-symbol-forward ()
   "Search forward for symbol at point"
   (interactive)
+  
   (search-forward (thing-at-point 'symbol)))
 (global-set-key (kbd "C-S-S") 'search-symbol-forward)
 
@@ -193,12 +184,6 @@
   (interactive)
   (add-hook 'write-contents-functions 'update-copyright)
   (add-hook 'write-contents-functions 'delete-trailing-whitespace))
-(autoload 'ruby-mode "ruby-mode")
-(add-to-list 'auto-mode-alist '("\\.rbw?$" . ruby-mode))
-(add-to-list 'auto-mode-alist '("Rakefile$" . ruby-mode))
-(add-to-list 'auto-mode-alist '("Cakefile$" . ruby-mode))
-(add-to-list 'auto-mode-alist '("Gemfile$" . ruby-mode))
-(add-to-list 'auto-mode-alist '("\\.rake$" . ruby-mode))
 (set 'ruby-deep-arglist 'nil)
 (set 'ruby-deep-indent-paren 'nil)
 (set 'ruby-deep-indent-paren-style 'nil)
@@ -212,54 +197,17 @@
   (interactive)
   (query-replace-regexp ":\\(\\w+\\) =>" "\\1:"))
 
-;; text-mode for bison grammars
-(add-to-list 'auto-mode-alist '("\\.y$" . text-mode))
 
 ;; js2-mode
-(autoload 'js2-mode "js2-mode" nil t)
-(autoload 'json-mode "json-mode" nil t)
-(add-to-list 'auto-mode-alist '("\\.js?$" . js2-mode))
-(add-to-list 'auto-mode-alist '("\\.json$" . json-mode))
 (setq js-indent-level 2)
 (setq js2-basic-offset 3)
 (defun setup-js2-mode () "js2-mode setup" (interactive)
   (set 'indent-tabs-mode nil))
 (setq js2-mode-hook 'setup-js2-mode)
 
-(add-to-list 'auto-mode-alist '("\\.jade?$" . jade-mode))
-
-;; css-mode
-(autoload 'css-mode "css-mode")
-(add-to-list 'auto-mode-alist '("\\.css\\'" . css-mode))
-(add-to-list 'auto-mode-alist '("\\.less?$" . css-mode))
-
 ;; lua-mode
-(autoload 'lua-mode "lua-mode")
-(add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
 (set 'lua-indent-offset 2)
 (set 'lua-indent-level 2)
-
-;; c-mode for ttcn3 source
-(add-to-list 'auto-mode-alist '("\\.tt3$" . c-mode))
-(add-to-list 'auto-mode-alist '("\\.shader$" . c-mode))
-
-;; c++-mode for .h files
-(add-to-list 'auto-mode-alist '("\\.h$" . c++-mode))
-(add-to-list 'auto-mode-alist '("\\.ino$" . c++-mode))
-
-;; haml-mode
-(autoload 'haml-mode "haml-mode")
-(add-to-list 'auto-mode-alist '("\\.haml$" . haml-mode))
-
-;; cmake-mode
-(add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
-(add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
-(autoload 'cmake-mode "cmake-mode")
-
-;; batch-mode
-(autoload 'batch-mode "batch-mode")
-(add-to-list 'auto-mode-alist '("\\.bat\\'" . batch-mode))
-(add-to-list 'auto-mode-alist '("\\.cmd\\'" . batch-mode))
 
 ;; rst-mode
 (modify-coding-system-alist 'file "\\.rst\\'" 'utf-8)
@@ -294,8 +242,6 @@
   (c-toggle-hungry-state 1))
 (set 'c++-mode-hook 'setup-c++-mode)
 (set 'c-mode-hook 'setup-c++-mode)
-(setq dabbrev-case-fold-search nil) ; case sensitive expansion
-(setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_") ; complete only symbols (avoids completing & or *)
 
 ;; Google stuff
 (defun google-symbol-at-point ()
@@ -685,4 +631,4 @@ non-nil."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (goofy-mode scad-mode dokuwiki-mode markdown-mode hungry-delete whitespace-cleanup-mode visual-regexp-steroids powerline pcre2el json-mode jade-mode))))
+    (yaml-mode goofy-mode scad-mode dokuwiki-mode markdown-mode hungry-delete whitespace-cleanup-mode visual-regexp-steroids powerline pcre2el json-mode jade-mode))))
