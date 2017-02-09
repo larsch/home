@@ -1,29 +1,46 @@
-;; .emacs - Lars Christensen <larsch@belunktum.dk>
+;; .emacs.d/init.el - Lars Christensen <larsch@belunktum.dk>
+
+;; Turn off mouse interface early in startup to avoid momentary display
+(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+
+;; No splash screen please ... jeez
+(setq inhibit-startup-message t)
+(setq inhibit-startup-echo-area-message t)
+
+; Set path to dependencies
+(setq site-lisp-dir
+      (expand-file-name "site-lisp" user-emacs-directory))
+(setq settings-dir
+      (expand-file-name "settings" user-emacs-directory))
+
+;; Set up load path
+(add-to-list 'load-path settings-dir)
+(add-to-list 'load-path site-lisp-dir)
+
+;; Setup packages
+(require 'setup-package)
+
+;; Ensure that wanted packages are installed
+(packages-install
+ '(whitespace-cleanup-mode
+   powerline
+   visual-regexp
+   visual-regexp-steroids
+   pcre2el
+   js2-mode
+   jade-mode
+   json-mode
+   editorconfig))
+
+;;
+;; Below this point: Here be Dragons
+;;
 
 (require 'server)
 (if (equal window-system 'w32) (defun server-ensure-safe-dir (dir) "Noop" t))
 (server-start)
-
-(add-to-list 'load-path "~/.elisp")	; Personal elisp files
-(when (> emacs-major-version 23)
-  (require 'package)
-  (package-initialize)
-  (add-to-list 'package-archives
-               '("melpa" . "https://stable.melpa.org/packages/")
-               'APPEND))
-
-(require 'ensure-package)
-(package-initialize)
-(ensure-package-installed 'whitespace-cleanup-mode)
-(ensure-package-installed 'powerline)
-(ensure-package-installed 'visual-regexp)
-(ensure-package-installed 'visual-regexp-steroids)
-(ensure-package-installed 'pcre2el)
-(ensure-package-installed 'js2-mode)
-(ensure-package-installed 'jade-mode)
-(ensure-package-installed 'json-mode)
-(ensure-package-installed 'editorconfig)
-(package-initialize)
 
 (editorconfig-mode)
 
@@ -579,13 +596,13 @@ non-nil."
 ;; Customization
 ;;
 
-(defun font-exists-p (font) "check if font exists" (if (null (x-list-fonts font)) nil t))
+;; (defun font-exists-p (font) "check if font exists" (if (null (x-list-fonts font)) nil t))
 
-(defun pick-a-font (list) (find-if 'font-exists-p list))
+;; (defun pick-a-font (list) (find-if 'font-exists-p list))
 
-(defun preferred-font () "get the preferred font" (pick-a-font '("Consolas-12" "Inconsolata-12")))
+;; (defun preferred-font () "get the preferred font" (pick-a-font '("Consolas-12" "Inconsolata-12")))
 
-(preferred-font)
+;; (preferred-font)
 
 ;; (let ((font (preferred-font)))
 ;;      (set-face-attribute 'default nil :font font)
@@ -668,5 +685,4 @@ non-nil."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (scad-mode dokuwiki-mode markdown-mode hungry-delete whitespace-cleanup-mode visual-regexp-steroids powerline pcre2el json-mode jade-mode)))
- )
+    (goofy-mode scad-mode dokuwiki-mode markdown-mode hungry-delete whitespace-cleanup-mode visual-regexp-steroids powerline pcre2el json-mode jade-mode))))
