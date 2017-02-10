@@ -34,11 +34,9 @@ ARGV.each do |glob|
           io.write(newcontent)
         end
       else
-        File.open(targetpath, "w") do |file|
-          puts targetpath
-          file << newcontent
-          File.unlink(path) if targetpath != path
-        end
+        puts targetpath
+        IO.write(path, newcontent)
+        system "git", "mv", path, targetpath unless targetpath == path
       end
     end
   end
