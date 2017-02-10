@@ -33,7 +33,15 @@ def find_cmakecache(path)
   end
 end
 
-dte = WIN32OLE.connect("VisualStudio.DTE.10.0")
+def connect_dte
+  begin
+    WIN32OLE.connect("VisualStudio.DTE.10.0")
+  rescue WIN32OLERuntimeError
+    WIN32OLE.connect("VisualStudio.DTE.14.0")
+  end
+end
+
+dte = connect_dte
 WIN32OLE.const_load(dte)
 solution_path = dte.Solution.FileName
 if solution_path.empty?
