@@ -1,0 +1,10 @@
+[user]
+	name = Lars Christensen
+[push]
+	default = simple
+[alias]
+	lg = log --color --graph --pretty=format:'%C(red)%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+[pull]
+	rebase = true
+[gui]
+	encoding = utf-8
