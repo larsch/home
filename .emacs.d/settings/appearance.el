@@ -14,4 +14,15 @@
       (powerline-center-theme)		; Improved mode line
       ))
 
+;; Select a font that we like, if it's available
+(setq preferred-fonts
+      '("Monaco-10"
+	"Consolas-12"
+	"Inconsolata-12")))
+(defun font-exists-p (font) "Check if font exists" (if (null (x-list-fonts font)) nil t))
+(defun pick-a-font (list) (find-if 'font-exists-p list))
+(defun preferred-font () "Get the preferred font" (pick-a-font preferred-fonts))
+(add-to-list 'default-frame-alist (append '(font) (preferred-font)))
+(set-face-attribute 'default t :font (preferred-font))
+
 (provide 'appearance)
