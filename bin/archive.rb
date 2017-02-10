@@ -12,7 +12,7 @@ def archive(path)
   prefix = Time.now.strftime("%m-%d-%H%M-")
   zpath = File.join(ARCHIVE_PATH, year, prefix + File.basename(path) + ".7z")
   raise "#{zpath} already exist" if File.exist?(zpath)
-  args = [ SZIP, "a", zpath, path ]
+  args = [ SZIP, "-sdel", "a", zpath, path ]
   puts args.join(" ")
   case system(*args)
   when nil
@@ -20,7 +20,6 @@ def archive(path)
   when false
     raise "7-zip exited with an error"
   when true
-    FileUtils.rm_rf path
     puts "#{path} removed"
   end
 end
