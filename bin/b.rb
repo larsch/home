@@ -75,11 +75,11 @@ def make_config
   return config
 end
 
-def save_config(config = config)
+def save_config(cfg = config)
   dot_b = File.expand_path("~/.b")
-  if @orig_config != config
+  if @orig_config != cfg
     open dot_b, "w" do |io|
-      io << YAML.dump(config)
+      io << YAML.dump(cfg)
     end
   end
 end
@@ -106,7 +106,7 @@ def generators
   `cmake --help`.each_line do |line|
     section_found = true if line =~ /^Generators/
     next unless section_found
-    generators << $1 if line =~ /^  (\S.*?)\s*(=|$)/
+    generators << $1 if line =~ /^  (\S.*?)(?: \[arch\])?\s*(=|$)/
   end
   return generators
 end
@@ -219,7 +219,7 @@ opts = Trollop.options do
   opt :set_default_command, "Set default command (#{config["default_command"]})", type: String, short: :none
   opt :set_default_generator, "Set the default generator (#{config["default_generator"]}", type: String, short: :none
   opt :b_config, "Show configuration", short: '-b'
-  opt :delete, "Delete everything in build directory", short: '-d'
+  opt :delete, "Delete everything in build directory"
   opt :open, "Open Solution", short: '-o'
   opt :cmake, "Rerun CMake", short: '-c'
   opt :all, "Rerun CMake, Build, Test", short: '-a'
