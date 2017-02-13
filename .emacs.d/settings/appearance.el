@@ -18,7 +18,7 @@
 (setq preferred-fonts
       '("Monaco-10"
 	"Consolas-12"
-	"Inconsolata-12")))
+	"Inconsolata-12"))
 (defun font-exists-p (font) "Check if font exists" (if (null (x-list-fonts font)) nil t))
 (defun pick-a-font (list) (find-if 'font-exists-p list))
 (defun preferred-font () "Get the preferred font" (pick-a-font preferred-fonts))
