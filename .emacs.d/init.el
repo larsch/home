@@ -50,6 +50,8 @@
 ;; Below this point: Here be Dragons
 ;;
 
+(yas-global-mode 1)
+
 (defun cmake-version ()
   (let
       ((cmake-version (shell-command-to-string "cmake --version"))
