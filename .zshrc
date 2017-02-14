@@ -9,6 +9,7 @@ bindkey -r "^Ed" # Leave my end-of-line key alone
 zstyle :compinstall filename '/home/larsch/.zshrc'
 autoload -Uz compinit
 compinit
+alias syu='sudo pacman -Syu --noconfirm'
 alias dgit='git --work-tree=$HOME --git-dir=$HOME/home.git'
 alias arch-checkout-community='svn checkout --depth=empty svn://svn.archlinux.org/community'
 alias arch-checkout-packages='svn checkout --depth=empty svn://svn.archlinux.org/packages'
