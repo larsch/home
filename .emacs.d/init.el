@@ -27,16 +27,19 @@
 
 ;; Ensure that wanted packages are installed
 (packages-install
- '(whitespace-cleanup-mode
+ '(
+   editorconfig
+   jade-mode
+   js2-mode
+   json-mode
+   pcre2el
    powerline
    visual-regexp
    visual-regexp-steroids
-   pcre2el
-   js2-mode
-   jade-mode
-   json-mode
+   whitespace-cleanup-mode
    yaml-mode
-   editorconfig))
+   yasnippet
+   ))
 
 (require 'sane-defaults)
 (require 'appearance)
@@ -46,6 +49,15 @@
 ;;
 ;; Below this point: Here be Dragons
 ;;
+
+(defun cmake-version ()
+  (let
+      ((cmake-version (shell-command-to-string "cmake --version"))
+       (version-regexp (rxt-pcre-to-elisp "(\\d+(\\.\\d+)+)"))
+       )
+    (when (string-match version-regexp cmake-version)
+      (match-string 1 cmake-version))
+    ))
 
 (require 'server)
 (if (equal window-system 'w32) (defun server-ensure-safe-dir (dir) "Noop" t))
@@ -631,4 +643,4 @@ non-nil."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (yaml-mode goofy-mode scad-mode dokuwiki-mode markdown-mode hungry-delete whitespace-cleanup-mode visual-regexp-steroids powerline pcre2el json-mode jade-mode))))
+    (yasnippet yasnippets yaml-mode goofy-mode scad-mode dokuwiki-mode markdown-mode hungry-delete whitespace-cleanup-mode visual-regexp-steroids powerline pcre2el json-mode jade-mode))))

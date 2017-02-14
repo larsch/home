@@ -1,0 +1,6 @@
+# key: project
+# name: project
+# --
+cmake_minimum_required(VERSION `(cmake-version)`)
+project(${1:`(file-name-base (directory-file-name default-directory))`})
+add_executable($1 $1.c)
