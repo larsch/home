@@ -16,13 +16,17 @@
 
 ;; Select a font that we like, if it's available
 (setq preferred-fonts
-      '("Monaco-12"
-	"Consolas-12"
-	"Inconsolata-12"))
+      '(
+	"Monaco-11:dpi=96"
+	"Consolas-13:dpi=96"
+	"Inconsolata-12"
+	))
 (defun font-exists-p (font) "Check if font exists" (if (null (x-list-fonts font)) nil t))
 (defun pick-a-font (list) (find-if 'font-exists-p list))
 (defun preferred-font () "Get the preferred font" (pick-a-font preferred-fonts))
 (add-to-list 'default-frame-alist (append '(font) (preferred-font)))
 (set-face-attribute 'default t :font (preferred-font))
+
+;; (set-frame-font (preferred-font))
 
 (provide 'appearance)
