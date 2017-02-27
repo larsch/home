@@ -1,6 +1,6 @@
 XTerm*metaSendsEscape: true
 UXTerm*metaSendsEscape: true
-xterm*faceName: Monaco:size=11
+xterm*faceName: Monaco-11:dpi=96
 xterm*font: 7x13
 XTerm*colorBDMode: true
 XTerm*utf8: 1
@@ -15,7 +15,7 @@ Xft.hintstyle: hintfull
 Xft.rgba: none
 Xft.autohint: 1
 
-Rxvt.font: xft:Monaco:size=11
-Rxvt.boldFont: xft:Monaco:size=11
+Rxvt.font: xft:Monaco-11:dpi=96
+Rxvt.boldFont: xft:Monaco-11:dpi=96
 Rxvt.transparent: true
 Rxvt.scrollBar: false
