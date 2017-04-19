@@ -10,6 +10,7 @@ zstyle :compinstall filename '/home/larsch/.zshrc'
 autoload -Uz compinit
 compinit
 alias syu='sudo pacman -Syu --noconfirm'
+alias tmuxre='tmux new-session -t default || tmux new-session -s default'
 alias dgit='git --work-tree=$HOME --git-dir=$HOME/home.git'
 alias arch-checkout-community='svn checkout --depth=empty svn://svn.archlinux.org/community'
 alias arch-checkout-packages='svn checkout --depth=empty svn://svn.archlinux.org/packages'
