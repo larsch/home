@@ -535,6 +535,19 @@
   (when newline-and-indent
     (indent-according-to-mode)))
 
+(defun duplicate-line ()
+  "Duplicate current line"
+  (interactive)
+  (save-excursion
+    (kill-ring-save
+     (progn (forward-visible-line 0) (point))
+     (progn (forward-visible-line 1) (point)))
+    )
+  (forward-visible-line 1)
+  (save-excursion (yank))
+  (indent-according-to-mode))
+(global-set-key (kbd "M-O") 'duplicate-line)
+
 (unless (fboundp 'delete-consecutive-dups)
   (defun delete-consecutive-dups (list &optional circular)
     "Destructively remove `equal' consecutive duplicates from LIST.
