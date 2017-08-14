@@ -25,6 +25,7 @@
 
 ;; jade-mode
 (add-to-list 'auto-mode-alist '("\\.jade?$" . jade-mode))
+(add-to-list 'auto-mode-alist '("\\.pug?$" . jade-mode))
 
 ;; lua-mode
 (autoload 'lua-mode "lua-mode")
