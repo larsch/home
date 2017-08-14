@@ -581,34 +581,6 @@ non-nil."
 ;;      (set-face-attribute 'default nil :font font)
 ;;      (set-frame-font font nil t))
 
-(if window-system
-    (custom-set-faces
-     '(default ((t (:inherit nil
-			     :stipple nil
-			     :background "#2e3436"
-			     :foreground "#eeeeec"
-			     ;; :slant normal
-			     ;; :weight normal
-			     ;; :height 108
-			     ;; :width normal
-			     ;; :foundry "outline"
-			     ;; :family (or (preferred-font) (font-at (point)))
-			     ))))
-     '(font-lock-comment-face ((t (:foreground "#73d216" :slant italic)))))
-  )
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#2e3436" :foreground "#eeeeec"))))
- '(font-lock-comment-face ((t (:foreground "#73d216" :slant italic))))
- '(j-adverb-face ((t (:foreground "Green"))))
- '(j-conjunction-face ((t (:foreground "Blue"))))
- '(j-other-face ((t (:foreground "Gray"))))
- '(j-verb-face ((t (:foreground "Red")))))
-
 (set 'markdown-command "pandoc -f markdown_github-hard_line_breaks --template=default.html5 -M css:file:///m:/projects/doc-md/doc.css")
 
 ;; org-mode

@@ -29,4 +29,12 @@
 
 ;; (set-frame-font (preferred-font))
 
+(custom-set-faces
+ '(default ((t (:inherit nil :stipple nil :background "#2e3436" :foreground "#eeeeec"))))
+ '(font-lock-comment-face ((t (:foreground "#73d216" :slant italic))))
+ '(j-adverb-face ((t (:foreground "Green"))))
+ '(j-conjunction-face ((t (:foreground "Blue"))))
+ '(j-other-face ((t (:foreground "Gray"))))
+ '(j-verb-face ((t (:foreground "Red")))))
+
 (provide 'appearance)
