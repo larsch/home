@@ -24,5 +24,4 @@ if [ $? = 0 ]; then
 fi
 export SMING_HOME=/home/larsch/esp/Sming/Sming
 export ESP_HOME=/home/larsch/esp/esp-open-sdk
-
-[[ -o login ]] && dgit status -s || true
+[ -e "/usr/share/terminfo/${TERM:0:1}/${TERM}" ] || export TERM=xterm
