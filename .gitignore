@@ -1,13 +1,1 @@
-bin/*.exe
-.*
-!.emacs.d
-!.elisp
-archive
-test
-WikidPad.config
-WikidPad_Error.log
-CVS
-_viminfo
-_lesshst
-temp/
-home.git/
+*
