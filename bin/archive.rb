@@ -3,11 +3,10 @@ require 'fileutils'
 raise "%HOME% not set" unless ENV.has_key?("HOME")
 raise "%HOME% not found (#{ENV["HOME"]})" unless File.directory?(ENV["HOME"])
 ARCHIVE_PATH = (ENV["ARCHIVE"] || File.join(ENV["HOME"], "archive")).tr('\\','/')
-SZIP = "C:/Program Files/7-zip/7z.exe"
+SZIP = "7z"
 
 def archive(path)
   raise "#{path} not found" unless File.exist?(path)
-  raise "#{SZIP} not found" unless File.exist?(SZIP)
   year = Time.now.strftime("%Y")
   prefix = Time.now.strftime("%m-%d-%H%M-")
   zpath = File.join(ARCHIVE_PATH, year, prefix + File.basename(path) + ".7z")
