@@ -39,6 +39,7 @@
    whitespace-cleanup-mode
    yaml-mode
    yasnippet
+   rg
    ))
 
 (require 'sane-defaults)
@@ -618,8 +619,9 @@ non-nil."
 (defun poor-mans-find-references ()
   ""
   (interactive)
-  (ag
+  (rg
    (thing-at-point 'symbol)
+   "all"
    (file-name-directory (buffer-file-name))))
 (global-set-key (kbd "M-F") 'poor-mans-find-references)
 
@@ -630,4 +632,16 @@ non-nil."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (yasnippet yasnippets yaml-mode goofy-mode scad-mode dokuwiki-mode markdown-mode hungry-delete whitespace-cleanup-mode visual-regexp-steroids powerline pcre2el json-mode jade-mode))))
+    (rg yasnippet yasnippets yaml-mode goofy-mode scad-mode dokuwiki-mode markdown-mode hungry-delete whitespace-cleanup-mode visual-regexp-steroids powerline pcre2el json-mode jade-mode))))
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :stipple nil :background "#2e3436" :foreground "#eeeeec"))))
+ '(font-lock-comment-face ((t (:foreground "#73d216" :slant italic))))
+ '(j-adverb-face ((t (:foreground "Green"))))
+ '(j-conjunction-face ((t (:foreground "Blue"))))
+ '(j-other-face ((t (:foreground "Gray"))))
+ '(j-verb-face ((t (:foreground "Red")))))
