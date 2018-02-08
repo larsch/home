@@ -43,18 +43,22 @@ Use MELPA
 #+BEGIN_SRC emacs-lisp
 (require 'package)
 (add-to-list 'package-archives
-             '("melpa-stable" . "https://melpa.org/packages/") t)   
-#+END_SRC   
+             '("melpa" . "https://melpa.org/packages/") t)
+#+END_SRC
 Auto-load archive on new installations
 #+BEGIN_SRC emacs-lisp
-(unless (file-exists-p "~/.emacs.d/elpa/archives/melpa")
-  (package-refresh-contents))
+(setq larsch/package-contents-fresh nil)
+(defun package-install-fresh (package)
+  (unless larsch/package-contents-fresh
+    (package-refresh-contents)
+    (setq larsch/package-contents-fresh t))
+  (package-install package))
 #+END_SRC
 Automatically install my packages
 #+BEGIN_SRC emacs-lisp
 (defun packages-install (packages)
-  (mapcar #'package-install
-	  (cl-remove-if #'package-installed-p packages))
+  (mapcar #'package-install-fresh
+          (cl-remove-if #'package-installed-p packages))
   (delete-other-windows))
 (packages-install
  '(editorconfig
