@@ -21,6 +21,11 @@
 (global-subword-mode 1)	     ; Navigate PascalCasedWords
 (setq-default indent-tabs-mode nil) ; never use tabs for indent
 #+END_SRC
+Keep customizations elsewhere
+#+BEGIN_SRC emacs-lisp
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(load custom-file)
+#+END_SRC
 ** Server
 #+BEGIN_SRC emacs-lisp
 (require 'server)
