@@ -266,6 +266,8 @@ Define style
 		       (inextern-lang . 0)
 		       (innamespace . 0)
 		       ))))
+(setq c-default-style
+  '((java-mode . "java") (other . "larsch")))
 #+END_SRC
 Setup C/C++ mode
 #+BEGIN_SRC emacs-lisp
@@ -273,6 +275,7 @@ Setup C/C++ mode
   (set 'comment-column 35)
   (set 'fill-column 70)
   (set 'indent-tabs-mode nil)
+  (set 'parens-require-spaces nil)
   (local-set-key "\C-m" 'newline-and-indent)
   (local-set-key "\M-]" 'ff-find-other-file)
   (c-toggle-hungry-state 1))
