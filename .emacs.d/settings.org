@@ -4,7 +4,7 @@
 #+BEGIN_SRC emacs-lisp
 (auto-compression-mode t)    ; Auto-open compressed
 (global-font-lock-mode t)    ; Colourize text
-(transient-mark-mode 1)	     ; Highlight selection
+(transient-mark-mode 1)      ; Highlight selection
 (defalias 'yes-or-no-p 'y-or-n-p) ; Allow me to answer with 'y' or 'n' keys
 (prefer-coding-system 'utf-8) ; Give me UTF-8
 (set-language-environment "UTF-8")
@@ -18,7 +18,7 @@
 (setq vc-cvs-stay-local nil) ; Disable VCS backup files
 (global-auto-revert-mode 1)  ; Auto-revert if change on disk
 (setq revert-without-query ".*") ; Revert all unedited files
-(global-subword-mode 1)	     ; Navigate PascalCasedWords
+(global-subword-mode 1)      ; Navigate PascalCasedWords
 (setq-default indent-tabs-mode nil) ; never use tabs for indent
 #+END_SRC
 Keep customizations elsewhere
@@ -77,12 +77,12 @@ Automatically install my packages
 ** Appearance
 *** Basic appearance
 #+BEGIN_SRC emacs-lisp
-(show-paren-mode t)	     ; Highlight matching parens
+(show-paren-mode t)          ; Highlight matching parens
 (set 'show-paren-delay 0.05) ; Reduce the delay for showing matching parens
-(line-number-mode t)	     ; Show line number
-(column-number-mode 1)	     ; Show column number
-(global-linum-mode 1)	     ; Show line numbers
-(blink-cursor-mode 0)	     ; Stop cursor blinking
+(line-number-mode t)         ; Show line number
+(column-number-mode 1)       ; Show column number
+(global-linum-mode 1)        ; Show line numbers
+(blink-cursor-mode 0)        ; Stop cursor blinking
 (setq frame-title-format "%b - Emacs")	; Show filename first in title bar
 (setq split-width-threshold 'nil)       ; Sensible split-window-sensible
 (if window-system (powerline-center-theme)) ; Improved mode line
@@ -103,8 +103,8 @@ Automatically pick the preferred font if available (cross-platform)
 #+BEGIN_SRC emacs-lisp
 (setq preferred-fonts
       '("Monaco-11:dpi=96"
-	"Consolas-13:dpi=96"
-	"Inconsolata-12"))
+        "Consolas-13:dpi=96"
+        "Inconsolata-12"))
 (defun font-exists-p (font) "Check if font exists" (if (null (x-list-fonts font)) nil t))
 (defun pick-a-font (list) (cl-find-if 'font-exists-p list))
 (defun preferred-font () "Get the preferred font" (pick-a-font preferred-fonts))
@@ -271,10 +271,10 @@ Define style
  '("k&r"
    (c-basic-offset . 2)
    (c-offsets-alist . ((inline-open . 0)
-		       (statement-case-open . +)
-		       (inextern-lang . 0)
-		       (innamespace . 0)
-		       ))))
+                       (statement-case-open . +)
+                       (inextern-lang . 0)
+                       (innamespace . 0)
+                       ))))
 (setq c-default-style
   '((java-mode . "java") (other . "larsch")))
 #+END_SRC
