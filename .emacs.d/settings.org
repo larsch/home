@@ -341,12 +341,11 @@ Setup C/C++ mode
 (add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
 #+END_SRC
 ** Custom Operations
-
-Quick short to kill current-buffer without asking
+*** Easily kill current buffer without asking
 #+BEGIN_SRC emacs-lisp
 (global-set-key [?\C-.] 'kill-this-buffer)
 #+END_SRC
-** Copy symbol with M-w if there is no region
+*** Copy symbol with M-w if there is no region
 When copying (M-w) and no region is selected, just copy the symbol
 (word) under the cursor.
 #+BEGIN_SRC emacs-lisp
@@ -362,8 +361,9 @@ When copying (M-w) and no region is selected, just copy the symbol
     (kill-ring-save-symbol-at-point)))
 (global-set-key "\M-w" 'kill-ring-save-region-or-word)
 #+END_SRC
-*** vi-like open-line
-https://www.emacswiki.org/emacs/OpenNextLine
+*** Open new lines more like vi
+Based on https://www.emacswiki.org/emacs/OpenNextLine
+
 Behave like vi's o command
 #+BEGIN_SRC emacs-lisp
 (defun open-next-line (arg)
