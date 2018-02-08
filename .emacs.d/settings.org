@@ -3,18 +3,23 @@
 ** Sane defaults
 #+BEGIN_SRC emacs-lisp
 (auto-compression-mode t)    ; Auto-open compressed
-(global-auto-revert-mode 1)  ; Auto-revert if change on disk
 (global-font-lock-mode t)    ; Colourize text
-(global-subword-mode 1)	     ; Navigate PascalCasedWords
-(setq shift-select-mode nil) ; Disable shift-select
 (transient-mark-mode 1)	     ; Highlight selection
 (defalias 'yes-or-no-p 'y-or-n-p) ; Allow me to answer with 'y' or 'n' keys
 (prefer-coding-system 'utf-8) ; Give me UTF-8
 (set-language-environment "UTF-8")
-(setq revert-without-query ".*") ; Revert all unedited files
 (setq inhibit-read-only t)   ; Never open files in read-only mode
-(setq-default indent-tabs-mode nil) ; never use tabs for indent
 (setq mouse-wheel-progressive-speed 'nil) ; Disable scroll acceleration
+#+END_SRC
+** Personal preferences
+#+BEGIN_SRC emacs-lisp
+(setq shift-select-mode nil) ; Disable shift-select
+(setq make-backup-files nil) ; Disable backup files
+(setq vc-cvs-stay-local nil) ; Disable VCS backup files
+(global-auto-revert-mode 1)  ; Auto-revert if change on disk
+(setq revert-without-query ".*") ; Revert all unedited files
+(global-subword-mode 1)	     ; Navigate PascalCasedWords
+(setq-default indent-tabs-mode nil) ; never use tabs for indent
 #+END_SRC
 ** Server
 #+BEGIN_SRC emacs-lisp
@@ -333,6 +338,7 @@ Setup C/C++ mode
 (add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
 #+END_SRC
 ** Custom Operations
+
 Quick short to kill current-buffer without asking
 #+BEGIN_SRC emacs-lisp
 (global-set-key [?\C-.] 'kill-this-buffer)
@@ -345,8 +351,7 @@ Behave like vi's o command
   "Move to the next line and then opens a line.
     See also `newline-and-indent'."
   (interactive "p")
-  (next-line)
-  (beginning-of-line)
+  (beginning-of-line 2)
   (open-line arg)
   (when newline-and-indent
     (indent-according-to-mode)))
