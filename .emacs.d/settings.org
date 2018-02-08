@@ -346,6 +346,22 @@ Quick short to kill current-buffer without asking
 #+BEGIN_SRC emacs-lisp
 (global-set-key [?\C-.] 'kill-this-buffer)
 #+END_SRC
+** Copy symbol with M-w if there is no region
+When copying (M-w) and no region is selected, just copy the symbol
+(word) under the cursor.
+#+BEGIN_SRC emacs-lisp
+(defun kill-ring-save-symbol-at-point ()
+  "Kill word under cursor"
+  (interactive)
+  (kill-new (thing-at-point 'symbol)))
+(defun kill-ring-save-region-or-word ()
+  "Save the region as if killed, but don't kill it. If no region is active, kill the symbol at the cursor."
+  (interactive)
+  (if (use-region-p)
+    (kill-ring-save (point) (mark t))
+    (kill-ring-save-symbol-at-point)))
+(global-set-key "\M-w" 'kill-ring-save-region-or-word)
+#+END_SRC
 *** vi-like open-line
 https://www.emacswiki.org/emacs/OpenNextLine
 Behave like vi's o command
