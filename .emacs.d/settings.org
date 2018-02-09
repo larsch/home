@@ -161,6 +161,7 @@ Open recent files (with the recentf module) using ido
 (setq org-startup-indented nil)
 (setq org-ellipsis " ->")
 (setq org-adapt-indentation nil)
+(setq org-html-postamble nil)
 (define-key global-map "\C-cc" 'org-capture)
 #+END_SRC
 *** visual-regexp
