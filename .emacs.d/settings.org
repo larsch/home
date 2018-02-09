@@ -26,6 +26,10 @@ Keep customizations elsewhere
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file)
 #+END_SRC
+** Shortcuts
+#+BEGIN_SRC emacs-lisp
+(global-set-key "\C-cs" 'shell)
+#+END_SRC
 ** Server
 #+BEGIN_SRC emacs-lisp
 (require 'server)
@@ -208,6 +212,7 @@ position. https://www.emacswiki.org/emacs/Scrolling
 (global-set-key "\M-\"" 'insert-double-quotes)
 (global-set-key "\M-'" 'insert-quotes)
 (global-set-key "\M-[" 'insert-brackets)
+(set 'parens-require-spaces nil) ; dont insert space before parentheses
 #+END_SRC
 Insert pairs of braces while taking care of wrapping regions and
 indentation
@@ -237,7 +242,6 @@ indentation
 #+BEGIN_SRC emacs-lisp
 (defun install-before-save-hooks-ruby ()
   (interactive)
-  (add-hook 'write-contents-functions 'update-copyright)
   (add-hook 'write-contents-functions 'delete-trailing-whitespace))
 (set 'ruby-deep-arglist 'nil)
 (set 'ruby-deep-indent-paren 'nil)
