@@ -29,6 +29,7 @@ Keep customizations elsewhere
 ** Shortcuts
 #+BEGIN_SRC emacs-lisp
 (global-set-key "\C-cs" 'shell)
+(global-set-key "\C-j" 'newline-and-indent)
 #+END_SRC
 ** Server
 #+BEGIN_SRC emacs-lisp
@@ -226,7 +227,7 @@ indentation
   (insert "{\n\n}")
   (indent-region (- (line-beginning-position) 3) (line-end-position) nil)
   (previous-line 1)
-  (c-indent-command))
+  (indent-according-to-mode))
 (defun insert-braces-region () "Insert matching curly braces around region" (interactive)
   (let ((beginning (region-beginning))
         (end (region-end)))
