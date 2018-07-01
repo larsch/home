@@ -1,21 +1,24 @@
+Emacs.font: Monospace 11
+Emacs.FontBackend: xft
+Emacs.menuBar: off
+Emacs.verticalScrollBars: off
+
+Rxvt.font: xft:Monospace-11
+Rxvt.boldFont: xft:Monospace-11
+Rxvt.transparent: true
+Rxvt.scrollBar: false
+
+XTerm*faceName: Monospace-11
 XTerm*metaSendsEscape: true
 UXTerm*metaSendsEscape: true
-xterm*faceName: Monaco-11:dpi=96
-xterm*font: 7x13
 XTerm*colorBDMode: true
 XTerm*utf8: 1
 XTerm*cursorBlink: false
-#include ".Xresources.sexy"
-Emacs.font: Monaco 11
-Emacs.menuBar: off
-Emacs.verticalScrollBars: off
-Xft.antialias: 1
-Xft.hinting: 1
-Xft.hintstyle: hintfull
-Xft.rgba: none
-Xft.autohint: 1
 
-Rxvt.font: xft:Monaco-11:dpi=96
-Rxvt.boldFont: xft:Monaco-11:dpi=96
-Rxvt.transparent: true
-Rxvt.scrollBar: false
+#include ".Xresources.sexy"
+
+Xft.hinting: true
+Xft.dpi: 92
+Xft.hintstyle: hintfull
+Xft.lcdfilter: lcddefault
+Xft.rgba: rgb
