@@ -103,15 +103,15 @@ Automatically install my packages
 *** Fonts
 Automatically pick the preferred font if available (cross-platform)
 #+BEGIN_SRC emacs-lisp
-(setq preferred-fonts
-      '("Monaco-11:dpi=96"
-        "Consolas-13:dpi=96"
-        "Inconsolata-12"))
-(defun font-exists-p (font) "Check if font exists" (if (null (x-list-fonts font)) nil t))
-(defun pick-a-font (list) (cl-find-if 'font-exists-p list))
-(defun preferred-font () "Get the preferred font" (pick-a-font preferred-fonts))
-(add-to-list 'default-frame-alist (append '(font) (preferred-font)))
-(set-face-attribute 'default t :font (preferred-font))
+  ;; (setq preferred-fonts
+  ;;       '("Monaco-11:dpi=96"
+  ;;         "Consolas-13:dpi=96"
+  ;;         "Inconsolata-12"))
+  ;; (defun font-exists-p (font) "Check if font exists" (if (null (x-list-fonts font)) nil t))
+  ;; (defun pick-a-font (list) (cl-find-if 'font-exists-p list))
+  ;; (defun preferred-font () "Get the preferred font" (pick-a-font preferred-fonts))
+  ;; (add-to-list 'default-frame-alist (append '(font) (preferred-font)))
+  ;; (set-face-attribute 'default t :font (preferred-font))
 #+END_SRC
 ** Behaviour
 *** move-lines
@@ -159,6 +159,7 @@ Open recent files (with the recentf module) using ido
 #+END_SRC
 *** org-mode
 #+BEGIN_SRC emacs-lisp
+(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
 (setq org-startup-indented nil)
 (setq org-ellipsis " ->")
 (setq org-adapt-indentation nil)
