@@ -5,12 +5,13 @@
 # whitespace, copyright notice, etc.
 #
 
-require 'yaml'
+require "yaml"
 
-FILENAME_PATTERN = /\.(h|c|cpp|hpp|cxx|hxx|c++|h++)$/
-ENCODING = 'ISO-8859-1'
+FILENAME_PATTERN = /\.(h|c|cpp|hpp|cxx|hxx|c++|h++|ino)$/
+ALL_GLOB = "**/*.{h,c,cpp,hpp,cxx,hxx,c++,h++,ino}"
+ENCODING = "ISO-8859-1"
 ASTYLE_EXECUTABLE = "astyle"
-ASTYLE_OPTIONS =  ["-q", "-A1Os3YHUjck1M60Km0" ]
+ASTYLE_OPTIONS = ["-q", "-A1Os3YHUjck1M60Km0"]
 CONDITION_PATTERN = /Copyright/
 ASTYLE_RE = /x?[a-zA-Z]\d*/
 ASTYLE_FLAGS = "A1Os3YHUjck1M60EK".scan(ASTYLE_RE)
@@ -69,16 +70,16 @@ def get_content_options(content)
   opts = {}
   opt_re = /(astyle|restyle):\s*(.*)/
   comment_re = /(?:\/\/\s*#{opt_re}\s*$|\/\*\s*#{opt_re}\s*\*\/)/
-  content.scan(opt_re) { |opt1,arg1,opt2,arg2| opts[opt1 || opt2] = arg1 || arg2 }
+  content.scan(opt_re) { |opt1, arg1, opt2, arg2| opts[opt1 || opt2] = arg1 || arg2 }
   opts
 end
 
 def load_dot_restyle(file)
-  require 'yaml'
+  require "yaml"
   YAML.parse_file(file).transform
 end
 
-def get_style_options(file)
+def get_style_options(file, options)
   files = []
   path = File.expand_path(file)
   while ((superpath = File.dirname(path)) != path)
@@ -124,7 +125,7 @@ def restyle_file(file)
   astyle_options = Shellwords.shellwords(options["astyle_options"])
   argv = astyle_options + [temp_file]
   astyle = options["astyle_executable"]
-  system(astyle, *argv) or fail "Failed to execute #{astyle} #{options.inspect} #{$?}"
+  system(astyle, *argv) or fail("Failed to execute #{astyle} #{options.inspect} #{$?}")
 
   content = File.read(temp_file, :encoding => options["encoding"])
   File.unlink(temp_file)
@@ -160,7 +161,7 @@ def restyle_code(code, path, options)
   code.gsub!(/Copyright \S+ (?:(\d+)(-\d+)*)/) do |m|
     old_start = $1
     year = "#{old_start}-#{year}" if old_start != year
-    "Copyright © #{year}"
+    "Copyright ï¿½ #{year}"
   end
 
   # Exactly one newline at end of file
@@ -179,19 +180,19 @@ def restyle_code(code, path, options)
   code.sub!(/\A\s*\/\/={54}\n(\/\/(.*\n))+?\/\/-{54}/) { |x|
     x.split("\n").map { |ln|
       ln.sub(/\A(\/\/)\s+(.*?)\s*\Z/) {
-        $1 + " " * [((54 - $2.size)/2),0].max + $2
+        $1 + " " * [((54 - $2.size) / 2), 0].max + $2
       }
     }.join("\n")
   }
 
   # Remove empty lines and whitespace before file header
-  code.sub!(/\A\s*/, '')
+  code.sub!(/\A\s*/, "")
 
   # At least one space after C++ style comment markers (//)
   code.gsub!(/(^| +)\/\/(?!lint)([a-z0-9])/i, "\\1// \\2")
 
   # Forward slashes in includes
-  code.gsub!(/^(\s*#\s*include\s+["<])(.*?)([>"])/) { $1 + $2.tr('\\','/') + $3 }
+  code.gsub!(/^(\s*#\s*include\s+["<])(.*?)([>"])/) { $1 + $2.tr('\\', "/") + $3 }
 
   # One empty line after } at outermost level
   code.gsub!(/^}\n(\w)/, "}\n\n\\1")
@@ -209,7 +210,7 @@ def restyle_code(code, path, options)
   end
 
   # Strip old CVS keywords
-  remove_tags = [ "Revision", "Date", "Author" ].join("|")
+  remove_tags = ["Revision", "Date", "Author"].join("|")
   code.gsub!(/^.*\$(#{remove_tags}):.*$.*\n/, "")
 
   # Remove duplicate //--- lines
@@ -269,10 +270,10 @@ def determine_headerguard(path)
     lastbasedir = basedir
     basename = File.basename(basedir)
     if basename =~ HEADER_GUARD_BREAK
-      hgpath = path[basedir.size + 1 .. -1]
+      hgpath = path[basedir.size + 1..-1]
       break
     elsif File.exist?(File.join(lastbasedir, "CMakeLists.txt")) or File.exist?(File.join(lastbasedir, "..", "changes.txt"))
-      hgpath = path[File.dirname(basedir).size + 1 .. -1]
+      hgpath = path[File.dirname(basedir).size + 1..-1]
       break
     end
     basedir = File.dirname(basedir)
@@ -292,11 +293,11 @@ def restyle_headerguards(content, path)
     case ln
     when /^\s*\#\s*if(?:n?def)?\s+(.*)$/
       firstline ||= i
-      stack.push [[i,$1]]
+      stack.push [[i, $1]]
     when /^\s*\#\s*define (\w+)$/
-      stack.last[1] ||= [i,$1] unless stack.empty?
+      stack.last[1] ||= [i, $1] unless stack.empty?
     when /^\s*\#\s*endif\s*(.*)$/
-      groups.push stack.pop + [[i,$1]]
+      groups.push stack.pop + [[i, $1]]
     end
   end
   last = groups.last
@@ -315,14 +316,14 @@ def restyle_headerguards(content, path)
 
     # Adjust empty lines before and after header guards
     before = lines[0...last[0][0]]
-    guard1 = lines[last[0][0] .. last[1][0]]
-    middle = lines[last[1][0]+1 ... last[2][0]]
+    guard1 = lines[last[0][0]..last[1][0]]
+    middle = lines[last[1][0] + 1...last[2][0]]
     guard2 = lines[last[2][0], 1]
     after = lines[last[2][0] + 1..-1]
     before.pop while middle.last && before.last.strip.empty?; before.push ""
     middle.shift while middle.first && middle.first.strip.empty?; middle.unshift ""
     middle.pop while middle.last && middle.last.strip.empty?; middle.push ""
-    lines = [before,guard1,middle,guard2,after].flatten
+    lines = [before, guard1, middle, guard2, after].flatten
   else
   end
   content.replace(lines.join("\n") + "\n")
@@ -344,6 +345,7 @@ def log(str)
 end
 
 class Options
+  attr_accessor :all
   attr_accessor :force
   attr_accessor :verbose
   attr_accessor :diff
@@ -352,7 +354,8 @@ class Options
   attr_accessor :cached
   attr_accessor :check
   attr_accessor :single
-
+  attr_accessor :filename_pattern
+  attr_accessor :source_pattern
 
   def initialize
     @force = false
@@ -363,10 +366,8 @@ class Options
     @cached = false
     @check = false
     @single = false
-  end
-  def inspect
-    pp instance_variables
-    instance_variables.join(',')
+    @filename_pattern = FILENAME_PATTERN
+    @source_pattern = CONDITION_PATTERN
   end
 end
 
@@ -402,30 +403,30 @@ def get_options(options)
   files = []
   while arg = ARGV.shift
     case arg
-    when '--check', '-c'
+    when "--check", "-c"
       opts.check = true
-    when '--force', '-f'
+    when "--force", "-f"
       opts.force = true
-    when '--edited', '-e', '--dirty'
+    when "--edited", "-e", "--dirty"
       opts.dirty = true
-    when '--cached'
+    when "--cached"
       opts.cached = true
-    when '--all', '-a'
+    when "--all", "-a"
       files.push options["all"]
-    when '--verbose', '-v'
+    when "--verbose", "-v"
       opts.verbose = true
-    when '--diff', '-d'
+    when "--diff", "-d"
       opts.diff = true
-    when '--pattern', '-p'
-      options["source_pattern"] = eval(ARGV.shift)
-    when '--single', '-s'
+    when "--pattern", "-p"
+      options.source_pattern = eval(ARGV.shift)
+    when "--single", "-s"
       opts.single = true
-    when '--leave-copy'
+    when "--leave-copy"
       options["leave_copyright"] = true
-    when '--show-options'
+    when "--show-options"
       puts options.to_yaml
       exit 0
-    when '--help', '-h', '-?'
+    when "--help", "-h", "-?"
       print_usage
       exit 1
     when /^-/
@@ -477,14 +478,15 @@ end
 
 if __FILE__ == $0
   $opts = get_options(@options)
-  require 'pp'
-  pp $opts
+  require "pp"
+  pp opts: $opts
+  pp options: @options
 
-  @filename_pattern = eval(@options["filename_pattern"])
-  @source_pattern = eval(@options["source_pattern"])
+  @filename_pattern = $opts.filename_pattern
+  @source_pattern = $opts.source_pattern
 
   # Load tmpdir conditionally (bit more responsive in VS macro)
-  require 'tmpdir' if $opts.diff
+  require "tmpdir" if $opts.diff
 
   if $opts.dirty
     if File.exist?("CVS")
@@ -502,7 +504,7 @@ if __FILE__ == $0
   end
 
   files = ARGV.map do |glob|
-    result = Dir.glob(glob.tr('\\','/'))
+    result = Dir.glob(glob.tr('\\', "/"))
     if result.empty?
       puts "#{glob} does not exist."
       exit 1
@@ -518,12 +520,14 @@ if __FILE__ == $0
   # Replace directory names with their contents
   files.map! do |path|
     if File.directory?(path)
-      Dir.glob(File.join(path, @options["all"]))
+      Dir.glob(File.join(path, ALL_GLOB))
     else
       path
     end
   end
   files.flatten!
+
+  p files
 
   orig_options = @options.dup
   path_option_cache = {}
@@ -542,7 +546,8 @@ if __FILE__ == $0
       next
     end
     if path =~ @filename_pattern
-      restyle(path, options)
+      p @options
+      restyle_file(path)
     end
   end
 

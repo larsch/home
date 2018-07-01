@@ -1,12 +1,12 @@
-#!/usr/bin/env ruby
-require 'time'
+#!/usr/bin/env ruby -w
+require "time"
 
-def each_dir(path = '.', &block)
+def each_dir(path = ".", &block)
   Dir.entries(path).each do |entry|
     next if entry == "." or entry == ".." or entry == "CVS"
     subpath = File.join(path, entry)
     if File.directory?(subpath)
-      each_dir(subpath, &block) 
+      each_dir(subpath, &block)
       yield(subpath)
     end
   end
@@ -16,11 +16,11 @@ def each_cvs_file
   each_dir do |path|
     entriesfile = File.join(path, "CVS", "Entries")
     if File.exist?(entriesfile)
-      File.read(entriesfile).lines.map { |x| x.split('/') }.each do |type,name,rev,date|
+      File.read(entriesfile).lines.map { |x| x.split("/") }.each do |type, name, rev, date|
         if type == ""
           time = nil
           begin
-            date[-4,0] ="GMT "
+            date[-4, 0] = "GMT "
             time = Time.parse(date)
           rescue ArgumentError
             time = Time.utc(1970)
@@ -35,7 +35,7 @@ def each_cvs_file
 end
 
 def each_edited_file
-  each_cvs_file do |file,rev,time|
+  each_cvs_file do |file, rev, time|
     if File.file?(file)
       if File.mtime(file) != time
         yield file, rev, time
@@ -45,7 +45,7 @@ def each_edited_file
 end
 
 if $0 == __FILE__
-  each_edited_file do |file,rev,time|
+  each_edited_file do |file, rev, time|
     puts file
   end
-end  
+end
