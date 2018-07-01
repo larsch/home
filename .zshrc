@@ -14,6 +14,7 @@ alias tmuxre='tmux new-session -t default || tmux new-session -s default'
 alias dgit='git --work-tree=$HOME --git-dir=$HOME/home.git'
 alias arch-checkout-community='svn checkout --depth=empty svn://svn.archlinux.org/community'
 alias arch-checkout-packages='svn checkout --depth=empty svn://svn.archlinux.org/packages'
+alias arch-remove-orphans='sudo pacman -Rns $(pacman -Qtdq)'
 alias esptool='python2 ~/esp/esp-open-sdk/esptool/esptool.py'
 function aur-download() { curl -OLf https://aur.archlinux.org/cgit/aur.git/snapshot/$1.tar.gz }
 
@@ -25,3 +26,4 @@ fi
 export SMING_HOME=/home/larsch/esp/Sming/Sming
 export ESP_HOME=/home/larsch/esp/esp-open-sdk
 [ -e "/usr/share/terminfo/${TERM:0:1}/${TERM}" ] || export TERM=xterm
+alias restyle="find -regex '.*\.[ch]\(pp\)?$' | xargs clang-format -i"
