@@ -18,6 +18,8 @@ alias arch-remove-orphans='sudo pacman -Rns $(pacman -Qtdq)'
 alias esptool='python2 ~/esp/esp-open-sdk/esptool/esptool.py'
 function aur-download() { curl -OLf https://aur.archlinux.org/cgit/aur.git/snapshot/$1.tar.gz }
 
+[ -d "$HOME/bin" ] && export PATH=$PATH:$HOME/bin
+
 whence ruby > /dev/null
 if [ $? = 0 ]; then
   PATH="$(ruby -e 'print Gem.user_dir')/bin:$PATH"
