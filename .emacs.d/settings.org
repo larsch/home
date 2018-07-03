@@ -26,13 +26,6 @@ Keep customizations elsewhere
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file)
 #+END_SRC
-** Color theme
-#+BEGIN_SRC emacs-lisp
-(require 'color-theme)
-(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
-;; (color-theme-initialize)
-(load-theme 'Amelie)
-#+END_SRC
 ** Shortcuts
 #+BEGIN_SRC emacs-lisp
 (global-set-key "\C-cs" 'shell)
@@ -120,6 +113,12 @@ Automatically pick the preferred font if available (cross-platform)
   ;; (defun preferred-font () "Get the preferred font" (pick-a-font preferred-fonts))
   ;; (add-to-list 'default-frame-alist (append '(font) (preferred-font)))
   ;; (set-face-attribute 'default t :font (preferred-font))
+#+END_SRC
+** Color theme
+#+BEGIN_SRC emacs-lisp
+(require 'custom)
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+(load-theme 'Amelie)
 #+END_SRC
 ** Behaviour
 *** move-lines
