@@ -81,7 +81,8 @@ Automatically install my packages
    whitespace-cleanup-mode
    yaml-mode
    rg
-   iedit))
+   iedit
+   dockerfile-mode))
 #+END_SRC
 ** Appearance
 *** Basic appearance
@@ -260,6 +261,12 @@ indentation
 (add-hook 'ruby-mode-hook 'which-function-mode)
 (setq ruby-insert-encoding-magic-comment 'nil)
 #+END_SRC
+*** python-mode
+#+BEGIN_SRC emacs-lisp
+(add-hook 'python-mode-hook 'install-before-save-hooks-ruby)
+(add-hook 'python-mode-hook 'which-function-mode)
+(add-hook 'python-mode-hook 'flycheck-mode)
+#+END_SRC
 *** js2-mode
 #+BEGIN_SRC emacs-lisp
 (setq js-indent-level 2)
@@ -358,6 +365,10 @@ Setup C/C++ mode
 (autoload 'cmake-mode "cmake-mode")
 (add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
 (add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
+
+;; shell-script-mode
+(add-to-list 'auto-mode-alist '("\\.bb$" . shell-script-mode))
+(add-to-list 'auto-mode-alist '("\\.bbappend$" . shell-script-mode))
 #+END_SRC
 ** Custom Operations
 *** Easily kill current buffer without asking
