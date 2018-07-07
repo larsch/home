@@ -27,6 +27,11 @@ Keep customizations elsewhere
 (load custom-file)
 (pending-delete-mode t)
 #+END_SRC
+** Color theme
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+(load-theme 'Amelie)
+#+END_SRC
 ** Shortcuts
 #+BEGIN_SRC emacs-lisp
 (global-set-key "\C-cs" 'shell)
