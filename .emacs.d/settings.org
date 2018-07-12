@@ -369,6 +369,10 @@ Setup C/C++ mode
 (add-to-list 'auto-mode-alist '("\\.bb$" . shell-script-mode))
 (add-to-list 'auto-mode-alist '("\\.bbappend$" . shell-script-mode))
 #+END_SRC
+*** flycheck-mode
+#+BEGIN_SRC emacs-lisp
+(setq flycheck-temp-prefix "/tmp/.flycheck")
+#+END_SRC
 ** Custom Operations
 *** Easily kill current buffer without asking
 #+BEGIN_SRC emacs-lisp
