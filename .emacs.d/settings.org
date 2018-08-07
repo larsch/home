@@ -371,7 +371,10 @@ Setup C/C++ mode
 #+END_SRC
 *** flycheck-mode
 #+BEGIN_SRC emacs-lisp
-(setq flycheck-temp-prefix "/tmp/.flycheck")
+#+END_SRC
+** yasnippet
+#+BEGIN_SRC emacs-lisp
+(yas-global-mode)
 #+END_SRC
 ** Custom Operations
 *** Easily kill current buffer without asking
