@@ -63,19 +63,21 @@ Automatically install my packages
           (cl-remove-if #'package-installed-p packages))
   (delete-other-windows))
 (packages-install
- '(editorconfig
+ '(dockerfile-mode
+   editorconfig
+   iedit
    jade-mode
    js2-mode
    json-mode
+   nlinum
    pcre2el
    powerline
+   rg
    visual-regexp
    visual-regexp-steroids
    whitespace-cleanup-mode
    yaml-mode
-   rg
-   iedit
-   dockerfile-mode))
+   ))
 #+END_SRC
 ** Appearance
 *** Basic appearance
@@ -84,7 +86,7 @@ Automatically install my packages
 (set 'show-paren-delay 0.05) ; Reduce the delay for showing matching parens
 (line-number-mode t)         ; Show line number
 (column-number-mode 1)       ; Show column number
-(global-linum-mode 1)        ; Show line numbers
+(global-nlinum-mode 1)        ; Show line numbers
 (blink-cursor-mode 0)        ; Stop cursor blinking
 (setq frame-title-format "%b - Emacs")	; Show filename first in title bar
 (setq split-width-threshold 'nil)       ; Sensible split-window-sensible
