@@ -2,11 +2,11 @@
 require 'optparse'
 require 'securerandom'
 
-@include_control = true
-@include_digits = true
+@include_control = false
+@include_digits = false
 @include_uppercase = true
 @include_all = false
-@length = 10
+@length = 24
 @count = 1
 
 @letters = (?a..?z).to_a.join
