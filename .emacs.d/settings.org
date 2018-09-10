@@ -25,11 +25,17 @@ Keep customizations elsewhere
 #+BEGIN_SRC emacs-lisp
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file)
+(pending-delete-mode t)
 #+END_SRC
 ** Shortcuts
 #+BEGIN_SRC emacs-lisp
 (global-set-key "\C-cs" 'shell)
 (global-set-key "\C-j" 'newline-and-indent)
+(defun open-todo ()
+  (interactive)
+  (find-file "~/todo.org"))
+(global-set-key (kbd "C-c t") 'open-todo)
+(global-set-key (kbd "C-@") 'er/expand-region)
 #+END_SRC
 ** Server
 #+BEGIN_SRC emacs-lisp
@@ -65,6 +71,7 @@ Automatically install my packages
 (packages-install
  '(dockerfile-mode
    editorconfig
+   expand-region
    iedit
    jade-mode
    js2-mode
@@ -174,6 +181,8 @@ Open recent files (with the recentf module) using ido
 (setq org-adapt-indentation nil)
 (setq org-html-postamble nil)
 (define-key global-map "\C-cc" 'org-capture)
+(setq org-todo-keywords
+  '((sequence "TODO" "|" "DONE" "DELEGATED")))
 #+END_SRC
 *** visual-regexp
 A regexp/replace command for Emacs with interactive visual feedback
