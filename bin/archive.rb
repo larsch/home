@@ -30,12 +30,12 @@ if ARGV.include?('--register')
   ['*','Folder'].each do |cls|
     HKCR.open("#{cls}\\shell") do |reg|
       reg.create("archive") do |arch|
-        arch.write_s nil, "&Archive"
+        arch.write_s '', "&Archive"
         script = File.expand_path(__FILE__).tr('/','\\')
         ruby = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['RUBY_INSTALL_NAME'] + RbConfig::CONFIG['EXEEXT'])
         ruby.tr!('/','\\')
         arch.create "command" do |cmd|
-          cmd.write_s nil, "\"#{ruby}\" \"#{script}\" \"%1\""
+          cmd.write_s '', "\"#{ruby}\" \"#{script}\" \"%1\""
         end
       end
     end
