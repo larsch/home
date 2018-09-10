@@ -8,7 +8,7 @@
     ("be29e7507638de0e6b458112033d05dff55b224aa8cbffa71eeb1596ea4aabf9" default)))
  '(package-selected-packages
    (quote
-    (org-plus-contrib org-edna org iedit visual-regexp editorconfig yasnippet yaml-mode whitespace-cleanup-mode visual-regexp-steroids rust-mode rg powerline pcre2el markdown-mode json-mode js2-mode jade-mode hungry-delete htmlize editorconfig-custom-majormode ag))))
+    (expand-region nlinum dockerfile-mode flycheck-rust org-plus-contrib org-edna org iedit visual-regexp editorconfig yasnippet yaml-mode whitespace-cleanup-mode visual-regexp-steroids rust-mode rg powerline pcre2el markdown-mode json-mode js2-mode jade-mode hungry-delete htmlize editorconfig-custom-majormode ag))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
