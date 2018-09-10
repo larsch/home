@@ -15,8 +15,9 @@ module CppRegexp
   OPERATOR = /!=?|%=?|&[&=]?|[(),~;{}\[\]]|\*=?|\+[+=]?|-(?:-|=|>\*?)?|\.\*?|\/=?|::?|<(?:<=?|<|=)?|==?|>(?:=|>|>=)?|\?|\^=?|\|[=\|]?/
   PREPROCESSOR = /\#\s*(?:\w+).*$/
   WHITESPACE = /[\n\t ]+|(?:\\$)/
-  IDENTIFIER = /[A-Za-z_][A-Za-z0-9_]*/
-  CHARLITERAL = /\'[^\']+\'/
+  IDENTIFIER = /[A-Za-z_#][A-Za-z0-9_#]*/
+  CHAR_CHAR = /[^\\']|(?:\\.)/
+  CHARLITERAL = /\'#{CHAR_CHAR}+\'/
   SUBSTITUTABLE = /\A(?:#{IDENTIFIER}|#{STRING}|#{INTEGER}|#{FLOAT}|#{CHARLITERAL})\z/
   CPP_NAMED = %r{
      (?<string>#{STRING}) |
