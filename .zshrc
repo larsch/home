@@ -1,4 +1,5 @@
 # Lines configured by zsh-newuser-install
+export XKB_DEFAULT_OPTIONS=ctrl:nocaps
 HISTFILE=~/.histfile
 HISTSIZE=1000
 SAVEHIST=1000
@@ -16,6 +17,7 @@ alias arch-checkout-community='svn checkout --depth=empty svn://svn.archlinux.or
 alias arch-checkout-packages='svn checkout --depth=empty svn://svn.archlinux.org/packages'
 alias arch-remove-orphans='sudo pacman -Rns $(pacman -Qtdq)'
 alias esptool='python2 ~/esp/esp-open-sdk/esptool/esptool.py'
+alias clip='xclip -selection clipboard'
 function aur-download() { curl -OLf https://aur.archlinux.org/cgit/aur.git/snapshot/$1.tar.gz }
 
 [ -d "$HOME/bin" ] && export PATH=$PATH:$HOME/bin
@@ -28,5 +30,7 @@ fi
 export SMING_HOME=/home/larsch/esp/Sming/Sming
 export ESP_HOME=/home/larsch/esp/esp-open-sdk
 [ -e "/usr/share/terminfo/${TERM:0:1}/${TERM}" ] || export TERM=xterm
-alias restyle="find -regex '.*\.[ch]\(pp\)?$' | xargs clang-format -i"
+alias restyle="find -regex '.*\.(c|h|cpp|hpp|ino)$' | xargs clang-format -i"
 [ -z "$SSH_AGENT_PID" ] && eval $(ssh-agent)
+function p() { picocom --baud 115200 /dev/tty$1 }
+export XZ_OPT=-T0
