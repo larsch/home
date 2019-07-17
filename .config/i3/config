@@ -33,7 +33,7 @@ floating_modifier $mod
 # start a terminal
 bindsym $mod+Return exec i3-sensible-terminal
 
-bindsym $mod+p exec i3lock -c 000000
+bindsym $mod+p exec /home/larsch/.lock/lock.sh -c 000000
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -74,10 +74,10 @@ bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
 # split in horizontal orientation
-bindsym $mod+h split h
+bindsym $mod+v split h
 
 # split in vertical orientation
-bindsym $mod+v split v
+bindsym $mod+h split v
 
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
@@ -95,6 +95,7 @@ bindsym $mod+space focus mode_toggle
 
 # focus the parent container
 bindsym $mod+a focus parent
+bindsym $mod+Shift+a move parent
 
 # focus the child container
 #bindsym $mod+d focus child
@@ -193,10 +194,10 @@ set $text-color #f3f4f5
 set $inactive-text-color #676E7D
 set $urgent-bg-color #E53935
 
-# Start i3bar to display a workspace bar (plus the system information i3status
-# finds out, if available)
+# Start i3blocks to display a workspace bar (plus the system information
+# i3status finds out, if available)
 bar {
-        status_command i3blocks
+  status_command i3blocks
 	colors {
 		background $bg-color
 		separator #757575

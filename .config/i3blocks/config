@@ -28,6 +28,10 @@ command=/usr/lib/i3blocks/$BLOCK_NAME
 separator_block_width=15
 markup=none
 
+[disks]
+command=~/bin/blocks/disks
+interval=5
+
 # Volume indicator
 #
 # The first parameter sets the step (and units to display)
@@ -36,6 +40,7 @@ markup=none
 [volume]
 label=VOL
 #label=♪
+label=🔊
 instance=Master
 #instance=PCM
 interval=once
@@ -61,7 +66,7 @@ interval=30
 # The script may be called with a optional argument to set the alert
 # (defaults to 10 for 10%).
 [disk]
-label=ROOT
+label=🖴
 #instance=/mnt/data
 interval=30
 
@@ -71,6 +76,7 @@ interval=30
 # The address can be forced to IPv4 or IPv6 with -4 or -6 switches.
 [iface]
 #instance=wlan0
+label=🖧
 color=#00FF00
 interval=10
 separator=false
@@ -103,14 +109,17 @@ min_width=CPU: 100.00%
 [battery]
 label=BAT
 label=⚡
+label=🔋
 instance=0
 interval=30
 
 [serial]
+label=🔌
 command=~/bin/blocks/serial
 interval=5
 
 [keyboard]
+label=⌨
 command=~/bin/blocks/keyboard
 interval=2
 
@@ -118,7 +127,7 @@ interval=2
 #
 [time]
 command=date '+%Y-%m-%d %H:%M:%S'
-interval=5
+interval=1
 
 # Generic media player support
 #
