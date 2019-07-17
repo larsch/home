@@ -1,0 +1,2 @@
+#!/bin/sh
+cat ~/.xkbmap | tr 'a-z' 'A-Z'

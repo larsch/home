@@ -1,0 +1,2 @@
+#!/bin/sh
+echo $(find /dev -maxdepth 1 -type c \( -name ttyUSB\* -o -name ttyACM\* \) -printf "%f\n" | sed 's/^tty//')
