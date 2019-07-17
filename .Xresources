@@ -1,24 +1,27 @@
-Emacs.font: Monospace 11
+Emacs.font: Monaco-12
 Emacs.FontBackend: xft
 Emacs.menuBar: off
 Emacs.verticalScrollBars: off
 
-Rxvt.font: xft:Monospace-11
-Rxvt.boldFont: xft:Monospace-11
-Rxvt.transparent: true
+Rxvt.font: xft:FiraCode-11
+Rxvt.boldFont: xft:FiraCode-11
+Rxvt.transparent: false
 Rxvt.scrollBar: false
+Rxvt.skipBuiltinGlyphs: true
 
-XTerm*faceName: Monospace-11
+XTerm*fastScroll: true
+XTerm*faceName: Monaco-11
 XTerm*metaSendsEscape: true
 UXTerm*metaSendsEscape: true
 XTerm*colorBDMode: true
 XTerm*utf8: 1
 XTerm*cursorBlink: false
 
-#include ".Xresources.sexy"
+#include "/home/larsch/.Xresources.sexy"
 
 Xft.hinting: true
 Xft.dpi: 92
-Xft.hintstyle: hintfull
+!Xft.hintstyle: hintfull
+Xft.hintstyle: none
 Xft.lcdfilter: lcddefault
 Xft.rgba: rgb
