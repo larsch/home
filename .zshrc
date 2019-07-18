@@ -34,3 +34,4 @@ alias restyle="find -regex '.*\.(c|h|cpp|hpp|ino)$' | xargs clang-format -i"
 [ -z "$SSH_AGENT_PID" ] && eval $(ssh-agent)
 function p() { picocom --baud 115200 /dev/tty$1 }
 export XZ_OPT=-T0
+[ -e "/lib/modules/$(uname -r)" ] || echo "Reboot needed (new kernel)"
