@@ -12,7 +12,7 @@ set $left j
 set $down k
 set $up l
 set $right semicolon
-set $term urxvt
+set $term kitty
 
 # Visuals
 font pango:NotoSans 12
