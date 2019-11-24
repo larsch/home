@@ -37,6 +37,10 @@ input 2:7:SynPS/2_Synaptics_TouchPad {
        tap enabled
        natural_scroll enabled
        middle_emulation enabled
+	accel_profile flat
+}
+input 2:10:TPPS/2_Elan_TrackPoint {
+	accel_profile flat
 }
 
 
