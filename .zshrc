@@ -1,4 +1,5 @@
 # Lines configured by zsh-newuser-install
+#export LC_TIME=en_GB
 export XKB_DEFAULT_OPTIONS=ctrl:nocaps
 HISTFILE=~/.histfile
 HISTSIZE=1000
@@ -35,3 +36,5 @@ alias restyle="find -regex '.*\.(c|h|cpp|hpp|ino)$' | xargs clang-format -i"
 function p() { picocom --baud 115200 /dev/tty$1 }
 export XZ_OPT=-T0
 [ -e "/lib/modules/$(uname -r)" ] || echo "Reboot needed (new kernel)"
+
+[ "$TTY" = /dev/tty1 ] && [ "$HOST" = t495arch ] && sway >~/.swaylog 2>&1 ||:
