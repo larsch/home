@@ -1,0 +1,11 @@
+#!/bin/sh
+kbf=$HOME/.xkbmap
+layout=us
+[[ -e $kbf ]] && layout=$(cat $kbf)
+if [[ $layout == "dk" ]]; then
+  layout=us
+else
+  layout=dk
+fi
+setxkbmap -layout $layout
+echo $layout > $kbf
