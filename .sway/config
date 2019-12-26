@@ -35,6 +35,7 @@ set $menu bemenu-run
 # Input
 input 1:1:AT_Translated_Set_2_keyboard {
 	xkb_options ctrl:nocaps
+	xkb_layout us,dk
 }
 input 2:7:SynPS/2_Synaptics_TouchPad {
        dwt enabled
@@ -195,6 +196,8 @@ bindsym XF86MonBrightnessDown exec light -T 0.8
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5% #increase sound volume
 bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 0 -5% #decrease sound volume
 bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 0 toggle # mute sound
+
+bindsym $mod+x exec /home/larsch/bin/toggle_keyboard_sway
 
 #
 # Status Bar:

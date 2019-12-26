@@ -1,0 +1,4 @@
+#!/bin/bash
+id=1:1:AT_Translated_Set_2_keyboard
+cur=$(swaymsg -t get_inputs|jq ".[]|select(.identifier==\"$id\")|.xkb_active_layout_index")
+swaymsg input $id xkb_switch_layout $((1-cur))
