@@ -1,5 +1,7 @@
 # Initialization
-exec xrdb -merge ~/.Xresources
+#exec pulseaudio --daemonize --start
+#exec xrdb -merge ~/.Xresources
+#exec dropbox &
 exec swayidle -w \
          timeout 300 'swaylock -f -c 000000' \
          timeout 600 'swaymsg "output * dpms off"' \
@@ -26,7 +28,9 @@ set $hlbg "#c0c0c0"
 set $hlfg "#080808"
 
 # Launcher
-set $menu rofi -show run -color-window "#000000,#404040,#808080" -color-normal "#000000,#808080,#000000,#404000,#808080" -font "Fira Code 16" 
+#set $menu rofi -show run -color-window "#000000,#404040,#808080" -color-normal "#000000,#808080,#000000,#404000,#808080" -font "Fira Code 16" 
+
+set $menu bemenu-run
 
 # Input
 input 1:1:AT_Translated_Set_2_keyboard {
@@ -43,6 +47,9 @@ input 2:10:TPPS/2_Elan_TrackPoint {
 	accel_profile flat
 }
 
+# Windows
+for_window [class="Firefox"] inhibit_idle fullscreen
+for_window [app_id="firefox"] inhibit_idle fullscreen
 
 
 ### Key bindings
