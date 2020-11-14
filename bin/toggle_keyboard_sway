@@ -1,4 +1,7 @@
-#!/bin/bash
-id=1:1:AT_Translated_Set_2_keyboard
-cur=$(swaymsg -t get_inputs|jq ".[]|select(.identifier==\"$id\")|.xkb_active_layout_index")
-swaymsg input $id xkb_switch_layout $((1-cur))
+#!/bin/bash -eu
+inputs=$(swaymsg -t get_inputs|jq "[.[] | select(.type == \"keyboard\" and (.xkb_layout_names|length > 1))]")
+keyboards=$(echo "$inputs" | jq -r ".[]|.identifier")
+for id in $keyboards; do
+	cur=$(echo "$inputs"|jq -r "first(.[]|select(.identifier==\"$id\")|.xkb_active_layout_index)")
+	[ $cur == null ] || swaymsg input $id xkb_switch_layout $((1-cur))
+done
