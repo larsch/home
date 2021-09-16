@@ -158,17 +158,6 @@ bindsym XF86AudioRaiseVolume exec pactl set-sink-volume 0 +5% #increase sound vo
 bindsym XF86AudioLowerVolume exec pactl set-sink-volume 0 -5% #decrease sound volume
 bindsym XF86AudioMute exec pactl set-sink-mute 0 toggle # mute sound
 
-# Status Bar
-bar {
-    position bottom
-    status_command i3status
-    colors {
-        statusline #ffffff
-        background #323232
-        inactive_workspace #32323200 #32323200 #5c5c5c
-    }
-}
-
 include /etc/sway/config.d/*
 
 exec systemctl --user start sway-session.target
