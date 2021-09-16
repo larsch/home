@@ -1,0 +1,10 @@
+[Unit]
+Description=LID monitoring daemon
+
+[Service]
+Type=simple
+ExecStart=/home/larsch/bin/lidmon
+Environment=RUST_BACKTRACE=1
+
+[Install]
+WantedBy=graphical-session.target

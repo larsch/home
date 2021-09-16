@@ -1,0 +1,13 @@
+[Unit]
+Description=swayidle
+
+[Service]
+ExecStart=/usr/bin/swayidle -w \
+         lock 'swaylock -f -c 000000 -i ~/.sway/lock.jpg' \
+  timeout 300 'swaylock -f -c 000000 -i ~/.sway/lock.jpg' \
+  timeout 600 'swaymsg "output * dpms off"' \
+       resume 'swaymsg "output * dpms on"' \
+ before-sleep 'swaylock -f -c 000000 -i ~/.sway/lock.jpg'
+
+[Install]
+WantedBy=graphical-session.target
