@@ -96,8 +96,6 @@ bindsym $mod+Shift+c reload
 # Change normal to inverse to use left mouse button for resizing and right
 # mouse button for dragging.
 floating_modifier $mod normal
-
-# Workspaces
 bindsym $mod+1 workspace 1
 bindsym $mod+2 workspace 2
 bindsym $mod+3 workspace 3
@@ -159,5 +157,6 @@ bindsym XF86AudioLowerVolume exec pactl set-sink-volume 0 -5% #decrease sound vo
 bindsym XF86AudioMute exec pactl set-sink-mute 0 toggle # mute sound
 
 include /etc/sway/config.d/*
+include ~/.sway/config.d/*
 
 exec systemctl --user start sway-session.target
