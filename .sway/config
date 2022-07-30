@@ -26,18 +26,11 @@ set $hlbg "#c0c0c0"
 set $hlfg "#080808"
 
 # Input
-input 1:1:AT_Translated_Set_2_keyboard {
-    xkb_options ctrl:nocaps
-    xkb_layout us_custom
-    repeat_delay 300
-    repeat_rate 20
-}
-
-input 2385:5842:Kingston_HyperX_Alloy_FPS_Pro_Mechanical_Gaming_Keyboard {
+input type:keyboard {
 	xkb_options ctrl:nocaps
 	xkb_layout us_custom
-    repeat_delay 300
-    repeat_rate 20
+	repeat_delay 300
+	repeat_rate 20
 }
 
 input 2:7:SynPS/2_Synaptics_TouchPad {
@@ -170,16 +163,16 @@ bindsym $mod+minus scratchpad show
 
 # Resizing
 mode "resize" {
-    bindsym $left resize shrink width 10px
-    bindsym $down resize grow height 10px
-    bindsym $up resize shrink height 10px
-    bindsym $right resize grow width 10px
-    bindsym Left resize shrink width 10px
-    bindsym Down resize grow height 10px
-    bindsym Up resize shrink height 10px
-    bindsym Right resize grow width 10px
-    bindsym Return mode "default"
-    bindsym Escape mode "default"
+	bindsym $left resize shrink width 10px
+	bindsym $down resize grow height 10px
+	bindsym $up resize shrink height 10px
+	bindsym $right resize grow width 10px
+	bindsym Left resize shrink width 10px
+	bindsym Down resize grow height 10px
+	bindsym Up resize shrink height 10px
+	bindsym Right resize grow width 10px
+	bindsym Return mode "default"
+	bindsym Escape mode "default"
 }
 bindsym $mod+r mode "resize"
 
@@ -198,7 +191,7 @@ include ~/.sway/config.d/*
 
 exec systemctl --user start sway-session.target
 
-
+# Keyboard passthrough mode
 mode passthrough {
 	bindsym $mod+q mode default
 }
