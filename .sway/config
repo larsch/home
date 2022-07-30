@@ -1,11 +1,18 @@
 # Settings
 set $mod Mod4
-set $left j
-set $down k
-set $up l
-set $right semicolon
-set $term kitty
-set $menu bemenu-run
+set $left h
+set $down j
+set $up k
+set $right l
+set $term foot
+set $altterm kitty
+set $menu bemenu-run --fn "Cascadia Mono" --line-height=32
+
+set $ws_shell 1
+set $ws_browser 2
+set $ws_code 3
+set $ws_chat 4
+set $ws_music 5
 
 # Visuals
 font pango:NotoSans 10
@@ -20,15 +27,15 @@ set $hlfg "#080808"
 
 # Input
 input 1:1:AT_Translated_Set_2_keyboard {
-	xkb_options ctrl:nocaps
-	xkb_layout us,dk
+    xkb_options ctrl:nocaps
+    xkb_layout us_custom
     repeat_delay 300
     repeat_rate 20
 }
 
 input 2385:5842:Kingston_HyperX_Alloy_FPS_Pro_Mechanical_Gaming_Keyboard {
 	xkb_options ctrl:nocaps
-	xkb_layout us,dk
+	xkb_layout us_custom
     repeat_delay 300
     repeat_rate 20
 }
@@ -45,6 +52,14 @@ input 2:10:TPPS/2_Elan_TrackPoint {
 	accel_profile flat
 }
 
+# Output
+output DP-3 {
+	pos 0 0
+}
+output eDP-1 {
+	pos 1920 0
+}
+
 input 1133:49970:Logitech_Gaming_Mouse_G502 {
 	accel_profile flat
 	pointer_accel 0.1
@@ -53,16 +68,31 @@ input 1133:49970:Logitech_Gaming_Mouse_G502 {
 # Windows
 for_window [class="Firefox"] inhibit_idle fullscreen
 for_window [app_id="firefox"] inhibit_idle fullscreen
+assign [app_id="firefox"] workspace $ws_browser
+assign [class="Slack"] workspace $ws_chat
+assign [class="discord"] workspace $ws_chat
+assign [title="Spotify"] workspace $ws_music
+assign [app_id="telegramdesktop"] workspace $ws_chat
+assign [class="Code"] workspace $ws_code
 
 ### Key bindings
 
+bindsym $mod+f9 exec /home/larsch/bin/bt-toggle
+bindsym $mod+f10 exec /home/larsch/bin/bt-resync
+
 # Applications
 bindsym $mod+Return exec $term
+bindsym $mod+Shift+Return exec $altterm
 bindsym $mod+d exec $menu
 bindsym $mod+p exec loginctl lock-session
 bindsym $mod+Shift+q kill
-bindsym $mod+x exec /home/larsch/bin/toggle_keyboard_sway
+bindsym $mod+x input type:keyboard xkb_switch_layout next
 bindsym $mod+Shift+s exec grim -g "$(slurp)" - | wl-copy --type image/png
+bindsym $mod+t output eDP-1 toggle
+bindsym Alt+f1 exec /usr/local/bin/firefox
+bindsym Alt_R+f2 exec slack
+bindsym $mod+f3 exec discord
+bindsym $mod+f4 exec qalculate-qt
 
 # Focus
 bindsym $mod+$left focus left
@@ -119,6 +149,10 @@ bindsym $mod+Shift+8 move container to workspace 8
 bindsym $mod+Shift+9 move container to workspace 9
 bindsym $mod+Shift+0 move container to workspace 10
 
+# Move to output
+bindsym $mod+Ctrl+Left move workspace to output left
+bindsym $mod+Ctrl+Right move workspace to output right
+
 # Split
 bindsym $mod+b splith
 bindsym $mod+v splitv
@@ -155,8 +189,17 @@ bindsym XF86MonBrightnessDown exec light -T 0.8
 bindsym XF86AudioRaiseVolume exec pactl set-sink-volume 0 +5% #increase sound volume
 bindsym XF86AudioLowerVolume exec pactl set-sink-volume 0 -5% #decrease sound volume
 bindsym XF86AudioMute exec pactl set-sink-mute 0 toggle # mute sound
+bindsym XF86AudioPlay exec playerctl play-pause
+bindsym XF86AudioNext exec playerctl next
+bindsym XF86AudioPrev exec playerctl previous
 
 include /etc/sway/config.d/*
 include ~/.sway/config.d/*
 
 exec systemctl --user start sway-session.target
+
+
+mode passthrough {
+	bindsym $mod+q mode default
+}
+bindsym $mod+q mode passthrough
