@@ -10,16 +10,25 @@ if whence exa >/dev/null; then
 fi
 
 # system update
-alias syu='sudo pacman -Syu --noconfirm'
-alias yaysyu='yay -Syu --noconfirm'
+if whence pacman >/dev/null; then
+    alias syu='sudo pacman -Syu --noconfirm'
+fi
+if whence yay >/dev/null; then
+    alias yaysyu='yay -Syu --noconfirm'
+fi
 
-# other aliases
 alias dgit='git --work-tree=$HOME --git-dir=$HOME/home.git'
-alias qemu='qemu-system-x86_64'
+
+# qemu
+if whence qemu-system-x86_64 >/dev/null; then
+    alias qemu='qemu-system-x86_64'
+fi
 
 # virsh
-alias v='virsh'
-alias sv='virsh --connect qemu:///system'
+if whence virsh >/dev/null; then
+    alias v='virsh'
+    alias sv='virsh --connect qemu:///system'
+fi
 
 # keymap
 bindkey -e
@@ -33,7 +42,7 @@ bindkey "^[[27;7;13~" accept-line
 bindkey "^[[27;8;13~" accept-line
 
 # grc-rs
-if command -v grc-rs >/dev/null; then
+if whence grc-rs >/dev/null; then
     source <(grc-rs --aliases --except=ip)
 fi
 
@@ -70,7 +79,7 @@ fi
 if [[ -f /usr/share/fzf/completion.zsh ]]; then
     . /usr/share/fzf/completion.zsh
 fi
-if command -v fzf >/dev/null; then
+if whence fzf >/dev/null; then
     fzf-edit-widget() {
         local cmd="${FZF_ALT_E_COMMAND:-"command find -L . -mindepth 1 \\( -path '*/\\.*' -o -fstype 'sysfs' -o -fstype 'devfs' -o -fstype 'devtmpfs' -o -fstype 'proc' \\) -prune \
         -o -type f -print 2> /dev/null | cut -b3-"}"
@@ -91,6 +100,10 @@ if command -v fzf >/dev/null; then
     zle -N fzf-edit-widget
     bindkey '^[E' fzf-edit-widget
 fi
+
+zupdate() {
+    (cd "${ZDOTDIR}" && git pull) && . ${ZDOTDIR}/.zshenv && . ${ZDOTDIR}/.zshrc
+}
 
 # local configuration (~/.zshrc.d)
 [[ ! -d "$HOME/.zshrc.d" ]] || source <(cat $(find "$HOME/.zshrc.d" -type f) /dev/null)
