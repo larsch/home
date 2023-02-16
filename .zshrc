@@ -1,7 +1,7 @@
 # default to xterm if terminfo is missing
 [ -e "/usr/share/terminfo/${TERM:0:1}/${TERM}" ] || export TERM=xterm
 
-# exa
+# aliases
 if whence exa >/dev/null; then
     alias ls='exa --classify'
     alias ll='exa --classify -l'
@@ -9,25 +9,26 @@ if whence exa >/dev/null; then
     alias ltr='exa --classify -l --sort modified'
 fi
 
-# system update
 if whence pacman >/dev/null; then
     alias syu='sudo pacman -Syu --noconfirm'
+    alias zinstall='sudo pacman -Syu --needed fd fzf ripgrep exa grml-zsh-config zsh-syntax-highlighting'
 fi
+
 if whence yay >/dev/null; then
     alias yaysyu='yay -Syu --noconfirm'
 fi
 
-alias dgit='git --work-tree=$HOME --git-dir=$HOME/home.git'
-
-# qemu
 if whence qemu-system-x86_64 >/dev/null; then
     alias qemu='qemu-system-x86_64'
 fi
 
-# virsh
 if whence virsh >/dev/null; then
     alias v='virsh'
     alias sv='virsh --connect qemu:///system'
+fi
+
+if [[ -d ~/home.git ]]; then
+    alias dgit='git --work-tree=$HOME --git-dir=$HOME/home.git'
 fi
 
 # keymap
