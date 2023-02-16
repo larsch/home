@@ -1,4 +1,7 @@
-_setenv() { export "$@"; systemctl --user set-environment "$@" }
+_setenv() {
+    export "$@"
+    [[ -z ${SYSTEMD_EXEC_PID} ]] || systemctl --user set-environment "$@"
+}
 
 _setenv \
 MOZ_ENABLE_WAYLAND=1 \
@@ -13,5 +16,4 @@ QT_WAYLAND_DISABLE_WINDOWDECORATION=1
 
 unset _setenv
 
-[ "$TTY" != /dev/tty1 ] || [ ! -e /usr/bin/sway ] || exec systemd-cat sway --verbose
-# sway >~/.swaylog 2>&1
+[ "$TTY" != /dev/tty1 ] || [ ! whence sway >/dev/null ] || exec systemd-cat sway --verbose
