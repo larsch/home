@@ -1,6 +1,11 @@
 # default to xterm if terminfo is missing
 [ -e "/usr/share/terminfo/${TERM:0:1}/${TERM}" ] || export TERM=xterm
 
+if (( ! ${+GRML_OSTYPE} )); then
+    [[ -f "${ZDOTDIR}/grml" ]] || curl -s -L -o "${ZDOTDIR}/grml" https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
+    . "${ZDOTDIR}/grml"
+fi
+
 # aliases
 if whence exa >/dev/null; then
     alias ls='exa --classify'
@@ -12,6 +17,11 @@ fi
 if whence pacman >/dev/null; then
     alias syu='sudo pacman -Syu --noconfirm'
     alias zinstall='sudo pacman -Syu --needed fd fzf ripgrep exa grml-zsh-config zsh-syntax-highlighting'
+fi
+
+if whence apt-get >/dev/null; then
+    alias zinstall='sudo apt-get install fd-find fzf ripgrep exa; zupdategrml'
+    alias zupdategrml='mkdir -p ~/.zshrc.d; curl -s -L -z ~/.zshrc.d/50-grml -o ~/.zshrc.d/50-grml https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc'
 fi
 
 if whence yay >/dev/null; then
@@ -72,14 +82,16 @@ if [ -e /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.z
 fi
 
 # fzf
-if [ -e /usr/share/fzf/key-bindings.zsh ]; then
-    . /usr/share/fzf/key-bindings.zsh
-    bindkey "^T" transpose-chars  # restore default bindings
-    bindkey "^[o" fzf-file-widget
-fi
-if [[ -f /usr/share/fzf/completion.zsh ]]; then
-    . /usr/share/fzf/completion.zsh
-fi
+for _fzfpath in /usr/share/fzf /usr/share/doc/fzf/examples; do
+    if [ -e $_fzfpath/key-bindings.zsh ]; then
+        . $_fzfpath/key-bindings.zsh
+        bindkey "^T" transpose-chars  # restore default bindings
+        bindkey "^[o" fzf-file-widget
+    fi
+    if [[ -f $_fzfpath/completion.zsh ]]; then
+        . $_fzfpath/completion.zsh
+    fi
+done
 if whence fzf >/dev/null; then
     fzf-edit-widget() {
         local cmd="${FZF_ALT_E_COMMAND:-"command find -L . -mindepth 1 \\( -path '*/\\.*' -o -fstype 'sysfs' -o -fstype 'devfs' -o -fstype 'devtmpfs' -o -fstype 'proc' \\) -prune \
