@@ -8,10 +8,29 @@ fi
 
 # aliases
 if whence exa >/dev/null; then
-    alias ls='exa --classify'
-    alias ll='exa --classify -l'
-    alias l='exa --classify -l'
+    alias ls='command exa --classify'
+    alias ll='command exa --classify -l'
+    alias l='command exa --classify -l'
     alias ltr='exa --classify -l --sort modified'
+
+    # change default grml aliases to use exa
+    alias dir='command exa -lSrah'
+    alias la='command exa -la --color=auto'
+    alias lad='command exa -d .*(/)'
+    alias lh='command exa -al --color=auto'
+    alias lsa='command exa -a .*(.)'
+    alias lsbig='command exa -s none -l *(.OL[1,10])'
+    alias lsd='command exa -d *(/)'
+    alias lse='command exa -d *(/^F)'
+    alias lsl='command exa -l *(@)'
+    alias lsnew='command exa -s modified -rl *(D.om[1,10])'
+    alias lsnewdir='command exa -s modified -rdl *(/om[1,10]) .*(D/om[1,10])'
+    alias lsold='command exa -s modified -rl *(D.Om[1,10])'
+    alias lsolddir='command exa -s modified -rdl *(/Om[1,10]) .*(D/Om[1,10])'
+    alias lss='command exa -l *(s,S,t)'
+    alias lssmall='command exa -s size -rl *(.oL[1,10])'
+    alias lsw='command exa -ld *(R,W,X.^ND/)'
+    alias lsx='command exa -l *(*)'
 fi
 
 if whence pacman >/dev/null; then
