@@ -49,8 +49,15 @@ if whence pacman >/dev/null; then
 fi
 
 if whence apt-get >/dev/null; then
-    alias zinstall='sudo apt-get install fd-find fzf ripgrep exa; zupdategrml'
-    alias zupdategrml='mkdir -p ~/.zshrc.d; curl -s -L -z ~/.zshrc.d/50-grml -o ~/.zshrc.d/50-grml https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc'
+    zinstall() {
+        sudo apt-get install --ignore-missing fd-find fzf ripgrep exa
+        if ! whence exa >/dev/null; then
+            local _temp=$(tempfile)
+            curl -sfL "https://github.com/ogham/exa/releases/download/v0.10.1/exa-linux-x86_64-v0.10.1.zip" -o "$_temp"
+            unzip -o "$_temp" -d ~/.local
+            rm -f "$_temp"
+        fi
+    }
 fi
 
 if whence yay >/dev/null; then
