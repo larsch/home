@@ -6,6 +6,16 @@ if (( ! ${+GRML_OSTYPE} )); then
     . "${ZDOTDIR}/grml"
 fi
 
+# user paths
+[[ -d "$HOME/bin" ]] && export PATH=$PATH:$HOME/bin
+[[ -d "$HOME/.cargo/bin" ]] && export PATH=$PATH:$HOME/.cargo/bin
+[[ -d "$HOME/.local/bin" ]] && export PATH=$HOME/.local/bin:$PATH
+[[ -d "$HOME/.yarn" ]] && export PATH=$HOME/.yarn/bin:$PATH
+if whence ruby >/dev/null; then
+    PATH="$(ruby -e 'print Gem.user_dir')/bin:$PATH"
+    export PATH
+fi
+
 # aliases
 if whence exa >/dev/null; then
     alias ls='command exa --classify'
@@ -74,16 +84,6 @@ bindkey "^[[27;8;13~" accept-line
 # grc-rs
 if whence grc-rs >/dev/null; then
     source <(grc-rs --aliases --except=ip)
-fi
-
-# user paths
-[[ -d "$HOME/bin" ]] && export PATH=$PATH:$HOME/bin
-[[ -d "$HOME/.cargo/bin" ]] && export PATH=$PATH:$HOME/.cargo/bin
-[[ -d "$HOME/.local/bin" ]] && export PATH=$HOME/.local/bin:$PATH
-[[ -d "$HOME/.yarn" ]] && export PATH=$HOME/.yarn/bin:$PATH
-if whence ruby >/dev/null; then
-    PATH="$(ruby -e 'print Gem.user_dir')/bin:$PATH"
-    export PATH
 fi
 
 # tmux
