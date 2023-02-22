@@ -112,11 +112,13 @@ for _fzfpath in /usr/share/fzf /usr/share/doc/fzf/examples; do
     fi
 done
 if whence fzf >/dev/null; then
+    export FZF_ALT_C_OPTS="'--prompt=> cd '"
+    export FZF_ALT_E_OPTS="'--prompt=> vim '"
     fzf-edit-widget() {
         local cmd="${FZF_ALT_E_COMMAND:-"command find -L . -mindepth 1 \\( -path '*/\\.*' -o -fstype 'sysfs' -o -fstype 'devfs' -o -fstype 'devtmpfs' -o -fstype 'proc' \\) -prune \
         -o -type f -print 2> /dev/null | cut -b3-"}"
         setopt localoptions pipefail no_aliases 2> /dev/null
-        local dir="$(eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse --bind=ctrl-z:ignore $FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS" $(__fzfcmd) +m)"
+        local dir="$(eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse --bind=ctrl-z:ignore $FZF_DEFAULT_OPTS $FZF_ALT_E_OPTS" $(__fzfcmd) +m)"
         if [[ -z "$dir" ]]; then
             zle redisplay
             return 0
