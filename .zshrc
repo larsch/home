@@ -45,7 +45,9 @@ fi
 
 if whence pacman >/dev/null; then
     alias syu='sudo pacman -Syu --noconfirm'
-    alias zinstall='sudo pacman -Syu --needed fd fzf ripgrep exa grml-zsh-config zsh-syntax-highlighting'
+    zinstall() {
+        sudo pacman -Syu --needed fd fzf ripgrep exa grml-zsh-config zsh-syntax-highlighting
+    }
 fi
 
 if whence apt-get >/dev/null; then
