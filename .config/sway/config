@@ -6,7 +6,7 @@ set $up k
 set $right l
 set $term foot
 set $altterm kitty
-set $menu bemenu-run --fn "Cascadia Mono" --line-height=32
+set $menu bemenu-run --fn "Cascadia Mono 14" --line-height=32 -B 1 -M 20 -P 20
 
 set $ws_shell 1
 set $ws_browser 2
@@ -15,8 +15,8 @@ set $ws_chat 4
 set $ws_music 5
 
 # Visuals
-font pango:NotoSans 10
-set $background #002b3600
+# font pango:NotoSans 15
+set $background "#2b3600"
 set $foreground "#fdf6e3"
 set $separator $foreground
 set $bg "#080808"
@@ -64,12 +64,13 @@ for_window [app_id="firefox"] inhibit_idle fullscreen
 assign [app_id="firefox"] workspace $ws_browser
 assign [class="Slack"] workspace $ws_chat
 assign [class="discord"] workspace $ws_chat
-assign [title="Spotify"] workspace $ws_music
 assign [app_id="telegramdesktop"] workspace $ws_chat
 assign [class="Code"] workspace $ws_code
+for_window [class="Spotify"] move container|window to workspace $ws_music
 
 ### Key bindings
 
+bindsym $mod+f5 exec vncviewer localhost
 bindsym $mod+f9 exec /home/larsch/bin/bt-toggle
 bindsym $mod+f10 exec /home/larsch/bin/bt-resync
 
@@ -77,6 +78,7 @@ bindsym $mod+f10 exec /home/larsch/bin/bt-resync
 bindsym $mod+Return exec $term
 bindsym $mod+Shift+Return exec $altterm
 bindsym $mod+d exec $menu
+# bindcode --release 133 exec $menu
 bindsym $mod+p exec loginctl lock-session
 bindsym $mod+Shift+q kill
 bindsym $mod+x input type:keyboard xkb_switch_layout next
@@ -86,6 +88,26 @@ bindsym Alt+f1 exec /usr/local/bin/firefox
 bindsym Alt_R+f2 exec slack
 bindsym $mod+f3 exec discord
 bindsym $mod+f4 exec qalculate-qt
+bindsym $mod+Ctrl+f exec firefox
+bindsym $mod+Ctrl+l exec slack
+bindsym $mod+Ctrl+c exec code
+
+# scaling outputs
+mode "scale" {
+	bindsym 0 output * scale 1.0; mode "default"
+	bindsym 1 output * scale 1.1; mode "default"
+	bindsym 2 output * scale 1.2; mode "default"
+	bindsym 3 output * scale 1.3; mode "default"
+	bindsym 4 output * scale 1.4; mode "default"
+	bindsym 5 output * scale 1.5; mode "default"
+	bindsym 6 output * scale 1.6; mode "default"
+	bindsym 7 output * scale 1.7; mode "default"
+	bindsym 8 output * scale 1.8; mode "default"
+	bindsym 9 output * scale 1.9; mode "default"
+	bindsym Return mode "default"
+	bindsym Escape mode "default"
+}
+bindsym $mod+z mode "scale"
 
 # Focus
 bindsym $mod+$left focus left
@@ -112,6 +134,9 @@ bindsym $mod+Shift+Right move right
 # Session
 bindsym $mod+Shift+e exec swaynag -t warning -m 'Really exit?' -b 'Exit sway' 'swaymsg exit'
 bindsym $mod+Shift+c reload
+
+# vnc
+bindsym $mod+shift+v exec vncviewer localhost
 
 # Drag floating windows by holding down $mod and left mouse button.
 # Resize them with right mouse button + $mod.
@@ -187,7 +212,7 @@ bindsym XF86AudioNext exec playerctl next
 bindsym XF86AudioPrev exec playerctl previous
 
 include /etc/sway/config.d/*
-include ~/.sway/config.d/*
+include ~/.config/sway/config.d/*
 
 exec systemctl --user start sway-session.target
 
