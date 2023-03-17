@@ -166,5 +166,9 @@ zupdate() {
     (cd "${ZDOTDIR}" && git pull) && . ${ZDOTDIR}/.zshenv && . ${ZDOTDIR}/.zshrc
 }
 
+rmux() {
+    ssh -t "$@" tmux new-session -As default
+}
+
 # local configuration (~/.zshrc.d)
 [[ ! -d "$HOME/.zshrc.d" ]] || source <(cat $(find "$HOME/.zshrc.d" -type f) /dev/null)
