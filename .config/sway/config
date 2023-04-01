@@ -59,13 +59,15 @@ input 1133:49970:Logitech_Gaming_Mouse_G502 {
 }
 
 # Windows
+assign [app_id="firefox"] workspace $ws_browser
+assign [app_id="code-url-handler"] workspace $ws_code
+assign [app_id="Slack"] workspace $ws_chat
+assign [app_id="org.telegram.desktop"] workspace $ws_chat
+assign [class="discord"] workspace $ws_chat
+
 for_window [class="Firefox"] inhibit_idle fullscreen
 for_window [app_id="firefox"] inhibit_idle fullscreen
-assign [app_id="firefox"] workspace $ws_browser
-assign [class="Slack"] workspace $ws_chat
-assign [class="discord"] workspace $ws_chat
-assign [app_id="telegramdesktop"] workspace $ws_chat
-assign [class="Code"] workspace $ws_code
+
 for_window [class="Spotify"] move container|window to workspace $ws_music
 
 ### Key bindings
