@@ -102,6 +102,7 @@ bindsym $mod+f4 exec qalculate-qt
 bindsym $mod+Ctrl+f exec firefox
 bindsym $mod+Ctrl+l exec slack
 bindsym $mod+Ctrl+c exec code
+bindsym $mod+m exec /usr/bin/pkill -USR1 waybar
 
 # scaling outputs
 mode "scale" {
