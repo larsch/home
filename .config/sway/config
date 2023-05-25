@@ -104,6 +104,10 @@ bindsym $mod+Ctrl+l exec slack
 bindsym $mod+Ctrl+c exec code
 bindsym $mod+m exec /usr/bin/pkill -USR1 waybar
 
+exec /usr/bin/grep -q open /proc/acpi/button/lid/LID/state || swaymsg output eDP-1 disable
+bindswitch --locked lid:on output eDP-1 disable
+bindswitch --locked lid:off output eDP-1 enable
+
 # scaling outputs
 mode "scale" {
 	bindsym 0 output * scale 1.0; mode "default"
