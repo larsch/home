@@ -25,7 +25,7 @@ set $bgalt "$bg"
 set $hlbg "#c0c0c0"
 set $hlfg "#080808"
 
-# Input
+# keyboard
 input type:keyboard {
 	xkb_options ctrl:nocaps
 	xkb_layout us_custom
@@ -33,6 +33,7 @@ input type:keyboard {
 	repeat_rate 20
 }
 
+# touchpad
 input 2:7:SynPS/2_Synaptics_TouchPad {
 	dwt enabled
 	tap enabled
@@ -41,19 +42,26 @@ input 2:7:SynPS/2_Synaptics_TouchPad {
 	accel_profile flat
 }
 
+# trackpad
 input 2:10:TPPS/2_Elan_TrackPoint {
 	accel_profile flat
 }
 
-# Output
+# external monitor
 output DP-3 {
 	pos 0 0
 }
+
+# internal monitor
 output eDP-1 {
 	pos 1920 0
 }
 
-input 1133:49970:Logitech_Gaming_Mouse_G502 {
+# mouse
+# 1133:49970:Logitech_Gaming_Mouse_G502
+# 1133:45089:Logitech_Pebble_Mouse
+# 1133:50503:Logitech_USB_Receiver
+input type:pointer {
 	accel_profile flat
 	pointer_accel 0.1
 }
