@@ -1,0 +1,8 @@
+[Unit]
+Description=swaylock
+Requires=swayidle-locked.service
+OnSuccess=swayidle.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/swaylock -c 000000 -i ~/.config/sway/lock.jpg

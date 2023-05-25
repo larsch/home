@@ -1,13 +1,14 @@
 [Unit]
 Description=swayidle
+Conflicts=swayidle-locked.service
 
 [Service]
-ExecStart=/usr/bin/swayidle -w \
-         lock 'swaylock -f -c 000000 -i ~/.config/sway/lock.jpg' \
-  timeout 300 'swaylock -f -c 000000 -i ~/.config/sway/lock.jpg' \
-  timeout 600 'swaymsg "output * dpms off"' \
-       resume 'swaymsg "output * dpms on"' \
- before-sleep 'swaylock -f -c 000000 -i ~/.config/sway/lock.jpg'
+Type=simple
+ExecStart=/usr/bin/swayidle -w -d \
+    lock 'systemctl --user start swaylock.service' \
+    timeout 300 'loginctl lock-session' \
+    before-sleep 'loginctl lock-session' \
+    idlehint 60
 
 [Install]
-WantedBy=graphical-session.target
+WantedBy=sway.target

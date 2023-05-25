@@ -1,0 +1,10 @@
+[Unit]
+Description=swayidle-locked
+Conflicts=swayidle.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/swayidle -w \
+    timeout 30 'swaymsg "output * power off"' \
+    resume 'swaymsg "output * power on"' \
+    idlehint 60
