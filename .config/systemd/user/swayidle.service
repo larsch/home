@@ -11,4 +11,4 @@ ExecStart=/usr/bin/swayidle -w -d \
     idlehint 60
 
 [Install]
-WantedBy=sway.target
+WantedBy=sway-session.target
