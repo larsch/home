@@ -148,8 +148,20 @@ bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
 # Session
-bindsym $mod+Shift+e exec swaynag -t warning -m 'Really exit?' -b 'Exit sway' 'swaymsg exit'
+# bindsym $mod+Shift+e exec swaynag -t warning -m 'Really exit?' -b 'Exit sway' 'swaymsg exit'
 bindsym $mod+Shift+c reload
+
+# Exit
+mode "exit? (y/n)" {
+	bindsym y exit
+	bindsym Shift+y exit
+	bindsym n mode "default"
+	bindsym Shift+n mode "default"
+	bindsym Return mode "default"
+	bindsym Escape mode "default"
+}
+bindsym $mod+Shift+e mode "exit? (y/n)"
+
 
 # vnc
 bindsym $mod+shift+v exec vncviewer localhost
