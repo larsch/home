@@ -20,8 +20,8 @@
         "temperature",
         "backlight",
         "sway/language",
+        "custom/turbostat",
         "battery",
-        // "battery#bat2",
         "custom/ports",
         "custom/weather",
         "clock",
@@ -30,17 +30,16 @@
     // Modules configuration
     "sway/workspaces": {
         "disable-scroll": true,
-        //     "all-outputs": true,
         "format": "{name}: {icon}",
         "format-icons": {
-            "1": "",
-            "2": "",
-            "3": "",
-            "4": "",
-            "5": "",
-            "urgent": "",
-            "focused": "",
-            "default": ""
+            "1": " ",
+            "2": " ",
+            "3": " ",
+            "4": " ",
+            "5": " ",
+            "urgent": " ",
+            "focused": " ",
+            "default": " "
         }
     },
     "sway/mode": {
@@ -73,7 +72,7 @@
     //     "tooltip-format-disconnected": "MPD (disconnected)"
     // },
     "idle_inhibitor": {
-        "format": "{icon}",
+        "format": "{icon} ",
         "format-icons": {
             "activated": "",
             "deactivated": ""
@@ -81,7 +80,7 @@
     },
     "tray": {
         // "icon-size": 21,
-        "spacing": 10
+        "spacing": 100
     },
     "clock": {
         // "timezone": "America/New_York",
@@ -121,10 +120,11 @@
             "warning": 30,
             "critical": 15
         },
-        "format": "{capacity}% {icon}",
-        "format-charging": "{capacity}% ",
-        "format-plugged": "{capacity}% ",
-        "format-alt": "{time} {icon}",
+        "interval": 2,
+        "format": "{power:.2}W {capacity}% {icon} ",
+        "format-charging": "{power:.2}W {capacity}%  ",
+        "format-plugged": "{power:.2}W {capacity}%  ",
+        "format-alt": "{power:.2}W {time} {icon} ",
         // "format-good": "", // An empty format will hide the module
         // "format-full": "",
         "format-icons": [
@@ -182,7 +182,7 @@
         // "exec": "$HOME/.config/waybar/mediaplayer.py --player spotify 2> /dev/null" // Filter player based on name
     },
     "custom/weather": {
-        "format": "{icon} {}",
+        "format": "{icon} {} ",
         "exec": "$HOME/.cargo/bin/weatherbar",
         "interval": 300, // 5 minutes
         "return-type": "json"
@@ -191,5 +191,9 @@
         "format": "{}",
         "exec": "$HOME/bin/ports",
         "interval": 10
+    },
+    "custom/turbostat": {
+        "exec": "sudo turbostat --Summary --quiet --show PkgWatt --interval 1",
+        "format": "{:.4}W"
     }
 }
