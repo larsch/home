@@ -1,0 +1,8 @@
+[Unit]
+Description=Slack
+
+[Service]
+ExecStart=/usr/bin/slack --ozone-platform=wayland --enable-features=UseOzonePlatform,WebRTCPipeWireCapturer
+
+[Install]
+WantedBy=sway-session.target
