@@ -66,6 +66,9 @@ input type:pointer {
 	pointer_accel 0.1
 }
 
+# stay on screen when wrapping
+focus_wrapping workspace
+
 # Windows
 assign [app_id="firefox"] workspace $ws_browser
 assign [app_id="code-url-handler"] workspace $ws_code
@@ -77,7 +80,6 @@ for_window [class="Spotify"] move window to workspace $ws_music
 
 for_window [class="Firefox"] inhibit_idle fullscreen
 for_window [app_id="firefox"] inhibit_idle fullscreen
-
 
 ### Key bindings
 
