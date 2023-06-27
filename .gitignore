@@ -2,3 +2,4 @@
 .zdirs
 .zsh_history
 grml
+.cache/
