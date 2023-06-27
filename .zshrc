@@ -13,6 +13,7 @@ fi
 # user paths
 [[ -d "$HOME/bin" ]] && export PATH=$PATH:$HOME/bin
 [[ -d "$HOME/.cargo/bin" ]] && export PATH=$PATH:$HOME/.cargo/bin
+[[ -d "/usr/lib/cargo/bin" ]] && export PATH=/usr/lib/cargo/bin:$PATH
 [[ -d "$HOME/.local/bin" ]] && export PATH=$HOME/.local/bin:$PATH
 [[ -d "$HOME/.yarn" ]] && export PATH=$HOME/.yarn/bin:$PATH
 if whence ruby >/dev/null; then
