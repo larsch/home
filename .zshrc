@@ -1,6 +1,10 @@
 # default to xterm if terminfo is missing
 [ -e "/usr/share/terminfo/${TERM:0:1}/${TERM}" ] || export TERM=xterm
 
+if [[ -d ~/.local/completions ]]; then
+    fpath=(~/.local/completions $fpath)
+fi
+
 if (( ! ${+GRML_OSTYPE} )); then
     [[ -f "${ZDOTDIR}/grml" ]] || curl -s -L -o "${ZDOTDIR}/grml" https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc
     . "${ZDOTDIR}/grml"
