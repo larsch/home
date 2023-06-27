@@ -21,6 +21,13 @@ if whence ruby >/dev/null; then
     export PATH
 fi
 
+if whence nvim >/dev/null; then
+    alias vi=nvim
+    alias vim=nvim
+elif whence vim >/dev/null; then
+    alias vi=vim
+fi
+
 # aliases
 if whence exa >/dev/null; then
     alias ls='command exa --classify'
