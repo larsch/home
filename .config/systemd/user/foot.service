@@ -1,0 +1,9 @@
+[Unit]
+Description=Foot
+
+[Service]
+ExecStart=/usr/bin/foot --server
+Type=simple
+
+[Install]
+WantedBy=sway-session.target
