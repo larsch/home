@@ -124,6 +124,9 @@ remux-widget() {
 }
 zle -N remux-widget
 bindkey "^[k" remux-widget
+sshmux() {
+	command ssh -t $1 /usr/bin/tmux new-session -As default
+}
 
 # syntax highlighting
 if [ -e /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
