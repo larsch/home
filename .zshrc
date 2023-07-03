@@ -91,6 +91,13 @@ if [[ -d ~/home.git ]]; then
     alias dgit='git --work-tree=$HOME --git-dir=$HOME/home.git'
 fi
 
+if whence nvim >/dev/null; then
+    alias vi=nvim
+    alias vim=nvim
+elif whence vim >/dev/null; then
+    alias vi=vim
+fi
+
 # keymap
 bindkey -e
 bindkey -r "^Ed" # Leave my end-of-line key alone
