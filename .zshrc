@@ -98,6 +98,8 @@ elif whence vim >/dev/null; then
     alias vi=vim
 fi
 
+alias top='LIBPROC_HIDE_KERNEL=1 top'
+
 # keymap
 bindkey -e
 bindkey -r "^Ed" # Leave my end-of-line key alone
