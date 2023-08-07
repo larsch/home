@@ -7,6 +7,7 @@ set $right l
 set $term footclient
 set $altterm kitty
 set $menu bemenu-run --fn "Cascadia Mono 14" --line-height=32 -B 1 -M 20 -P 20
+set $menu bemenu-run  -s --tf '#606060' --hb '#800000' --hf '#ffffff' -p "󰣆" --fn "JetBrainsMono Nerd Font Propo 18" -B1 -l10
 
 set $ws_shell 1
 set $ws_browser 2
