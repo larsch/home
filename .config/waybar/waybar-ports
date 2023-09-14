@@ -1,0 +1,4 @@
+#!/bin/sh
+(echo once; exec inotifywait -q /dev -e create -e delete -m) | while read -r _change; do
+	echo $(find /dev -name ttyUSB\* -o -name ttyACM\* | sed 's#^/dev/tty##')
+done

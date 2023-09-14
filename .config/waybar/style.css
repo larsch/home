@@ -4,10 +4,23 @@
 * {
     /* `otf-font-awesome` is required to be installed for icons */
     font-family: FontAwesome, Cascadia Mono;
+    font-family: FontAwesome, JetbrainsMono Nerd Font;
     font-size: 12px;
 }
 
 #custom-turbostat {
     background: #206040;
     padding: 0px 5px;
+}
+
+#custom-ports {
+    padding-left: 10px;
+    padding-right: 10px;
+    background: #404000;
+}
+
+#custom-disks {
+    padding-left: 10px;
+    padding-right: 10px;
+    background: #400040;
 }

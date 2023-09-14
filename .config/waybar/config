@@ -23,6 +23,7 @@
         "custom/turbostat",
         "battery",
         "custom/ports",
+        "custom/disks",
         "custom/weather",
         "clock",
         "tray"
@@ -80,7 +81,7 @@
     },
     "tray": {
         // "icon-size": 21,
-        "spacing": 100
+        "spacing": 4
     },
     "clock": {
         // "timezone": "America/New_York",
@@ -188,9 +189,12 @@
         "return-type": "json"
     },
     "custom/ports": {
-        "format": "{}",
-        "exec": "$HOME/bin/ports",
-        "interval": 10
+        "format": "󰙜 {}",
+        "exec": "$HOME/.config/waybar/waybar-ports",
+    },
+    "custom/disks": {
+        "format": "󰋊 {}",
+        "exec": "$HOME/.config/waybar/waybar-drives"
     },
     "custom/turbostat": {
         "exec": "sudo turbostat --Summary --quiet --show PkgWatt --interval 1",

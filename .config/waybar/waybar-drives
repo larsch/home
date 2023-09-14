@@ -1,0 +1,4 @@
+#!/bin/sh
+(echo done; exec inotifywait -m -q /dev -e create -e delete) | while read -r _change; do
+	echo $(lsblk -d -o NAME -n)
+done
