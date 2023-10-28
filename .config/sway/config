@@ -1,3 +1,5 @@
+input * xkb_numlock enabled
+
 # Settings
 set $mod Mod4
 set $left h
@@ -14,6 +16,8 @@ set $ws_browser 2
 set $ws_code 3
 set $ws_chat 4
 set $ws_music 5
+set $ws_docs 6
+set $ws_notes 7
 
 # Visuals
 # font pango:NotoSans 15
@@ -53,6 +57,10 @@ output DP-3 {
 	pos 0 0
 }
 
+output HDMI-A-1 {
+	pos 0 0
+}
+
 # internal monitor
 output eDP-1 {
 	pos 1920 0
@@ -77,10 +85,13 @@ assign [app_id="Slack"] workspace $ws_chat
 assign [app_id="org.telegram.desktop"] workspace $ws_chat
 assign [class="discord"] workspace $ws_chat
 assign [class="Spotify"] workspace $ws_music
+assign [app_id="evince"] workspace $ws_docs
 for_window [class="Spotify"] move window to workspace $ws_music
 
-for_window [class="Firefox"] inhibit_idle fullscreen
-for_window [app_id="firefox"] inhibit_idle fullscreen
+for_window [app_id="qalculate-qt"] floating enable; resize set 30 ppt 20 ppt; move position 65 ppt 55 ppt
+
+# for_window [class="Firefox"] inhibit_idle fullscreen
+# for_window [app_id="firefox"] inhibit_idle fullscreen
 
 ### Key bindings
 
@@ -97,15 +108,28 @@ bindsym $mod+p exec loginctl lock-session
 bindsym $mod+Shift+q kill
 bindsym $mod+x input type:keyboard xkb_switch_layout next
 bindsym $mod+Shift+s exec grim -g "$(slurp)" - | wl-copy --type image/png
-bindsym $mod+t output eDP-1 toggle
-bindsym Alt+f1 exec /usr/local/bin/firefox
-bindsym Alt_R+f2 exec slack
-bindsym $mod+f3 exec discord
-bindsym $mod+f4 exec qalculate-qt
-bindsym $mod+Ctrl+f exec firefox
-bindsym $mod+Ctrl+l exec slack
-bindsym $mod+Ctrl+c exec code
+bindsym $mod+Ctrl+s exec grim
+#bindsym $mod+t output eDP-1 toggle
+bindsym $mod+t exec /home/larsch/bin/saytime
+bindsym F9 exec /home/larsch/bin/saypizza
+bindsym F10 exec /home/larsch/bin/hk
 bindsym $mod+m exec /usr/bin/pkill -USR1 waybar
+bindsym $mod+F1 exec /usr/bin/quakespasm
+bindsym $mod+F2 exec /usr/bin/yamagi-quake2
+bindsym $mod+F3 exec /opt/quake3/ioquake3 +connect 49.13.19.132
+bindsym $mod+c exec qalculate-qt
+bindsym XF86Calculator exec qalculate-qt
+
+mode "exec" {
+	bindsym f exec firefox; mode "default"
+	bindsym Return exec $term; mode "default"
+	bindsym g exec gimp; mode "default"
+	bindsym i exec inkscape; mode "default"
+	bindsym c exec code; mode "default"
+	bindsym p exec systemctl --user start pet; mode "default"
+	bindsym Escape mode "default"
+}
+bindsym $mod+period mode "exec"
 
 exec /usr/bin/grep -q open /proc/acpi/button/lid/LID/state || swaymsg output eDP-1 disable
 bindswitch --locked lid:on output eDP-1 disable
@@ -175,6 +199,8 @@ bindsym $mod+shift+v exec vncviewer localhost
 # Change normal to inverse to use left mouse button for resizing and right
 # mouse button for dragging.
 floating_modifier $mod normal
+
+# Switch to workspace
 bindsym $mod+1 workspace 1
 bindsym $mod+2 workspace 2
 bindsym $mod+3 workspace 3
@@ -252,3 +278,10 @@ mode passthrough {
 	bindsym $mod+q mode default
 }
 bindsym $mod+q mode passthrough
+
+exec systemctl --user restart sway-session.target
+
+bindsym $mod+n workspace $ws_notes; exec code /home/larsch/Sync/Dendron
+
+seat * hide_cursor when-typing enable
+seat * hide_cursor 5000
