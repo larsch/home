@@ -126,7 +126,7 @@ remux-widget() {
 zle -N remux-widget
 bindkey "^[k" remux-widget
 sshmux() {
-	command ssh -t $1 /usr/bin/tmux new-session -As default
+	command ssh -t "$1" /usr/bin/tmux new-session -As default
 }
 
 # syntax highlighting
