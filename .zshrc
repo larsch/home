@@ -29,45 +29,46 @@ elif whence vim >/dev/null; then
 fi
 
 # aliases
-if whence exa >/dev/null; then
-    alias ls='command exa --classify'
-    alias ll='command exa --classify -l'
-    alias l='command exa --classify -l'
-    alias ltr='exa --classify -l --sort modified'
+if whence eza >/dev/null; then
+    export EZA_ICONS_AUTO=1
+    alias ls='command eza --classify'
+    alias ll='command eza --classify -l -b'
+    alias l='command eza --classify -l -b'
+    alias ltr='eza --classify -l --sort modified'
 
-    # change default grml aliases to use exa
-    alias dir='command exa -lSrah'
-    alias la='command exa -la --color=auto'
-    alias lad='command exa -d .*(/)'
-    alias lh='command exa -al --color=auto'
-    alias lsa='command exa -a .*(.)'
-    alias lsbig='command exa -s none -l *(.OL[1,10])'
-    alias lsd='command exa -d *(/)'
-    alias lse='command exa -d *(/^F)'
-    alias lsl='command exa -l *(@)'
-    alias lsnew='command exa -s modified -rl *(D.om[1,10])'
-    alias lsnewdir='command exa -s modified -rdl *(/om[1,10]) .*(D/om[1,10])'
-    alias lsold='command exa -s modified -rl *(D.Om[1,10])'
-    alias lsolddir='command exa -s modified -rdl *(/Om[1,10]) .*(D/Om[1,10])'
-    alias lss='command exa -l *(s,S,t)'
-    alias lssmall='command exa -s size -rl *(.oL[1,10])'
-    alias lsw='command exa -ld *(R,W,X.^ND/)'
-    alias lsx='command exa -l *(*)'
+    # change default grml aliases to use eza
+    alias dir='command eza -lSrah'
+    alias la='command eza -la --color=auto'
+    alias lad='command eza -d .*(/)'
+    alias lh='command eza -al --color=auto'
+    alias lsa='command eza -a .*(.)'
+    alias lsbig='command eza -s none -l *(.OL[1,10])'
+    alias lsd='command eza -d *(/)'
+    alias lse='command eza -d *(/^F)'
+    alias lsl='command eza -l *(@)'
+    alias lsnew='command eza -s modified -rl *(D.om[1,10])'
+    alias lsnewdir='command eza -s modified -rdl *(/om[1,10]) .*(D/om[1,10])'
+    alias lsold='command eza -s modified -rl *(D.Om[1,10])'
+    alias lsolddir='command eza -s modified -rdl *(/Om[1,10]) .*(D/Om[1,10])'
+    alias lss='command eza -l *(s,S,t)'
+    alias lssmall='command eza -s size -rl *(.oL[1,10])'
+    alias lsw='command eza -ld *(R,W,X.^ND/)'
+    alias lsx='command eza -l *(*)'
 fi
 
 if whence pacman >/dev/null; then
     alias syu='sudo pacman -Syu --noconfirm'
     zinstall() {
-        sudo pacman -Syu --needed fd fzf ripgrep exa grml-zsh-config zsh-syntax-highlighting
+        sudo pacman -Syu --needed fd fzf ripgrep eza grml-zsh-config zsh-syntax-highlighting
     }
 fi
 
 if whence apt-get >/dev/null; then
     zinstall() {
-        sudo apt-get install --ignore-missing fd-find fzf ripgrep exa
-        if ! whence exa >/dev/null; then
+        sudo apt-get install --ignore-missing fd-find fzf ripgrep eza
+        if ! whence eza >/dev/null; then
             local _temp=$(tempfile)
-            curl -sfL "https://github.com/ogham/exa/releases/download/v0.10.1/exa-linux-x86_64-v0.10.1.zip" -o "$_temp"
+            curl -sfL "https://github.com/ogham/eza/releases/download/v0.10.1/eza-linux-x86_64-v0.10.1.zip" -o "$_temp"
             unzip -o "$_temp" -d ~/.local
             rm -f "$_temp"
         fi
