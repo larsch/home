@@ -10,6 +10,10 @@ if (( ! ${+GRML_OSTYPE} )); then
     . "${ZDOTDIR}/grml"
 fi
 
+# Lazy load helper functions
+fpath=("${ZDOTDIR}/functions" $fpath)
+autoload -Uz $fpath[1]/*(.:t)
+
 # user paths
 [[ -d "$HOME/bin" ]] && export PATH=$PATH:$HOME/bin
 [[ -d "$HOME/.cargo/bin" ]] && export PATH=$PATH:$HOME/.cargo/bin

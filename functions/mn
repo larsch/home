@@ -1,0 +1,1 @@
+FZF_DEFAULT_COMMAND="man -k . | grep -vE '3perl|::'" fzf --preview="MAN_KEEP_FORMATTING=1 man {1}{2} 2>/dev/null" --bind="enter:become(man {1}{2})" --bind="alt-v:execute(man {1}{2})"
