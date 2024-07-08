@@ -139,38 +139,15 @@ if [ -e /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.z
 fi
 
 # fzf
-for _fzfpath in /usr/share/fzf /usr/share/doc/fzf/examples; do
-    if [ -e $_fzfpath/key-bindings.zsh ]; then
-        . $_fzfpath/key-bindings.zsh
-        bindkey "^T" transpose-chars  # restore default bindings
-        bindkey "^[o" fzf-file-widget
-    fi
-    if [[ -f $_fzfpath/completion.zsh ]]; then
-        . $_fzfpath/completion.zsh
-    fi
-done
 if whence fzf >/dev/null; then
-    export FZF_ALT_C_OPTS="'--prompt=> cd '"
-    export FZF_ALT_E_OPTS="'--prompt=> vim '"
-    fzf-edit-widget() {
-        local cmd="${FZF_ALT_E_COMMAND:-"command find -L . -mindepth 1 \\( -path '*/\\.*' -o -fstype 'sysfs' -o -fstype 'devfs' -o -fstype 'devtmpfs' -o -fstype 'proc' \\) -prune \
-        -o -type f -print 2> /dev/null | cut -b3-"}"
-        setopt localoptions pipefail no_aliases 2> /dev/null
-        local dir="$(eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse --bind=ctrl-z:ignore $FZF_DEFAULT_OPTS $FZF_ALT_E_OPTS" $(__fzfcmd) +m)"
-        if [[ -z "$dir" ]]; then
-            zle redisplay
-            return 0
-        fi
-        zle push-line # Clear buffer. Auto-restored on next prompt.
-        BUFFER="${EDITOR} ${(q)dir}"
-        zle accept-line
-        local ret=$?
-        unset dir # ensure this doesn't end up appearing in prompt expansion
-        zle reset-prompt
-        return $ret
-    }
-    zle -N fzf-edit-widget
-    bindkey '^[E' fzf-edit-widget
+    source <(fzf --zsh)
+    bindkey "^T" transpose-chars  # restore default bindings
+    bindkey "^[o" fzf-file-widget
+    source "${ZDOTDIR}/fzf.zsh"
+    FZF_PREVIEW_COMMAND="${ZDOTDIR}/fzf-preview.sh {}"
+    FZF_ALT_SHIFT_E_OPTS="'--prompt=> vim ' --preview '${FZF_PREVIEW_COMMAND}'"
+    FZF_ALT_C_OPTS="'--prompt=> cd ' --preview 'tree -C {} | head -200'"
+    FZF_CTRL_T_OPTS="--preview '${FZF_PREVIEW_COMMAND}'"
 fi
 
 # auto-start ssh-agent
