@@ -1,5 +1,5 @@
 #!/bin/sh
-case "$(file -b --mime-type "$1")" in
+case "$(file -L -b --mime-type "$1")" in
     text/* | application/json)
         bat --style=numbers --color=always "$1" ;;
     image/*)
