@@ -21,7 +21,7 @@ case "$(file -L -b --mime-type "$1")" in
     application/x-xz)
         tar tfJ "$1" ;;
     inode/directory)
-        tree -C "$1" | head -200 ;;
+        eza -t "$1" | head -200 ;;
     *)
         echo "Don't know how to preview '$1'" ;;
 esac

@@ -146,7 +146,7 @@ if whence fzf >/dev/null; then
     source "${ZDOTDIR}/fzf.zsh"
     FZF_PREVIEW_COMMAND="${ZDOTDIR}/fzf-preview.sh {}"
     FZF_ALT_SHIFT_E_OPTS="'--prompt=> vim ' --preview '${FZF_PREVIEW_COMMAND}'"
-    FZF_ALT_C_OPTS="'--prompt=> cd ' --preview 'tree -C {} | head -200'"
+    FZF_ALT_C_OPTS="'--prompt=> cd ' --preview 'eza --colour=always -T {} | head -200'"
     FZF_CTRL_T_OPTS="--preview '${FZF_PREVIEW_COMMAND}'"
 fi
 
