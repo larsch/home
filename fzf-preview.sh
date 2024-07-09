@@ -1,8 +1,14 @@
 #!/bin/sh
-echo -e "\033[44;1m\033[2K $(file "$1") \033[0m"
+echo "\033[44;1m\033[2K $(file "$1") \033[0m"
 case "$(file -L -b --mime-type "$1")" in
     text/* | application/json)
-        bat --style=numbers --color=always "$1" ;;
+        if command -v bat >/dev/null; then
+            bat --style=numbers --color=always "$1"
+        elif command -v batcat >/dev/null; then
+            batcat --style=numbers --color=always "$1"
+        else
+            cat "$1"
+        fi ;;
     image/*)
         mediainfo "$1" ;;
     audio/*)
