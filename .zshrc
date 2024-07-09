@@ -15,7 +15,7 @@ fpath=("${ZDOTDIR}/functions" $fpath)
 autoload -Uz $fpath[1]/*(.:t)
 
 # user paths
-[[ -d "$HOME/bin" ]] && export PATH=$PATH:$HOME/bin
+[[ -d "$HOME/bin" ]] && export PATH=$HOME/bin:$PATH
 [[ -d "$HOME/.cargo/bin" ]] && export PATH=$PATH:$HOME/.cargo/bin
 [[ -d "/usr/lib/cargo/bin" ]] && export PATH=/usr/lib/cargo/bin:$PATH
 [[ -d "$HOME/.local/bin" ]] && export PATH=$HOME/.local/bin:$PATH
