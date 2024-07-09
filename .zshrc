@@ -69,13 +69,20 @@ fi
 
 if whence apt-get >/dev/null; then
     zinstall() {
-        sudo apt-get install --ignore-missing fd-find fzf ripgrep eza
-        if ! whence eza >/dev/null; then
-            local _temp=$(tempfile)
-            curl -sfL "https://github.com/ogham/eza/releases/download/v0.10.1/eza-linux-x86_64-v0.10.1.zip" -o "$_temp"
-            unzip -o "$_temp" -d ~/.local
-            rm -f "$_temp"
-        fi
+        sudo apt-get install --ignore-missing fd-find fzf ripgrep eza jq bat mediainfo
+        mkdir -p "$HOME/bin" "$HOME/.local/completions"
+        (set -eu -o pipefail &&
+            echo "Installing latest eza"
+            curl -Lsf "$(curl -Lsf https://api.github.com/repos/eza-community/eza/releases/latest \
+                         | jq -r '.assets[] | select(.name | contains("x86_64-unknown-linux-gnu.tar.gz")) | .browser_download_url')" \
+                | tar -x -z -C "$HOME/bin"
+            curl -Lsf "$(curl -Lsf https://api.github.com/repos/eza-community/eza/releases/latest \
+                         | jq -r '.assets[] | select(.name | contains("completions")) | .browser_download_url')" \
+                | tar -z -x -C "$HOME/.local/completions" --wildcards --strip=3 "./target/completions-*/_eza"
+            echo "Installing latest fzf"
+            curl -Lsf "$(curl -Lsf https://api.github.com/repos/junegunn/fzf/releases/latest \
+                         | jq -r '.assets[] | select(.name | contains("linux_amd64.tar.gz")) | .browser_download_url')" \
+                | tar -x -z -C "$HOME/bin")
     }
 fi
 
