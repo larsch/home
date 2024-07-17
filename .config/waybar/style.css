@@ -1,26 +1,108 @@
-@import "base.css"; 
+/* based on https://github.com/rubyowo/dotfiles/blob/f925cf8e3461420a21b6dc8b8ad1190107b0cc56/config/waybar/style.css */
+
 @import "frappe.css";
 
 * {
-    /* `otf-font-awesome` is required to be installed for icons */
-    font-family: FontAwesome, Cascadia Mono;
-    font-family: FontAwesome, JetbrainsMono Nerd Font;
-    font-size: 12px;
+    font-family: Arial, JetBrainsMono Nerd Font Propo;
+    font-size: 13px;
+    min-height: 0;
 }
 
-#custom-turbostat {
-    background: #206040;
-    padding: 0px 5px;
+#waybar {
+    background: transparent;
+    color: @text;
 }
 
-#custom-ports {
-    padding-left: 10px;
-    padding-right: 10px;
-    background: #404000;
+window#waybar.hidden {
+    opacity: 0.2;
 }
 
-#custom-disks {
-    padding-left: 10px;
-    padding-right: 10px;
-    background: #400040;
+#workspaces {
+    border-radius: 0.501rem;
+    background-color: @surface0;
+    margin-left: 0rem;
+}
+
+#workspaces button {
+    color: @lavender;
+    border-radius: 0.501rem;
+    padding: 0.2rem 0.6rem;
+}
+
+#workspaces button.focused {
+    background-color: shade(@blue, 0.3);
+    color: @sky;
+}
+
+#workspaces button:hover {
+    color: @sapphire;
+    border-radius: 0.501rem;
+}
+
+#custom-music,
+#tray,
+#backlight,
+#clock,
+#battery,
+#pulseaudio,
+#custom-turbostat,
+#custom-ports,
+#custom-disks,
+#custom-weather,
+#network,
+#memory,
+#cpu,
+#backlight,
+#language,
+#temperature,
+#custom-lock,
+#custom-power {
+    border-left: 1px solid black;
+    background-color: @surface0;
+    padding: 0.1rem 0.6rem;
+    margin: 0px 0;
+}
+
+#clock {
+    border-radius: 0.501rem;
+    margin-left: 2px;
+}
+
+#custom-weather {
+    border-radius: 0 0.501rem 0.501rem 0;
+}
+
+#backlight {
+    color: @yellow;
+}
+
+#backlight,
+#battery {
+    border-radius: 0;
+}
+
+#pulseaudio {
+    border-radius: 0.501rem 0px 0px 0.501rem;
+    margin-left: 1rem;
+}
+
+#custom-music {
+    color: @mauve;
+    border-radius: 1rem;
+}
+
+#custom-lock {
+    border-radius: 1rem 0px 0px 1rem;
+    color: @lavender;
+}
+
+#custom-power {
+    margin-right: 1rem;
+    border-radius: 0px 1rem 1rem 0px;
+    color: @red;
+}
+
+#tray {
+    margin-left: 2px;
+    border-radius: 0.501rem;
 }
