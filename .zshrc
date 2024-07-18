@@ -185,3 +185,30 @@ rmux() {
 
 # local configuration (~/.zshrc.d)
 [[ ! -d "$HOME/.zshrc.d" ]] || source <(cat $(find "$HOME/.zshrc.d" -type f) /dev/null)
+
+# Patch grml to not show hostname+user in title when on Wayland
+grml_control_xterm_title() {
+    case $TERM in
+        (xterm*|rxvt*|alacritty|foot)
+            if [[ -n $WAYLAND_DISPLAY ]]; then
+                set_title "${(%):-"%~"}" "$1"
+            else
+                set_title "${(%):-"%n@%m: %~"}" "$1"
+            fi
+            ;;
+    esac
+}
+
+# Patch grml to not show hostname+user in title when on Wayland
+grml_reset_screen_title() {
+    [[ ${NOTITLE:-} -gt 0 ]] && return 0
+    case $TERM in
+        (xterm*|rxvt*|alacritty|foot)
+            if [[ -n $WAYLAND_DISPLAY ]]; then
+                set_title ${(%):-"%~"}
+            else
+                set_title ${(%):-"%n@%m: %~"}
+            fi
+            ;;
+    esac
+}
