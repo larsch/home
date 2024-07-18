@@ -8,8 +8,9 @@ set $up k
 set $right l
 set $term footclient
 set $altterm kitty
-set $menu bemenu-run --fn "Cascadia Mono 14" --line-height=32 -B 1 -M 20 -P 20
-set $menu bemenu-run  -s --tf '#606060' --hb '#800000' --hf '#ffffff' -p "󰣆" --fn "JetBrainsMono Nerd Font Propo 18" -B1 -l10
+# set $menu bemenu-run --fn "Cascadia Mono 14" --line-height=32 -B 1 -M 20 -P 20
+# set $menu bemenu-run  -s --tf '#606060' --hb '#800000' --hf '#ffffff' -p "󰣆" --fn "JetBrainsMono Nerd Font Propo 18" -B1 -l10
+set $menu bemenu-run -n --border-radius 9 -b -W 0.4 --fn "JetBrainsMono Nerd Font 16" -B 1 --tf '#208000' --bdr '#208000' --hf '#40c000' --nf '#606060' --af '#606060'  -l "10 up" -P "" -p "󰣆"
 
 set $ws_shell 1
 set $ws_browser 2
@@ -18,17 +19,6 @@ set $ws_chat 4
 set $ws_music 5
 set $ws_docs 6
 set $ws_notes 7
-
-# Visuals
-# font pango:NotoSans 15
-set $background "#2b3600"
-set $foreground "#fdf6e3"
-set $separator $foreground
-set $bg "#080808"
-set $fg "#c0c0c0"
-set $bgalt "$bg"
-set $hlbg "#c0c0c0"
-set $hlfg "#080808"
 
 # keyboard
 input type:keyboard {
@@ -52,18 +42,12 @@ input 2:10:TPPS/2_Elan_TrackPoint {
 	accel_profile flat
 }
 
-# external monitor
-output DP-3 {
-	pos 0 0
+output "BNQ BenQ XL2720T E3D03427SL0" {
+	pos -1920 -240
 }
 
-output HDMI-A-1 {
+output "Chimei Innolux Corporation 0x14F2 Unknown" {
 	pos 0 0
-}
-
-# internal monitor
-output eDP-1 {
-	pos 1920 0
 }
 
 # mouse
@@ -88,7 +72,7 @@ assign [class="Spotify"] workspace $ws_music
 assign [app_id="evince"] workspace $ws_docs
 for_window [class="Spotify"] move window to workspace $ws_music
 
-for_window [app_id="qalculate-qt"] floating enable; resize set 30 ppt 20 ppt; move position 65 ppt 55 ppt
+for_window [app_id="qalculate-qt"] floating enable; resize set 30 ppt 60 ppt; move position 65 ppt 35 ppt
 
 # for_window [class="Firefox"] inhibit_idle fullscreen
 # for_window [app_id="firefox"] inhibit_idle fullscreen
@@ -98,6 +82,7 @@ for_window [app_id="qalculate-qt"] floating enable; resize set 30 ppt 20 ppt; mo
 bindsym $mod+f5 exec vncviewer localhost
 bindsym $mod+f9 exec /home/larsch/bin/bt-toggle
 bindsym $mod+f10 exec /home/larsch/bin/bt-resync
+bindsym $mod+Ctrl+p exec /home/larsch/bin/say-menu
 
 # Applications
 bindsym $mod+Return exec $term
@@ -108,17 +93,20 @@ bindsym $mod+p exec loginctl lock-session
 bindsym $mod+Shift+q kill
 bindsym $mod+x input type:keyboard xkb_switch_layout next
 bindsym $mod+Shift+s exec grim -g "$(slurp)" - | wl-copy --type image/png
-bindsym $mod+Ctrl+s exec grim
+bindsym $mod+Ctrl+s exec grim - | wl-copy --type image/png
 #bindsym $mod+t output eDP-1 toggle
 bindsym $mod+t exec /home/larsch/bin/saytime
-bindsym F9 exec /home/larsch/bin/saypizza
-bindsym F10 exec /home/larsch/bin/hk
+# bindsym F9 exec /home/larsch/bin/saypizza
+# bindsym F10 exec /home/larsch/bin/hk
 bindsym $mod+m exec /usr/bin/pkill -USR1 waybar
+# bindsym $mod+m exec /usr/bin/footclient --title man "--override=main.font=JetBrainsMono NFM:size=17.5" --override="main.font-bold=JetBrainsMono NFM:size=17.5" "/home/larsch/bin/manmenu"
 bindsym $mod+F1 exec /usr/bin/quakespasm
 bindsym $mod+F2 exec /usr/bin/yamagi-quake2
 bindsym $mod+F3 exec /opt/quake3/ioquake3 +connect 49.13.19.132
 bindsym $mod+c exec qalculate-qt
 bindsym XF86Calculator exec qalculate-qt
+
+bindsym $mod+Shift+n exec footclient -F --override "main.font=JetBrainsMono NFM:size=32.0" --override "main.font-bold=JetBrainsMono NFM:size=32.0" /home/larsch/bin/nerd-font-select
 
 mode "exec" {
 	bindsym f exec firefox; mode "default"
@@ -127,6 +115,7 @@ mode "exec" {
 	bindsym i exec inkscape; mode "default"
 	bindsym c exec code; mode "default"
 	bindsym p exec systemctl --user start pet; mode "default"
+	bindsym k exec keepassxc; mode "default"
 	bindsym Escape mode "default"
 }
 bindsym $mod+period mode "exec"
@@ -180,15 +169,14 @@ bindsym $mod+Shift+c reload
 
 # Exit
 mode "exit? (y/n)" {
-	bindsym y exit
-	bindsym Shift+y exit
+	bindsym y exec systemctl --user stop sway-session.target; exit
+	bindsym Shift+y exec systemctl --user stop sway-session.target; exit
 	bindsym n mode "default"
 	bindsym Shift+n mode "default"
 	bindsym Return mode "default"
 	bindsym Escape mode "default"
 }
 bindsym $mod+Shift+e mode "exit? (y/n)"
-
 
 # vnc
 bindsym $mod+shift+v exec vncviewer localhost
@@ -271,7 +259,7 @@ bindsym XF86AudioPrev exec playerctl previous
 include /etc/sway/config.d/*
 include ~/.config/sway/config.d/*
 
-exec systemctl --user start sway-session.target
+# exec systemctl --user start sway-session.target
 
 # Keyboard passthrough mode
 mode passthrough {
@@ -283,5 +271,5 @@ exec systemctl --user restart sway-session.target
 
 bindsym $mod+n workspace $ws_notes; exec code /home/larsch/Sync/Dendron
 
-seat * hide_cursor when-typing enable
-seat * hide_cursor 5000
+# seat * hide_cursor when-typing enable
+# seat * hide_cursor 5000
