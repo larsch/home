@@ -3,8 +3,9 @@
 @import "frappe.css";
 
 * {
-    font-family: Arial, JetBrainsMono Nerd Font Propo;
-    font-size: 13px;
+    /* font-family: Arial, JetBrainsMono Nerd Font Propo; */
+    font-family: Arimo Nerd Font Propo;
+    font-size: 11pt;
     min-height: 0;
 }
 
@@ -63,9 +64,20 @@ window#waybar.hidden {
     margin: 0px 0;
 }
 
+#custom-turbostat {
+    min-width: 4rem;
+}
+
+#clock, #tray, #pulseaudio {
+    margin-left: 0.1rem;
+}
+
+#idle_inhibitor {
+    margin-left: 1rem;
+}
+
 #clock {
     border-radius: 0.501rem;
-    margin-left: 2px;
 }
 
 #custom-weather {
@@ -83,7 +95,6 @@ window#waybar.hidden {
 
 #pulseaudio {
     border-radius: 0.501rem 0px 0px 0.501rem;
-    margin-left: 1rem;
 }
 
 #custom-music {
@@ -103,6 +114,12 @@ window#waybar.hidden {
 }
 
 #tray {
-    margin-left: 2px;
     border-radius: 0.501rem;
+}
+
+#idle_inhibitor {
+    background-color: #ff0000;
+    border-radius: 0.501rem;
+    background-color: @surface0;
+    padding: 0.1rem 0.6rem;
 }

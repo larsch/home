@@ -148,7 +148,7 @@
         "exec": "$HOME/.config/waybar/waybar-drives"
     },
     "custom/turbostat": {
-        "exec": "sudo turbostat --Summary --quiet --show PkgWatt --interval 1",
-        "format": "{:.4}W 󱪂"
+        "format": "{:.4}W 󱪂",
+        "exec": "sudo turbostat --Summary --quiet --show PkgWatt --interval 5"
     }
 }
