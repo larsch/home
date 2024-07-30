@@ -140,11 +140,6 @@ sshmux() {
 	command ssh -t "$1" /usr/bin/tmux new-session -As default
 }
 
-# syntax highlighting
-if [ -e /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
-    . /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-fi
-
 # fzf
 if whence fzf >/dev/null; then
     source <(fzf --zsh)
@@ -212,3 +207,8 @@ grml_reset_screen_title() {
             ;;
     esac
 }
+
+# syntax highlighting (should be last)
+if [ -e /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
+    . /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
