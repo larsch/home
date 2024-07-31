@@ -1,0 +1,6 @@
+#!/bin/sh -eu
+set -o pipefail
+export BEMENU_OPTS="-W 0.8 -i -p 󰻐 -l 20 up --fn 'JetBrainsMono Nerd Font 18'"
+selected=$(cat $HOME/.cache/unicode-list | automenu)
+first_char=$(echo "$selected" | awk '{print $1}')
+wl-copy "$first_char"

@@ -1,0 +1,10 @@
+#!/bin/sh -eu
+set -o pipefail
+export BEMENU_OPTS="-W 0.8 -i -p 'Nerd Font' -l '20 up' --fn 'JetBrainsMono Nerd Font 18'"
+if [ ! -f $HOME/.cache/nerd-fonts ]; then
+    curl -sfL https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/glyphnames.json |
+    jq -r "to_entries | map(select(.key != \"METADATA\")) | .[] | \"\(.value.char)  \(.key)  \(.value.code)\" " > $HOME/.cache/nerd-fonts
+fi
+selected=$(cat $HOME/.cache/nerd-fonts |automenu)
+first_char=$(echo "$selected" | awk '{print $1}')
+wl-copy "$first_char"

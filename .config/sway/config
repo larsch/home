@@ -101,7 +101,10 @@ bindsym $mod+F3 exec /opt/quake3/ioquake3 +connect 49.13.19.132
 bindsym $mod+c exec qalculate-qt
 bindsym XF86Calculator exec qalculate-qt
 
-bindsym $mod+Shift+n exec footclient -F --override "main.font=JetBrainsMono NFM:size=32.0" --override "main.font-bold=JetBrainsMono NFM:size=32.0" /home/larsch/bin/nerd-font-select
+bindsym $mod+Shift+n exec select-nerd-font
+bindsym $mod+Shift+u exec select-unicode
+bindsym $mod+Shift+f exec select-font
+
 
 mode "exec" {
 	bindsym f exec firefox; mode "default"

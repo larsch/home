@@ -1,0 +1,6 @@
+#!/bin/sh -eu
+set -o pipefail
+set > $HOME/set-term
+export BEMENU_OPTS="-p Font --fn 'Arimo Nerd Font Propo 11' -i -l 20"
+font=$(fc-list -f '%{family}\n' | sort | uniq | automenu)
+wl-copy "$font"

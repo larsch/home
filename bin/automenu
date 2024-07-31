@@ -1,0 +1,7 @@
+#!/bin/bash -eu
+set -o pipefail
+if [[ "$TERM" != "linux" ]]; then
+    exec fzf
+else
+    exec bemenu -W 0.8 -P " " -n --border-radius 9 -b -B 1 --border 1 -l "10 up" --bdr "#303446" --tb "#232634" --nb "#232634" --ab "#232634" --hb "#303446" --hf "#c6d0f5" --ff "#c6d0f5" --tf "#c6d0f5" --fb "#232634" "$@"
+fi
