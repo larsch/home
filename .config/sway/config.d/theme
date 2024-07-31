@@ -2,8 +2,9 @@ font pango:Arimo Nerd Font Propo 11
 
 include frappe.theme
 
-client.focused $surface0 $surface0 $text
-client.unfocused $crust $crust $subtext0
+client.unfocused $surface0 $surface0 $lavender
+client.focused $crust $crust $sky
+
 client.focused_inactive $mantle $mantle $subtext0
 titlebar_border_thickness 0
 smart_borders no_gaps
