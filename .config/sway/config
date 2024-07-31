@@ -8,9 +8,6 @@ set $up k
 set $right l
 set $term footclient
 set $altterm kitty
-# set $menu bemenu-run --fn "Cascadia Mono 14" --line-height=32 -B 1 -M 20 -P 20
-# set $menu bemenu-run  -s --tf '#606060' --hb '#800000' --hf '#ffffff' -p "󰣆" --fn "JetBrainsMono Nerd Font Propo 18" -B1 -l10
-set $menu bemenu-run -n --border-radius 9 -b -W 0.4 --fn "JetBrainsMono Nerd Font 16" -B 1 --tf '#208000' --bdr '#208000' --hf '#40c000' --nf '#606060' --af '#606060'  -l "10 up" -P "" -p "󰣆"
 
 set $ws_shell 1
 set $ws_browser 2
@@ -87,8 +84,6 @@ bindsym $mod+Ctrl+p exec /home/larsch/bin/say-menu
 # Applications
 bindsym $mod+Return exec $term
 bindsym $mod+Shift+Return exec $altterm
-bindsym $mod+d exec $menu
-# bindcode --release 133 exec $menu
 bindsym $mod+p exec loginctl lock-session
 bindsym $mod+Shift+q kill
 bindsym $mod+x input type:keyboard xkb_switch_layout next
@@ -273,3 +268,16 @@ bindsym $mod+n workspace $ws_notes; exec code /home/larsch/Sync/Dendron
 
 # seat * hide_cursor when-typing enable
 # seat * hide_cursor 5000
+
+set $menu bemenu-run -n --border-radius 9 -b -W 0.4 --fn "Arimo Nerd Font Propo 11" -B 1 --border 1 \
+    -l "10 up" -P "" -p "󰣆" \
+	--bdr $base \
+	--tb $crust \
+	--nb $crust \
+	--ab $crust \
+	--hb $base \
+	--hf $text \
+	--ff $text \
+	--tf $text \
+	--fb $crust
+bindsym $mod+d exec $menu
