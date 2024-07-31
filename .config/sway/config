@@ -40,11 +40,11 @@ input 2:10:TPPS/2_Elan_TrackPoint {
 }
 
 output "BNQ BenQ XL2720T E3D03427SL0" {
-	pos -1920 -240
+	pos 0 0
 }
 
 output "Chimei Innolux Corporation 0x14F2 Unknown" {
-	pos 0 0
+	pos 1920 240
 }
 
 # mouse
