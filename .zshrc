@@ -141,6 +141,19 @@ sshmux() {
 	command ssh -t "$1" /usr/bin/tmux new-session -As default
 }
 
+# btrfs
+if whence btrfs >/dev/null; then
+    if [[ $UID == 0 ]]; then
+        alias bfs=btrfs
+        alias bsv='btrfs subvolume'
+        alias bsn='btrfs subvolume snapshot'
+    else
+        alias bfs='sudo btrfs'
+        alias bsv='sudo btrfs subvolume'
+        alias bsn='sudo btrfs subvolume snapshot'
+    fi
+fi
+
 # fzf
 if whence fzf >/dev/null; then
     source <(fzf --zsh)
