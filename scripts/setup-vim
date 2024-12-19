@@ -1,0 +1,12 @@
+#!/bin/sh
+command -v vim >/dev/null || exit 1
+git_clone() {
+        if [ -e "$2" ]; then
+                git -C "$2" pull
+        else
+                git clone --depth 1 "$1" "$2"
+        fi
+}
+mkdir -p ~/.vim/pack/tpope/start
+git_clone https://tpope.io/vim/sensible.git ~/.vim/pack/tpope/start/sensible
+git_clone https://tpope.io/vim/sleuth.git ~/.vim/pack/tpope/start/sleuth 

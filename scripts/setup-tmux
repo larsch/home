@@ -1,0 +1,25 @@
+#!/bin/sh
+# https://github.com/tmux-plugins/tpm
+# https://github.com/catppuccin/tmux
+# https://github.com/tmux-plugins/tmux-sensible
+set -eu
+command -v tmux >/dev/null || exit 1
+if [[ -d ~/.tmux/plugins/tpm ]]; then
+	git -C ~/.tmux/plugins/tpm pull
+else
+	git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+fi
+cat >$HOME/.tmux.conf <<__EOF__
+set-option -sa terminal-overrides ",xterm*:Tc"
+set -g base-index 1
+set -g pane-base-index 1
+set-window-option -g pane-base-index 1
+set -g @catppuccin_flavor "mocha"
+set -g @catppuccin_window_status_style "rounded"
+set -g @plugin 'tmux-plugins/tpm'
+set -g @plugin 'tmux-plugins/tmux-sensible'
+set -g @plugin 'catppuccin/tmux'
+run '~/.tmux/plugins/tpm/tpm'
+__EOF__
+$HOME/.tmux/plugins/tpm/bin/install_plugins
+$HOME/.tmux/plugins/tpm/bin/update_plugins all
