@@ -1,0 +1,14 @@
+#!/bin/sh -exu
+set -o pipefail
+tempdir=$(mktemp -d)
+cleanup() {
+    cd
+    echo rm -rf "$tempdir"
+}
+trap cleanup EXIT
+cd "$tempdir"
+curl -LOsf https://aur.archlinux.org/cgit/aur.git/snapshot/paru-bin.tar.gz
+tar xfz paru-bin.tar.gz
+cd paru-bin
+makepkg -sf
+sudo pacman -U paru-bin-[0-9]*.pkg.tar.zst

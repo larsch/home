@@ -15,4 +15,4 @@ QT_WAYLAND_DISABLE_WINDOWDECORATION=1
 
 unset _setenv
 
-[[ "$TTY" != /dev/tty1 ]] || ! whence sway >/dev/null || exec systemd-cat sway --verbose
+[[ "$TTY" != /dev/tty1 ]] || ! whence sway >/dev/null || exec systemd-cat sway --unsupported-gpu --verbose
