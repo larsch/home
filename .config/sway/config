@@ -70,6 +70,7 @@ assign [app_id="evince"] workspace $ws_docs
 for_window [class="Spotify"] move window to workspace $ws_music
 
 for_window [app_id="qalculate-qt"] floating enable; resize set 30 ppt 60 ppt; move position 65 ppt 35 ppt
+for_window [app_id="qalculate-gtk"] floating enable; resize set 30 ppt 60 ppt; move position 65 ppt 35 ppt
 
 # for_window [class="Firefox"] inhibit_idle fullscreen
 # for_window [app_id="firefox"] inhibit_idle fullscreen
@@ -98,7 +99,7 @@ bindsym $mod+m exec /usr/bin/pkill -USR1 waybar
 bindsym $mod+F1 exec /usr/bin/quakespasm
 bindsym $mod+F2 exec /usr/bin/yamagi-quake2
 bindsym $mod+F3 exec /opt/quake3/ioquake3 +connect 49.13.19.132
-bindsym $mod+c exec qalculate-qt
+bindsym $mod+c exec $HOME/.config/sway/togglewin qalculate-gtk
 bindsym XF86Calculator exec qalculate-qt
 
 bindsym $mod+Shift+n exec select-nerd-font

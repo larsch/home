@@ -1,0 +1,19 @@
+#!/bin/sh
+set -eu -o pipefail
+app="$1"
+window_id=$(swaymsg -t get_tree | jq --arg app_id "$app" -r '.. | select(.app_id?==$app_id).id')
+
+# run the app if it's not running
+if [ -z "$window_id" ]; then
+    exec $app
+fi
+
+# move the app to the scratchpad if it's focused, otherwise move it to the current workspace
+is_focused=$(swaymsg -t get_tree | jq -r --argjson window_id "$window_id" '.. | select(.id?==$window_id).focused')
+if [ "$is_focused" = "true" ]; then
+    swaymsg "[con_id=$window_id] move container to scratchpad"
+else
+    current_workspace=$(swaymsg -t get_workspaces | jq '.[] | select(.focused==true).name')
+    swaymsg "[con_id=$window_id] move container to workspace \"$current_workspace\""
+    swaymsg "[con_id=$window_id] focus"
+fi
