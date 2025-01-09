@@ -287,15 +287,23 @@ bindsym $mod+n workspace $ws_notes; exec code /home/larsch/Sync/Dendron
 # seat * hide_cursor when-typing enable
 # seat * hide_cursor 5000
 
-set $menu bemenu-run -n --border-radius 9 -b -W 0.4 --fn "Arimo Nerd Font Propo 11" -B 1 --border 1 \
+
+
+set $menustyle -n --border-radius 9 \
+    -b -W 0.4 \
+    --fn "Arimo Nerd Font Propo 14"\
+    -B 1 \
+    --border 1 \
     -l "10 up" -P "" -p "󰣆" \
-	--bdr $base \
-	--tb $crust \
-	--nb $crust \
-	--ab $crust \
-	--hb $base \
-	--hf $text \
-	--ff $text \
-	--tf $text \
-	--fb $crust
-bindsym $mod+d exec $menu
+    --bdr $base \
+    --tb $crust \
+    --nb $crust \
+    --ab $crust \
+    --hb $base \
+    --hf $text \
+    --ff $text \
+    --tf $text \
+    --fb $crust
+
+bindsym $mod+d exec bemenu-run $menustyle
+bindsym $mod+Shift+d exec j4-dmenu-desktop --dmenu='bemenu -i $menustyle'
