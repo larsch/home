@@ -40,13 +40,25 @@ input 2:10:TPPS/2_Elan_TrackPoint {
 	accel_profile flat
 }
 
-output "BNQ BenQ XL2720T E3D03427SL0" {
+# output "BNQ BenQ XL2720T E3D03427SL0" {
+# 	pos 0 0
+# }
+#
+# output "Chimei Innolux Corporation 0x14F2 Unknown" {
+# 	pos 1920 240
+# }
+
+output "Chimei Innolux Corporation 0x14F2 Unknown" {
 	pos 0 0
 }
 
-output "Chimei Innolux Corporation 0x14F2 Unknown" {
-	pos 1920 240
+output "Invalid Vendor Codename - RTK CX156A 0x00000001" {
+	pos -1080 -800
+	transform 90
+	scale 1
 }
+
+input 1046:49512:TSTP_MTouch map_to_output "Invalid Vendor Codename - RTK CX156A 0x00000001"
 
 # mouse
 # 1133:49970:Logitech_Gaming_Mouse_G502
