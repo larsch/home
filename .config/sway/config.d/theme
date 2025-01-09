@@ -12,6 +12,7 @@ titlebar_padding 5 0
 output * bg $crust solid_color
 default_border normal 1
 
+for_window [class="discord"] title_format " %title"
 for_window [app_id="firefox"] title_format " %title"
 for_window [app_id="footclient"] title_format " %title"
 for_window [app_id="code-url-handler"] title_format "󰨞 %title"
