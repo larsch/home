@@ -3,6 +3,8 @@ Description=Foot
 
 [Service]
 ExecStart=/usr/bin/foot --server
+Restart=always
+RestartSec=2
 Type=simple
 
 [Install]
