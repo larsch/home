@@ -94,6 +94,7 @@ bindsym $mod+f5 exec vncviewer localhost
 bindsym $mod+f9 exec /home/larsch/bin/bt-toggle
 bindsym $mod+f10 exec /home/larsch/bin/bt-resync
 bindsym $mod+Ctrl+p exec /home/larsch/bin/say-menu
+bindsym $mod+Shift+r exec /usr/bin/rdesktop 10.9.8.60
 
 # Applications
 bindsym $mod+Return exec $term
