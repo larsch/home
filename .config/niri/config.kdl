@@ -102,12 +102,20 @@ input {
     position x=1280 y=0
 }
 
+output "PNP(BNQ) BenQ XL2720T E3D03427SL0" {
+    mode "1920x1080" // needed to get 120 Hz
+}
+
+output "Samsung Electric Company SyncMaster HS4P603771" {
+    position x=-1600 y=0
+}
+
 // Settings that influence how windows are positioned and sized.
 // Find more information on the wiki:
 // https://github.com/YaLTeR/niri/wiki/Configuration:-Layout
 layout {
     // Set gaps around windows in logical pixels.
-    gaps 1
+    gaps 0
 
     // When to center a column when changing focus, options are:
     // - "never", default behavior, focusing an off-screen column will keep at the left
