@@ -1,0 +1,1 @@
+bindsym $mod+f12 exec play /opt/rvgl/wavs/honka.wav

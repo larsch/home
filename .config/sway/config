@@ -17,29 +17,6 @@ set $ws_music 5
 set $ws_docs 6
 set $ws_notes 7
 
-# keyboard
-input type:keyboard {
-	xkb_options ctrl:nocaps
-	xkb_layout us_custom
-	repeat_delay 300
-	repeat_rate 20
-}
-
-# touchpad
-input 2:7:SynPS/2_Synaptics_TouchPad {
-	dwt enabled
-	tap enabled
-	natural_scroll enabled
-	middle_emulation enabled
-	accel_profile flat
-	pointer_accel 1.0
-}
-
-# trackpad
-input 2:10:TPPS/2_Elan_TrackPoint {
-	accel_profile flat
-}
-
 # output "BNQ BenQ XL2720T E3D03427SL0" {
 # 	pos 0 0
 # }
@@ -48,26 +25,26 @@ input 2:10:TPPS/2_Elan_TrackPoint {
 # 	pos 1920 240
 # }
 
-output "Chimei Innolux Corporation 0x14F2 Unknown" {
-	pos 0 0
-}
+# output "Chimei Innolux Corporation 0x14F2 Unknown" {
+# 	pos 0 0
+# }
+# 
+# output "Invalid Vendor Codename - RTK CX156A 0x00000001" {
+# 	pos -1080 -800
+# 	transform 90
+# 	scale 1
+# }
 
-output "Invalid Vendor Codename - RTK CX156A 0x00000001" {
-	pos -1080 -800
-	transform 90
-	scale 1
-}
-
-input 1046:49512:TSTP_MTouch map_to_output "Invalid Vendor Codename - RTK CX156A 0x00000001"
+# input 1046:49512:TSTP_MTouch map_to_output "Invalid Vendor Codename - RTK CX156A 0x00000001"
 
 # mouse
 # 1133:49970:Logitech_Gaming_Mouse_G502
 # 1133:45089:Logitech_Pebble_Mouse
 # 1133:50503:Logitech_USB_Receiver
-input type:pointer {
-	accel_profile flat
-	pointer_accel 0.1
-}
+# input type:pointer {
+# 	accel_profile flat
+# 	pointer_accel 0.1
+# }
 
 # stay on screen when wrapping
 focus_wrapping workspace
@@ -91,8 +68,8 @@ for_window [app_id="qalculate-gtk"] floating enable; resize set 30 ppt 60 ppt; m
 ### Key bindings
 
 bindsym $mod+f5 exec vncviewer localhost
-bindsym $mod+f9 exec /home/larsch/bin/bt-toggle
-bindsym $mod+f10 exec /home/larsch/bin/bt-resync
+# bindsym $mod+f9 exec /home/larsch/bin/bt-toggle
+# bindsym $mod+f10 exec /home/larsch/bin/bt-resync
 bindsym $mod+Ctrl+p exec /home/larsch/bin/say-menu
 bindsym $mod+Shift+r exec /usr/bin/rdesktop 10.9.8.60
 
@@ -264,6 +241,8 @@ bindsym XF86MonBrightnessUp exec light -T 1.25
 bindsym XF86MonBrightnessDown exec light -T 0.8
 bindsym XF86AudioRaiseVolume exec pactl set-sink-volume 0 +5% #increase sound volume; exec play ~/.config/sway/bap.mp3
 bindsym XF86AudioLowerVolume exec pactl set-sink-volume 0 -5% #decrease sound volume; exec play ~/.config/sway/bup.mp3
+# bindsym XF86AudioRaiseVolume exec pactl set-sink-volume 0 +5% #increase sound volume; exec /home/larsch/prj/bipbap/playrand.sh
+# bindsym XF86AudioLowerVolume exec pactl set-sink-volume 0 -5% #decrease sound volume; exec /home/larsch/prj/bipbap/playrand.sh
 bindsym XF86AudioMute exec pactl set-sink-mute 0 toggle # mute sound
 bindsym XF86AudioPlay exec playerctl play-pause
 bindsym XF86AudioNext exec playerctl next
