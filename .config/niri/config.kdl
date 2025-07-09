@@ -539,6 +539,7 @@ binds {
 
     // Center all fully visible columns on screen.
     Mod+Ctrl+C { center-visible-columns; }
+    Mod+Shift+C { spawn "qalculate-qt" "-n"; }
 
     // Finer width adjustments.
     // This command can also:
