@@ -4,6 +4,8 @@
 .android/
 .bash_history
 .bundle/
+.cache/
+.local/
 .emacs.d/.org-id-locations
 .emacs.d/history
 .emacs.d/server/
@@ -43,3 +45,8 @@ project/
 src/
 temp/
 test
+.steam/
+.steampath
+.steampid
+.zshenv
+.pulse-cookie
