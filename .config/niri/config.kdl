@@ -311,8 +311,26 @@ window-rule {
 }
 
 window-rule {
+    match app-id="firefox"
+    open-on-workspace "browser"
+}
+
+window-rule {
+    match app-id="code"
+    open-on-workspace "code"
+}
+
+window-rule {
     match app-id="Slack"
+    match app-id="discord"
+    match app-id="org.telegram.desktop"
     open-on-workspace "chat"
+}
+
+window-rule {
+    match app-id="io.github.Qalculate.qalculate-qt"
+    open-floating true
+    default-window-height { proportion 0.5; }
 }
 
 binds {
