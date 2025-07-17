@@ -307,6 +307,7 @@ window-rule {
     match app-id="firefox"
     match app-id="Slack"
     match app-id="code"
+    match app-id="discord"
     open-maximized true
 }
 
@@ -324,6 +325,7 @@ window-rule {
     match app-id="Slack"
     match app-id="discord"
     match app-id="org.telegram.desktop"
+    match app-id="discord"
     open-on-workspace "chat"
 }
 
