@@ -607,3 +607,9 @@ binds {
 cursor {
     hide-when-typing
 }
+
+// https://github.com/YaLTeR/niri/wiki/Nvidia
+// https://github.com/YaLTeR/niri/issues/1432
+debug {
+    wait-for-frame-completion-in-pipewire
+}
