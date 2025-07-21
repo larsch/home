@@ -110,6 +110,7 @@ input {
 
 output "PNP(BNQ) BenQ XL2720T E3D03427SL0" {
     mode "1920x1080" // needed to get 120 Hz
+    focus-at-startup
 }
 
 output "Samsung Electric Company SyncMaster HS4P603771" {
