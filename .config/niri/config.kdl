@@ -1,5 +1,8 @@
 environment {
-	DISPLAY ":0"
+    DISPLAY ":0"
+    MOZ_ENABLE_WAYLAND "1"
+    QT_FONT_DPI "96"
+    PROTON_ENABLE_WAYLAND "1"
 }
 
 gestures {
