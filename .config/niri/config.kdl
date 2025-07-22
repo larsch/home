@@ -300,6 +300,9 @@ binds {
     Ctrl+Alt+Delete { quit; }
 
     Mod+Shift+P { power-off-monitors; }
+
+    Mod+Ctrl+Equal { spawn "~/.config/niri/niri-scale" "up"; }
+    Mod+Ctrl+Minus { spawn "~/.config/niri/niri-scale" "down"; }
 }
 
 cursor {

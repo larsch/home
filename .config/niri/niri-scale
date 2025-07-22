@@ -1,0 +1,19 @@
+#!/bin/bash -exu
+read output scale < <(niri msg -j focused-output | jq -r '[.name, (.logical.scale*100|round)] | @tsv')
+case "$1" in
+  up) scale=$((scale + 10)) ;;
+  down) scale=$((scale - 10)) ;;
+  *) echo "Usage: $0 {up|down}" >&2; exit 1 ;;
+esac
+
+((scale < 10)) && scale=10
+((scale > 400)) && scale=400
+
+notificationidfile="${XDG_RUNTIME_DIR:-/tmp}/niri-scale-notificationid"
+notificationid=0
+[ -f "$notificationidfile" ] && notificationid=$(cat "$notificationidfile")
+
+notify-send --print-id --app-name=niri-scale --replace-id="$notificationid" "Output $output scale $scale%" > "$notificationidfile"
+
+fractscale=$(echo "scale=1; $scale/100" | bc)
+exec niri msg output "$output" scale "$fractscale"
