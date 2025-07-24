@@ -234,3 +234,11 @@ if [ -e /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.z
     . /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fi
 
+# incognito mode
+if [[ -n "$ZSH_NO_HISTORY" ]]; then
+	unset HISTFILE
+	SAVEHIST=0
+    grml_theme_add_token incognito ' 󰗹 ' '%K{#400000}%F{#ff0000}' '%f%k '
+    # note: the default items can be seen with `which prompt_grml_precmd`
+    zstyle ':prompt:grml:left:setup' items incognito rc change-root user at host path vcs percent
+fi
