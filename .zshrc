@@ -1,3 +1,5 @@
+[[ "$TTY" != /dev/tty1 ]] || exec systemd-cat niri-session
+
 # default to xterm if terminfo is missing
 [ -e "/usr/share/terminfo/${TERM:0:1}/${TERM}" ] || export TERM=xterm
 
@@ -226,3 +228,4 @@ grml_reset_screen_title() {
 if [ -e /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
     . /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fi
+
