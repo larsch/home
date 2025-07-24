@@ -113,6 +113,11 @@ elif whence vim >/dev/null; then
     alias vi=vim
 fi
 
+if whence bat >/dev/null; then
+    alias cat=bat
+    export MANPAGER="sh -c 'sed -u -e \"s/\\x1B\[[0-9;]*m//g; s/.\\x08//g\" | bat -p -lman'"
+fi
+
 alias top='LIBPROC_HIDE_KERNEL=1 top'
 
 # keymap
