@@ -203,7 +203,7 @@
         "exec": "sudo turbostat --Summary --quiet --show PkgWatt --interval 5"
     },
     "custom/bluetooth": {
-        "format": "{text}% {icon}",
+        "format": "{text} {icon}",
         "format-icons": [
             "󰁺",
             "󰁻",
