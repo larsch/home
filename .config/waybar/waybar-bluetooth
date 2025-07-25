@@ -47,12 +47,18 @@ def main():
         if "/headset" in device or "/headphones" in device:
             battery_percentage = info.get("percentage", "N/A")
             if battery_percentage.endswith("%"):
-                battery_percentage = battery_percentage[:-1]
+                battery_percentage = float(battery_percentage[:-1])
             else:
-                battery_percentage = "N/A"
+                battery_percentage = float("NaN")
+            if battery_percentage < 21:
+                class_name = "low"
+            elif battery_percentage < 41:
+                class_name = "medium"
+            else:
+                class_name = "high"
             waybar_json = {
                 "text": f"{battery_percentage}",
-                "class": "upower",
+                "class": class_name,
                 "tooltip": f"Device: {device}\nBattery: {battery_percentage}",
                 "percentage": float(battery_percentage),
             }

@@ -41,6 +41,7 @@ window#waybar.hidden {
 }
 
 #custom-music,
+#custom-bluetooth,
 #tray,
 #backlight,
 #clock,
@@ -63,6 +64,18 @@ window#waybar.hidden {
     background-color: @surface0;
     padding: 0.1rem 0.6rem;
     margin: 0px 0;
+}
+
+#custom-bluetooth.low {
+    color: @red;
+}
+
+#custom-bluetooth.medium {
+    color: @yellow;
+}
+
+#custom-bluetooth.high {
+    color: @text;
 }
 
 #custom-turbostat {
