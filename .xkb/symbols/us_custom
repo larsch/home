@@ -12,7 +12,7 @@ xkb_symbols "basic" {
 	key <AD07> { [ u, U, U00B5 ] }; # µ
 	key <AD09> { [ o, O, U2126 ] }; # Ω
 	key <AD10> { [ p, P, U03C0 ] }; # π
-        key <AC03> { [ d, D, U00B0 ] }; # °
+	key <AC03> { [ d, D, U00B0 ] }; # °
 	key <AC10> { [ semicolon, colon, ae, AE ] }; # æ
 	key <AC11> { [ apostrophe, quotedbl, oslash, Ooblique ] }; # ø
 	key <AD11> { [ bracketleft, braceleft, aring, Aring ] }; # å

@@ -1,0 +1,3 @@
+! include %S/evdev
+! option = symbols
+* = +restorefn
