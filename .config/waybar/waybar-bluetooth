@@ -1,0 +1,66 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import subprocess
+import time
+import json
+import sys
+
+
+def get_device_info(device_path):
+    output = subprocess.check_output(["upower", "-i", device_path]).decode()
+    info = {}
+    for line in output.splitlines():
+        if (
+            not line.strip()
+            or line.startswith(" " * 2)
+            and not line.startswith(" " * 4)
+        ):
+            continue
+        if ":" in line:
+            key, value = line.split(":", 1)
+            info[key.strip()] = value.strip()
+    return info
+
+
+def get_upower_devices():
+    try:
+        output = subprocess.check_output(
+            ["upower", "-e"], text=True, stderr=subprocess.DEVNULL
+        )
+        devices = output.strip().split("\n")
+        return devices
+    except subprocess.CalledProcessError as e:
+        print(f"Error fetching UPower devices: {e}")
+        return []
+
+
+def get_upower_data():
+    devices = get_upower_devices()
+    all_info = {dev: get_device_info(dev) for dev in devices}
+    return all_info
+
+
+def main():
+    upower_data = get_upower_data()
+    for device, info in upower_data.items():
+        if "/headset" in device or "/headphones" in device:
+            battery_percentage = info.get("percentage", "N/A")
+            if battery_percentage.endswith("%"):
+                battery_percentage = battery_percentage[:-1]
+            else:
+                battery_percentage = "N/A"
+            waybar_json = {
+                "text": f"{battery_percentage}",
+                "class": "upower",
+                "tooltip": f"Device: {device}\nBattery: {battery_percentage}",
+                "percentage": float(battery_percentage),
+            }
+            print(json.dumps(waybar_json), flush=True)
+            return
+
+
+if __name__ == "__main__":
+    while True:
+        main()
+        time.sleep(10)

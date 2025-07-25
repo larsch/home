@@ -2,8 +2,8 @@
     "layer": "bottom",
     "position": "bottom",
     "modules-left": [
-        "sway/workspaces",
-        "sway/mode",
+        // "sway/workspaces",
+        // "sway/mode",
         "niri/workspaces"
     ],
     "niri/workspaces": {
@@ -24,13 +24,17 @@
         "max-length-ellipsis-text-urgent": "!!"
     },
     "modules-center": [
-        "sway/window"
+        "niri/window"
     ],
     "modules-right": [
         "idle_inhibitor",
-        "pulseaudio",
+        "custom/bluetooth",
+        "wireplumber#sink",
+        "wireplumber#source",
         "network",
         "cpu",
+        "custom/gpu_power",
+        "custom/gpu_temp",
         "memory",
         "temperature",
         "custom/turbostat",
@@ -139,6 +143,24 @@
         "format-disconnected": "Disconnected ⚠",
         "format-alt": "{ifname}: {ipaddr}/{cidr}"
     },
+    "wireplumber#sink": {
+        "format": "{volume}% {icon}",
+        "format-muted": "",
+        "format-icons": [
+            "",
+            "",
+            ""
+        ],
+        "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "scroll-step": 5
+    },
+    "wireplumber#source": {
+        "node-type": "Audio/Source",
+        "format": "{volume}% ",
+        "format-muted": "",
+        "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle",
+        "scroll-step": 5
+    },
     "pulseaudio": {
         // "scroll-step": 1, // %, can be a float
         "format": "{volume}% {icon} {format_source}",
@@ -179,5 +201,41 @@
     "custom/turbostat": {
         "format": "{:.4}W 󱪂",
         "exec": "sudo turbostat --Summary --quiet --show PkgWatt --interval 5"
+    },
+    "custom/bluetooth": {
+        "format": "{text}% {icon}",
+        "format-icons": [
+            "󰁺",
+            "󰁻",
+            "󰁼",
+            "󰁽",
+            "󰁾",
+            "󰁿",
+            "󰂀",
+            "󰂁",
+            "󰂂",
+            "󰁹"
+        ],
+        "exec": "/home/larsch/.config/waybar/waybar-bluetooth",
+        "return-type": "json"
+    },
+    "custom/gpu_power": {
+        "format": "{text}W ",
+        "exec": "/home/larsch/.config/waybar/waybar-gpu-power",
+        "interval": 1,
+        "return-type": "json"
+    },
+    "custom/gpu_temp": {
+        "format": "{text}°C {icon}",
+        "format-icons": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "exec": "/home/larsch/.config/waybar/waybar-gpu-temp",
+        "interval": 1,
+        "return-type": "json"
     }
 }

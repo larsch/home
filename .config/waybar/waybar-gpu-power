@@ -1,0 +1,10 @@
+#!/bin/sh
+power=$(nvidia-smi --query-gpu=power.draw --format=csv,noheader,nounits)
+integer_power=$(printf "%.0f" "$power")
+if [[ $integer_power -gt 200 ]]; then
+    echo "{\"text\":\"$integer_power\",\"class\":\"high\"}"
+elif [[ $integer_power -gt 100 ]]; then
+    echo "{\"text\":\"$integer_power\",\"class\":\"medium\"}"
+else
+    echo "{\"text\":\"$integer_power\",\"class\":\"low\"}"
+fi

@@ -46,6 +46,7 @@ window#waybar.hidden {
 #clock,
 #battery,
 #pulseaudio,
+#wireplumber,
 #custom-turbostat,
 #custom-ports,
 #custom-disks,
@@ -122,4 +123,50 @@ window#waybar.hidden {
     border-radius: 0.501rem;
     background-color: @surface0;
     padding: 0.1rem 0.6rem;
+}
+
+#custom-bluetooth {
+    border-radius: 0.501rem;
+    padding: 0.1rem 0.6rem;
+    color: @blue;
+}
+
+#custom-gpu_power {
+    background-color: @surface1;
+    border-left: 1px solid black;
+    border-radius: 0;
+    padding: 0.1rem 0.6rem;
+    min-width: 3.5rem;
+}
+
+#custom-gpu_power.low {
+    color: @text;
+}
+
+#custom-gpu_power.medium {
+    color: @yellow;
+}
+#custom-gpu_power.high {
+    color: @red;
+}
+
+#custom-gpu_temp {
+    background-color: @surface1;
+    border-left: 1px solid black;
+    border-radius: 0;
+    padding: 0.1rem 0.6rem;
+    color: @text;
+    min-width: 3.5rem;
+}
+
+#custom-gpu_temp.low {
+    color: @text;
+}
+
+#custom-gpu_temp.medium {
+    color: @yellow;
+}
+
+#custom-gpu_temp.high {
+    color: @red;
 }

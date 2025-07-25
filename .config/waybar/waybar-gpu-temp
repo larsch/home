@@ -1,0 +1,12 @@
+#!/bin/sh
+temp=$(nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits)
+low=40
+high=80
+percentage=$(( (temp - low) * 100 / (high - low) ))
+if [ $temp -ge 80 ]; then
+    echo "{\"text\":\"$temp\",\"class\":\"high\",\"percentage\":$percentage}"
+elif [ $temp -ge 70 ]; then
+    echo "{\"text\":\"$temp\",\"class\":\"medium\",\"percentage\":$percentage}"
+else
+    echo "{\"text\":\"$temp\",\"class\":\"low\",\"percentage\":$percentage}"
+fi
