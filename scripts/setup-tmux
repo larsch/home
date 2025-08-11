@@ -20,6 +20,8 @@ set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'tmux-plugins/tmux-sensible'
 set -g @plugin 'catppuccin/tmux'
 run '~/.tmux/plugins/tpm/tpm'
+set -g mouse on
+set -sg escape-time 250
 __EOF__
 $HOME/.tmux/plugins/tpm/bin/install_plugins
 $HOME/.tmux/plugins/tpm/bin/update_plugins all
