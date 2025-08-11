@@ -34,6 +34,11 @@ elif whence vim >/dev/null; then
     alias vi=vim
 fi
 
+if whence bat >/dev/null; then
+    export MANPAGER="sh -c 'sed -u -e \"s/\\x1B\[[0-9;]*m//g; s/.\\x08//g\" | bat -p -lman'"
+    alias cat=bat
+fi
+
 # aliases
 if whence eza >/dev/null; then
     export EZA_ICONS_AUTO=1
