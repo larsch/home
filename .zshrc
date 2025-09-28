@@ -178,24 +178,6 @@ if whence fzf >/dev/null; then
     FZF_CTRL_T_OPTS="--preview '${FZF_PREVIEW_COMMAND}'"
 fi
 
-# auto-start ssh-agent
-_tmpagent=${XDG_RUNTIME_DIR:-$HOME}/.sshagent
-if (( ! ${+SSH_AUTH_SOCK} )); then
-    if [ -e "${_tmpagent}" ]; then
-        . "${_tmpagent}" >/dev/null
-        if [[ -d "/proc/$SSH_AGENT_PID" && -S "$SSH_AUTH_SOCK" ]]; then
-            # continue
-        else
-            # start new agent
-            eval $(ssh-agent 2>/dev/null | tee "${_tmpagent}") >/dev/null
-        fi
-    else
-        # start new agent
-        eval $(ssh-agent 2>/dev/null | tee "${_tmpagent}") >/dev/null
-    fi
-fi
-unset _tmpagent
-
 zupdate() {
     (cd "${ZDOTDIR}" && git pull) && . ${ZDOTDIR}/.zshenv && . ${ZDOTDIR}/.zshrc
 }
