@@ -204,6 +204,21 @@ rmux() {
     ssh -t "$@" tmux new-session -As default
 }
 
+# run command in zsh and pipe to less -R, using unbuffer to preserve colors
+zle_unbuffer_less() {
+    local unbuffer=$(whence unbuffer)
+    if [[ -z "$unbuffer" ]]; then
+        echo "unbuffer not found. Install expect." >&2
+        return 1
+    fi
+    local cmd="$BUFFER"
+    BUFFER=""
+    eval "unbuffer zsh -ic $(printf '%q' "$cmd") | less -R </dev/null"
+    zle reset-prompt
+}
+zle -N zle_unbuffer_less
+bindkey "^[U" zle_unbuffer_less
+
 # local configuration (~/.zshrc.d)
 [[ ! -d "$HOME/.zshrc.d" ]] || source <(cat $(find "$HOME/.zshrc.d" -type f) /dev/null)
 
