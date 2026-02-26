@@ -4,7 +4,7 @@
 
 * {
     /* font-family: Arial, JetBrainsMono Nerd Font Propo; */
-    font-family: Arimo Nerd Font Propo;
+    font-family: Arimo Nerd Font;
     font-size: 11pt;
     min-height: 0;
 }
@@ -42,6 +42,8 @@ window#waybar.hidden {
 
 #custom-music,
 #custom-bluetooth,
+#custom-homevpn,
+#custom-powerprofile,
 #tray,
 #backlight,
 #clock,
@@ -76,6 +78,30 @@ window#waybar.hidden {
 
 #custom-bluetooth.high {
     color: @text;
+}
+
+#custom-homevpn.connected {
+    color: @green;
+}
+
+#custom-homevpn.disconnected {
+    color: @red;
+}
+
+#custom-powerprofile.balanced {
+    color: @text;
+}
+
+#custom-powerprofile.balanced-performance {
+    color: @yellow;
+}
+
+#custom-powerprofile.performance {
+    color: @orange;
+}
+
+#custom-powerprofile.low-power {
+    color: @green;
 }
 
 #custom-turbostat {

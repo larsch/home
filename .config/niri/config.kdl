@@ -21,9 +21,8 @@ input {
         numlock
     }
     touchpad {
-        // off
         tap
-        // dwt
+        dwt
         // dwtp
         // drag false
         // drag-lock
@@ -168,8 +167,10 @@ binds {
     XF86AudioMute        allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
     XF86AudioMicMute     allow-when-locked=true { spawn "playerctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
     F13 allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
-    XF86MonBrightnessUp {spawn "light" "-T" "1.25";}
-    XF86MonBrightnessDown {spawn "light" "-T" "0.8";}
+    // XF86MonBrightnessUp {spawn "light" "-T" "1.25";}
+    // XF86MonBrightnessDown {spawn "light" "-T" "0.8";}
+    XF86MonBrightnessUp {spawn "brightnessctl" "--min-value=10000" "--exponent=4" "-d" "amdgpu_bl1" "--" "s" "+10%";}
+    XF86MonBrightnessDown {spawn "brightnessctl" "--min-value=10000" "--exponent=4" "-d" "amdgpu_bl1" "--" "s" "-10%";}
     XF86AudioPrev allow-when-locked=true { spawn "playerctl" "previous"; }
     XF86AudioNext allow-when-locked=true { spawn "playerctl" "next"; }
     XF86AudioPlay allow-when-locked=true { spawn "playerctl" "play-pause"; }
@@ -294,6 +295,8 @@ binds {
     Mod+V       { toggle-window-floating; }
     Mod+Shift+V { switch-focus-between-floating-and-tiling; }
 
+    Mod+Alt+V { spawn "/home/larsch/bin/homevpn-toggle"; }
+
     Mod+W { toggle-column-tabbed-display; }
 
     Print { screenshot; }
@@ -319,5 +322,5 @@ cursor {
 // https://github.com/YaLTeR/niri/wiki/Nvidia
 // https://github.com/YaLTeR/niri/issues/1432
 debug {
-    wait-for-frame-completion-in-pipewire
+//    wait-for-frame-completion-in-pipewire
 }

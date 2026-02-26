@@ -28,6 +28,8 @@
     ],
     "modules-right": [
         "idle_inhibitor",
+        "custom/homevpn",
+        "custom/powerprofile",
         "custom/bluetooth",
         "wireplumber#sink",
         "wireplumber#source",
@@ -183,6 +185,28 @@
             ]
         },
         "on-click": "pavucontrol"
+    },
+    "custom/homevpn": {
+        "format": "{text} {icon}",
+        "format-icons": {
+            "connected": "󰤨",
+            "disconnected": "󰤭"
+        },
+        "exec": "/home/larsch/.config/waybar/waybar-homevpn",
+        "return-type": "json",
+        "interval": 2,
+        "on-click": "/home/larsch/bin/homevpn-toggle"
+    },
+    "custom/powerprofile": {
+        "format": "{text} {icon}",
+        "format-icons": {
+            "performance": "󰒋",
+            "balanced": "󰒉",
+            "power-saver": "󰒊"
+        },
+        "exec": "/home/larsch/.config/waybar/waybar-powerprofile",
+        "return-type": "json",
+        "interval": 2
     },
     "custom/weather": {
         "format": "{}",

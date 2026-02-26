@@ -4,7 +4,15 @@ Conflicts=swayidle.service
 
 [Service]
 Type=simple
+# ExecStart=/usr/bin/swayidle -w \
+#     timeout 30 'swaymsg "output * power off"' \
+#     resume 'swaymsg "output * power on"' \
+#     idlehint 60
+# ExecStart=/usr/bin/swayidle -w \
+#     timeout 30 'niri msg --json outputs | jq -r ".[]|.name" | xargs -I MON niri msg output MON off'
+#     resume 'niri msg --json outputs | jq -r ".[]|.name" | xargs -I MON niri msg output MON on'
+#     idlehint 10
 ExecStart=/usr/bin/swayidle -w \
-    timeout 30 'swaymsg "output * power off"' \
-    resume 'swaymsg "output * power on"' \
-    idlehint 60
+    timeout 30 'logger OUTPUTS OFF' \
+    resume 'logger OUTPUTS ON' \
+    idlehint 10
