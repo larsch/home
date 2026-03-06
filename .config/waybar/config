@@ -34,11 +34,13 @@
         "wireplumber#sink",
         "wireplumber#source",
         "network",
+        "custom/speed",
         "cpu",
         "custom/gpu_power",
         "custom/gpu_temp",
         "memory",
-        "temperature",
+        // "temperature",
+        "custom/cpu_temp",
         "custom/turbostat",
         "battery",
         "custom/ports",
@@ -107,6 +109,18 @@
             "",
             ""
         ]
+    },
+    "custom/cpu_temp": {
+        "format": "{}°C {icon}",
+        "format-icons": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "exec": "sensors -j 2>/dev/null | jq '.[\"nct6798-isa-0290\"].CPUTIN.temp2_input | round'",
+        "interval": 1
     },
     "backlight": {
         "format": "{percent}% {icon}",
@@ -240,7 +254,13 @@
             "󰂂",
             "󰁹"
         ],
-        "exec": "/home/larsch/.config/waybar/waybar-bluetooth",
+        "exec": "$HOME/.config/waybar/waybar-bluetooth",
+        "return-type": "json",
+        "interval": 60
+    },
+    "custom/speed": {
+        "exec": "$HOME/.config/waybar/waybar-speed",
+        "interval": 1,
         "return-type": "json"
     },
     "custom/gpu_power": {

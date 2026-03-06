@@ -61,11 +61,22 @@ window#waybar.hidden {
 #language,
 #temperature,
 #custom-lock,
-#custom-power {
+#custom-power,
+#custom-speed,
+#custom-cpu_temp {
     border-left: 1px solid black;
     background-color: @surface0;
     padding: 0.1rem 0.6rem;
     margin: 0px 0;
+}
+
+#wireplumber.source {
+    min-width: 3.5rem;
+}
+
+#wireplumber.muted {
+    color: #ffffff;
+    background-color: @red;
 }
 
 #custom-bluetooth.low {
