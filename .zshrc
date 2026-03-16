@@ -22,6 +22,7 @@ autoload -Uz $fpath[1]/*(.:t)
 [[ -d "/usr/lib/cargo/bin" ]] && export PATH=/usr/lib/cargo/bin:$PATH
 [[ -d "$HOME/.local/bin" ]] && export PATH=$HOME/.local/bin:$PATH
 [[ -d "$HOME/.yarn" ]] && export PATH=$HOME/.yarn/bin:$PATH
+[[ -d "$HOME/.local/npm/bin" ]] && export PATH=$HOME/.local/npm/bin:$PATH
 if whence ruby >/dev/null; then
     PATH="$(ruby -e 'print Gem.user_dir')/bin:$PATH"
     export PATH

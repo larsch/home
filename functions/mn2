@@ -1,0 +1,1 @@
+FZF_DEFAULT_COMMAND="man -k . | grep -vE '3perl|::'" fzf --query "$1" --preview="man {1}{2} 2>/dev/null | bat -p -lman --color=always" --bind="enter:become(man {1}{2})" --bind="alt-v:execute(man {1}{2})"
