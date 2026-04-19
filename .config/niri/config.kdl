@@ -128,6 +128,7 @@ window-rule {
 
 window-rule {
     match app-id="firefox"
+    match app-id="slack"
     match app-id="Slack"
     match app-id="code"
     open-maximized true
@@ -188,8 +189,8 @@ binds {
 
     Mod+Return hotkey-overlay-title="Open a Terminal: foot" { spawn "footclient"; }
     Mod+D hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
-    // Mod+Shift+D hotkey-overlay-title="Run an Application: menu" { spawn "/home/larsch/bin/xmenu-run"; }
-    Mod+Shift+D { spawn "/home/larsch/bin/focus"; }
+    Mod+Shift+D hotkey-overlay-title="Go to Window" { spawn "~/.config/niri/window-picker" "focus"; }
+    Mod+Ctrl+D hotkey-overlay-title="Move Window Here" { spawn "~/.config/niri/window-picker" "move-here"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "loginctl" "lock-session"; }
 
     F13 { spawn "footclient" "ssh" "root@10.9.9.1"; }

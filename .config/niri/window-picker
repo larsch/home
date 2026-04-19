@@ -1,0 +1,40 @@
+#!/bin/sh
+set -eu
+
+mode="${1:-}"
+
+windows_json="$(niri msg -j windows)"
+workspaces_json="$(niri msg -j workspaces)"
+
+selection="$({
+    printf '%s\n' "$windows_json" | jq -r --argjson workspaces "$workspaces_json" '
+        map(select(.id != null))
+        | sort_by(.focus_timestamp) | reverse
+        | .[]
+        | . as $w
+        | ($workspaces | map(select(.id == $w.workspace_id)) | .[0]) as $ws
+        | [
+            ($w.id | tostring),
+            ((($ws.name // ("#" + (($ws.idx // 0) | tostring))) + " | " + ($w.app_id // "?") + " | " + ($w.title // "")))
+          ]
+        | @tsv
+    '
+} | fuzzel --dmenu --prompt="Window> ")"
+
+[ -n "$selection" ] || exit 0
+window_id="${selection%%	*}"
+
+case "$mode" in
+    focus)
+        exec niri msg action focus-window --id "$window_id"
+        ;;
+    move-here)
+        current_workspace_ref="$(printf '%s\n' "$workspaces_json" | jq -r 'map(select(.is_focused))[0] | (.name // (.idx | tostring))')"
+        [ -n "$current_workspace_ref" ] || exit 1
+        exec niri msg action move-window-to-workspace --window-id "$window_id" "$current_workspace_ref"
+        ;;
+    *)
+        echo "Usage: $0 {focus|move-here}" >&2
+        exit 2
+        ;;
+esac
