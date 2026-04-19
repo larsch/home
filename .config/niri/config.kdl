@@ -153,6 +153,7 @@ window-rule {
 
 window-rule {
     match app-id="Slack"
+    match app-id="slack"
     match app-id="org.telegram.desktop"
     open-on-workspace "chat"
 }
