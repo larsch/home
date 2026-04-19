@@ -1,0 +1,45 @@
+#!/bin/sh
+set -eu
+timestamp=$(date +%Y%m%d-%H%M%S)
+
+if [ "$#" -eq 0 ]; then
+    echo "Usage: $0 [file_or_directory ...]" >&2
+    exit 1
+elif [ "$#" -gt 1 ]; then
+    for arg in "$@"; do
+        "$0" "$arg"
+    done
+    exit 0
+fi
+
+if [ ! -e "$1" ]; then
+    echo "Error: '$1' does not exist." >&2
+    exit 1
+fi
+
+thispath=$(realpath .)
+case "$(realpath "$1")" in
+    "$thispath"/*) ;;
+    *)
+        echo "Error: '$1' is not below the current directory." >&2
+        exit 1
+        ;;
+esac
+
+if [ -f "$1" ]; then
+    basename=$(basename "$1")
+    case "$basename" in
+        *.tar|*.tar.gz|*.tar.bz2|*.tar.xz|*.zip|*.png|*.jpg|*.jpeg|*.mp4|*.avi|*.mkv)
+            mv -- "$1" "$timestamp-$basename"
+            ;;
+        *)
+            archive_name="${timestamp}-${basename}.xz"
+            xz --check=crc32 -c -T0 -z -9 -- "$1" > "$archive_name"
+            rm -- "$1"
+            ;;
+    esac
+else
+    archive_name="${timestamp}-backup.tar.xz"
+    bsdtar --xz -cf "$archive_name" -- "$@"
+    rm -rf -- "$@"
+fi

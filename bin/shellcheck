@@ -1,0 +1,41 @@
+#!/bin/bash
+# Wrapper script for shellcheck container
+# Exposes the same CLI interface as shellcheck
+
+set -euo pipefail
+
+CONTAINER_IMAGE="${SHELLCHECK_IMAGE:-docker.io/koalaman/shellcheck:latest}"
+CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-podman}"
+
+# Parse arguments and handle file paths
+declare -a ARGS
+declare -a FILES
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -*)
+            ARGS+=("$1")
+            if [[ "$1" =~ ^-[a-zA-Z]*[fco]$ ]] || [[ "$1" == "--source-path" ]] || [[ "$1" == "--include" ]] || [[ "$1" == "--exclude" ]]; then
+                shift
+                ARGS+=("$1")
+            fi
+            ;;
+        *)
+            FILES+=("$1")
+            ;;
+    esac
+    shift
+done
+
+# Convert file paths to absolute and mount them
+declare -a MOUNTS
+declare -a MOUNTED_FILES
+
+for file in "${FILES[@]}"; do
+    abs_path="$(cd "$(dirname "$file")" && pwd)/$(basename "$file")"
+    MOUNTS+=("-v" "$abs_path:$abs_path:ro")
+    MOUNTED_FILES+=("$abs_path")
+done
+
+# Run shellcheck in container
+$CONTAINER_RUNTIME run --rm -t "${MOUNTS[@]}" "$CONTAINER_IMAGE" "${ARGS[@]}" "${MOUNTED_FILES[@]}"
