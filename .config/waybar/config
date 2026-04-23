@@ -137,7 +137,7 @@
         },
         "interval": 2,
         "format": "{power:.2}W {capacity}% {icon}",
-        "format-charging": "{power:.2}W {capacity}% ",
+        "format-charging": "{power:.2}W {capacity}% 󰂐",
         "format-plugged": "{power:.2}W {capacity}% ",
         "format-alt": "{power:.2}W {time} {icon}",
         "format-icons": [

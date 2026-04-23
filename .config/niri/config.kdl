@@ -12,7 +12,7 @@ gestures {
 }
 
 input {
-    focus-follows-mouse
+    focus-follows-mouse max-scroll-amount="5%"
     keyboard {
         xkb {
             layout "us_custom"
@@ -73,7 +73,7 @@ layout {
         width 1
         active-color "#000000"
         inactive-color "#505050"
-        active-gradient from="#f700ff" to="#fdad00" angle=45
+	    active-gradient from="#80c8ff" to="#c7ff7f" angle=45
     }
     background-color "transparent"
 }
@@ -138,6 +138,7 @@ window-rule {
     match app-id="discord"
     // open-on-output "Samsung Electric Company SyncMaster HS4P603771"
     open-on-output "HDMI-A-1"
+    match app-id="chromium"
     open-maximized true
 }
 
