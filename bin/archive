@@ -1,6 +1,8 @@
 #!/bin/sh
 set -eu
+month=$(date +%Y-%m)
 timestamp=$(date +%Y%m%d-%H%M%S)
+archive_path="$HOME/archives/$month"
 
 if [ "$#" -eq 0 ]; then
     echo "Usage: $0 [file_or_directory ...]" >&2
@@ -30,16 +32,21 @@ if [ -f "$1" ]; then
     basename=$(basename "$1")
     case "$basename" in
         *.tar|*.tar.gz|*.tar.bz2|*.tar.xz|*.zip|*.png|*.jpg|*.jpeg|*.mp4|*.avi|*.mkv)
-            mv -- "$1" "$timestamp-$basename"
+            mkdir -p -- "$archive_path"
+            mv -- "$1" "$archive_path/$timestamp-$basename"
             ;;
         *)
-            archive_name="${timestamp}-${basename}.xz"
-            xz --check=crc32 -c -T0 -z -9 -- "$1" > "$archive_name"
+            mkdir -p -- "$archive_path"
+            archive_name="${archive_path}/${timestamp}-${basename}.xz"
+            xz --check=crc32 -c -T0 -z -9 -- "$1" > "${archive_name}.part"
+            mv -- "${archive_name}.part" "$archive_name"
             rm -- "$1"
             ;;
     esac
 else
-    archive_name="${timestamp}-backup.tar.xz"
-    bsdtar --xz -cf "$archive_name" -- "$@"
+    mkdir -p -- "$archive_path"
+    archive_name="${archive_path}/${timestamp}-$(basename "$1").tar.xz"
+    bsdtar --xz -cf "${archive_name}.part" -- "$@"
+    mv -- "${archive_name}.part" "$archive_name"
     rm -rf -- "$@"
 fi
