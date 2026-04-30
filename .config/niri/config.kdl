@@ -21,7 +21,7 @@ input {
         numlock
     }
     touchpad {
-        tap
+        // tap
         dwt
         // dwtp
         // drag false
