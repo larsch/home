@@ -119,7 +119,8 @@
             "",
             ""
         ],
-        "exec": "sensors -j 2>/dev/null | jq '.[\"nct6798-isa-0290\"].CPUTIN.temp2_input | round'",
+        // "exec": "sensors -j 2>/dev/null | jq '.[\"nct6798-isa-0290\"].CPUTIN.temp2_input | round'",
+        "exec": "sensors -j 2>/dev/null | jq '(.[\"nct6798-isa-0290\"].CPUTIN.temp2_input // .[\"k10temp-pci-00c3\"].Tctl.temp1_input) | round'",
         "interval": 1
     },
     "backlight": {
