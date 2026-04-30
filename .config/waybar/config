@@ -34,7 +34,7 @@
         "wireplumber#sink",
         "wireplumber#source",
         "network",
-        "custom/speed",
+        // "custom/speed",
         "cpu",
         "custom/gpu_power",
         "custom/gpu_temp",
