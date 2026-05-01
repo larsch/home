@@ -183,6 +183,7 @@ window-rule {
 
 window-rule {
     match app-id="spotify"
+    match app-id="Spotify"
     open-on-workspace "media"
 }
 
