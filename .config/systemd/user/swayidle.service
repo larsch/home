@@ -1,5 +1,6 @@
 [Unit]
 Description=swayidle
+After=niri.service
 Conflicts=swayidle-locked.service
 
 [Service]
@@ -11,4 +12,4 @@ ExecStart=/usr/bin/swayidle -w -d \
     idlehint 60
 
 [Install]
-WantedBy=sway-session.target
+WantedBy=graphical-session.target
