@@ -182,7 +182,7 @@ window#waybar.hidden {
 }
 
 #custom-gpu_power {
-    background-color: @surface1;
+    background-color: @surface0;
     border-left: 1px solid black;
     border-radius: 0;
     padding: 0.1rem 0.6rem;
@@ -201,7 +201,7 @@ window#waybar.hidden {
 }
 
 #custom-gpu_temp {
-    background-color: @surface1;
+    background-color: @surface0;
     border-left: 1px solid black;
     border-radius: 0;
     padding: 0.1rem 0.6rem;
