@@ -19,7 +19,7 @@ selection="$({
           ]
         | @tsv
     '
-} | fuzzel --dmenu --prompt="Window> ")"
+} | fuzzel --dmenu --prompt="$mode> ")"
 
 [ -n "$selection" ] || exit 0
 window_id="${selection%%	*}"
