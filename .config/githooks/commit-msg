@@ -1,0 +1,9 @@
+#!/bin/sh
+# Validate the commit message using commit-check.
+# ANSI color codes are stripped from the output before printing.
+out=$(uvx commit-check --message --no-banner "$1" 2>&1)
+rc=$?
+if [ -n "$out" ]; then
+    printf '%s\n' "$out" | sed 's/\x1b\[[0-9;]*m//g'
+fi
+exit $rc
