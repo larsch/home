@@ -1,0 +1,8 @@
+#!/bin/bash
+# Launch xi in a named worktree. Thin wrapper around `worktree` with
+# `xi` as the command to run inside the worktree.
+if [ $# -lt 1 ]; then
+    echo "usage: $(basename "$0") <worktree-slug> [xi args...]" >&2
+    exit 2
+fi
+exec worktree "$1" xi "${@:2}"

@@ -7,8 +7,8 @@ environment {
 }
 
 xwayland-satellite {
-    // path "/home/larsch/prj/xwayland-satellite/xwayland-satellite-debug.sh"
-    path "/usr/bin/xwayland-satellite"
+    path "/home/larsch/prj/xwayland-satellite/xwayland-satellite-debug.sh"
+    // path "/usr/bin/xwayland-satellite"
 }
 
 gestures {

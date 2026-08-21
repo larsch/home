@@ -1,0 +1,97 @@
+#!/bin/bash
+set -euo pipefail
+
+if [ $# -lt 1 ]; then
+    echo "usage: $(basename "$0") <worktree-slug> [command] [args...]" >&2
+    exit 2
+fi
+slug="$1"
+shift
+if [ $# -ge 1 ]; then
+    cmd="$1"
+    shift
+else
+    cmd="${SHELL:-/bin/sh}"
+fi
+
+# Locate the enclosing git repository and its worktrees directory.
+root="$(git rev-parse --show-toplevel 2>/dev/null)" || {
+    echo "$(basename "$0"): not inside a git repository" >&2
+    exit 1
+}
+wt="$root/.worktrees/$slug"
+
+# Create the worktree if it does not already exist. If a branch with the
+# slug's name already exists, check it out; otherwise create a new branch.
+if [ ! -d "$wt" ]; then
+    if git -C "$root" show-ref --verify --quiet "refs/heads/$slug"; then
+        git -C "$root" worktree add ".worktrees/$slug" "$slug"
+    else
+        git -C "$root" worktree add ".worktrees/$slug" -b "$slug"
+    fi
+fi
+
+# Detect the execution environment.
+in_tmux=false
+[ -n "${TMUX:-}" ] && in_tmux=true
+
+is_wayland=false
+[ "${XDG_SESSION_TYPE:-}" = wayland ] && is_wayland=true
+[ -n "${WAYLAND_DISPLAY:-}" ] && is_wayland=true
+
+foot_server=false
+systemctl --user is-active --quiet foot-server.service 2>/dev/null && foot_server=true
+
+# Run a command detached from this shell so the script can return immediately
+# once the new instance has been started.
+detach() {
+    setsid "$@" </dev/null >/dev/null 2>&1 &
+}
+
+# 1. Running inside tmux: open a new window.
+if $in_tmux; then
+    tmux new-window -n "$slug" -c "$wt" "$cmd" "$@"
+    exit 0
+fi
+
+# 2. Wayland with a running foot server: connect via footclient.
+if $is_wayland && $foot_server; then
+    footclient --no-wait --working-directory="$wt" --title="$slug" "$cmd" "$@"
+    exit 0
+fi
+
+# 3. Wayland without a foot server: start foot (it spawns its own server).
+if $is_wayland; then
+    detach foot --working-directory="$wt" --title="$slug" "$cmd" "$@"
+    exit 0
+fi
+
+# 4. Fall back to another terminal emulator (X11 or otherwise).
+if [ -z "${DISPLAY:-}" ]; then
+    echo "$(basename "$0"): no window environment (not tmux, wayland, or X11)" >&2
+    exit 1
+fi
+
+for term in alacritty kitty wezterm gnome-terminal xterm; do
+    command -v "$term" >/dev/null 2>&1 || continue
+    case "$term" in
+        alacritty)
+            detach alacritty --working-directory "$wt" -e "$cmd" "$@"
+            exit 0 ;;
+        kitty)
+            detach kitty --directory "$wt" "$cmd" "$@"
+            exit 0 ;;
+        wezterm)
+            detach wezterm start --cwd "$wt" -- "$cmd" "$@"
+            exit 0 ;;
+        gnome-terminal)
+            detach gnome-terminal --working-directory="$wt" -- "$cmd" "$@"
+            exit 0 ;;
+        xterm)
+            detach xterm -e sh -c 'cd "$1" && shift && exec "$@"' _ "$wt" "$cmd" "$@"
+            exit 0 ;;
+    esac
+done
+
+echo "$(basename "$0"): no terminal emulator found" >&2
+exit 1
