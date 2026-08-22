@@ -1,0 +1,17 @@
+#compdef xi
+
+_xi() {
+  _arguments \
+    '(-P --provider)'{-P+,--provider=}'[LLM provider to use]:provider:' \
+    '(-m --model)'{-m+,--model=}'[model name to use]:model:' \
+    '(-p --print)'{-p+,--print=}'[run non-interactively, send prompt and stream response]:prompt:' \
+    '--prompt=[start the interactive UI and auto-submit prompt]:prompt:' \
+    '--prompt-file=[submit the UTF-8 contents of a file as the prompt]:file:_files' \
+    '--print-dirs[print the file-system paths xi uses and exit]' \
+    '--theme=[path to a theme.toml file]:file:_files' \
+    '--theme-demo[start with a representative transcript]' \
+    '(-h --help)'{-h,--help}'[print help]' \
+    '(-V --version)'{-V,--version}'[print version]'
+}
+
+_xi "$@"

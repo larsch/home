@@ -1,0 +1,46 @@
+#compdef worktree xi-worktree
+
+_worktree() {
+  # First positional argument: the worktree slug.
+  if (( CURRENT == 2 )); then
+    _worktree_slugs
+    return
+  fi
+
+  # xi-worktree always runs `xi`; delegate the remaining words to xi.
+  if [[ $words[1] == xi-worktree ]]; then
+    _worktree_run_as xi "${(@)words[3,-1]}"
+    return
+  fi
+
+  # worktree: second positional is the command, the rest are its arguments.
+  if (( CURRENT == 3 )); then
+    _command_names -e
+  else
+    _worktree_run_as "${(@)words[3,-1]}"
+  fi
+}
+
+# Complete as if the given command line had been typed directly.
+_worktree_run_as() {
+  words=( "$@" )
+  CURRENT=$#
+  _normal
+}
+
+_worktree_slugs() {
+  local root s
+  local -a wt branch slugs
+  root=$(git rev-parse --show-toplevel 2>/dev/null)
+  wt=() branch=()
+  if [[ -n $root ]]; then
+    wt=(${root}/.worktrees/*(N:t))
+    branch=(${(f)"$(git -C "$root" for-each-ref --format='%(refname:short)' refs/heads 2>/dev/null)"})
+  fi
+  slugs=()
+  for s in $wt; do slugs+=("$s:worktree"); done
+  for s in $branch; do slugs+=("$s:branch"); done
+  _describe 'worktree slug' slugs
+}
+
+_worktree "$@"
