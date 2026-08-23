@@ -1,0 +1,7 @@
+[Service]
+Type=simple
+ExecStart=/usr/bin/swaybg -i /home/larsch/.local/share/background.jpg
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target
