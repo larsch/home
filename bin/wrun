@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+    printf 'usage: %s <branch> [cargo run arguments ...]\n' "${0##*/}" >&2
+    exit 2
+}
+
+(( $# >= 1 )) || usage
+branch=$1
+shift
+
+root=$(git rev-parse --show-toplevel 2>/dev/null) || {
+    printf '%s: not inside a git worktree\n' "${0##*/}" >&2
+    exit 1
+}
+
+# Find the checkout for this exact local branch, independent of where it lives.
+worktrees=$(git -C "$root" worktree list --porcelain) || exit 1
+worktree=
+current_path=
+while IFS= read -r line; do
+    case $line in
+        'worktree '*) current_path=${line#worktree } ;;
+        'branch refs/heads/'*)
+            if [[ ${line#branch refs/heads/} == "$branch" ]]; then
+                worktree=$current_path
+                break
+            fi
+            ;;
+    esac
+done <<< "$worktrees"
+
+if [[ -z $worktree ]]; then
+    printf '%s: branch %q is not checked out in a worktree\n' "${0##*/}" "$branch" >&2
+    exit 1
+fi
+
+manifest="$worktree/Cargo.toml"
+if [[ ! -f $manifest ]]; then
+    printf '%s: no Cargo.toml in worktree for branch %q (%s)\n' "${0##*/}" "$branch" "$worktree" >&2
+    exit 1
+fi
+
+exec cargo run --release --manifest-path="$manifest" -- "$@"
