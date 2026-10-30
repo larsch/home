@@ -181,6 +181,7 @@ window-rule {
     match app-id="slack"
     match app-id="org.telegram.desktop"
     open-on-workspace "chat"
+    open-focused false
 }
 
 window-rule {
