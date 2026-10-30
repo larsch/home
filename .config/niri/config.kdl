@@ -76,7 +76,7 @@ output "Samsung Electric Company SyncMaster HS4P603771" {
 }
 
 layout {
-    gaps 2
+    gaps 1
     preset-column-widths {
         proportion 0.33333
         proportion 0.5
@@ -92,7 +92,7 @@ layout {
     background-color "transparent"
 }
 
-workspace "console" {
+workspace "games" {
     open-on-output "ASUSTek COMPUTER INC XG27AQDMGR T9LMTF161195"
 }
 workspace "browser" {
@@ -105,9 +105,6 @@ workspace "chat" {
     open-on-output "ASUSTek COMPUTER INC XG27AQDMGR T9LMTF161195"
 }
 workspace "media" {
-    open-on-output "ASUSTek COMPUTER INC XG27AQDMGR T9LMTF161195"
-}
-workspace "games" {
     open-on-output "ASUSTek COMPUTER INC XG27AQDMGR T9LMTF161195"
 }
 
