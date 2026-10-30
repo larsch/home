@@ -1,0 +1,53 @@
+# pyproject.toml snippets for a modern Python project
+# Copy the relevant sections into your pyproject.toml
+
+# ── Ruff ────────────────────────────────────────────────────────────────────
+[tool.ruff]
+target-version = "py312"   # match system Python minor version
+line-length = 160
+fix = true
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = []
+
+[tool.ruff.lint.isort]
+known-first-party = ["<your_package>"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+
+# ── Pytest ───────────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--tb=short --strict-markers"
+
+
+# ── Coverage (optional, used with pytest-cov) ────────────────────────────────
+[tool.coverage.run]
+source = ["src"]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+
+
+# ── Full minimal pyproject.toml example ──────────────────────────────────────
+# [project]
+# name = "my-project"
+# version = "0.1.0"
+# description = "Short description"
+# requires-python = ">=3.12"
+# dependencies = [
+#   "rich",
+# ]
+#
+# [dependency-groups]
+# dev = [
+#   "ruff>=0.9",
+#   "pytest>=8",
+#   "pytest-cov>=6",
+# ]
