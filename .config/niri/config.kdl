@@ -220,6 +220,7 @@ window-rule {
 }
 
 binds {
+	Mod+F9 { spawn "cargo" "run" "--release" "--manifest-path=/home/larsch/prj/tfa3000/Cargo.toml"; }
     Mod+Shift+Slash { show-hotkey-overlay; }
 
     Mod+Return hotkey-overlay-title="Open a Terminal: foot" { spawn "footclient"; }
@@ -380,6 +381,7 @@ binds {
     Ctrl+Alt+Delete { quit; }
 
     Mod+Shift+P { power-off-monitors; }
+    Mod+Shift+O { spawn "sh" "-c" "if niri msg -j outputs | jq -e 'has(\"DP-3\")' >/dev/null; then niri msg output DP-3 off; else niri msg output DP-3 on; fi"; }
 
     Mod+Ctrl+Equal { spawn "~/.config/niri/niri-scale" "up"; }
     Mod+Ctrl+Minus { spawn "~/.config/niri/niri-scale" "down"; }
