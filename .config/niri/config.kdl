@@ -155,6 +155,7 @@ window-rule {
     match app-id="slack"
     match app-id="Slack"
     match app-id="code"
+    match app-id="steam_app_3224872723"
     open-maximized true
 }
 
@@ -221,6 +222,7 @@ window-rule {
 
 binds {
 	Mod+F9 { spawn "cargo" "run" "--release" "--manifest-path=/home/larsch/prj/tfa3000/Cargo.toml"; }
+    Mod+F8 hotkey-overlay-title="Reset Bluetooth Audio Delay" { spawn "/home/larsch/.local/bin/bt-audio-resync"; }
     Mod+Shift+Slash { show-hotkey-overlay; }
 
     Mod+Return hotkey-overlay-title="Open a Terminal: foot" { spawn "footclient"; }

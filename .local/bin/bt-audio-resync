@@ -1,0 +1,88 @@
+#!/bin/sh
+# bt-audio-resync — flush accumulated Bluetooth audio delay without reconnecting.
+#
+# A Bluetooth A2DP sink keeps buffering while the link stalls (dropout, range
+# loss). When the link recovers the buffer is deeper than before and audio stays
+# behind. Suspend/resume-cycling the *sink* flushes that state; the Bluetooth
+# connection and codec negotiation are left untouched.
+#
+# Caveat: pactl keeps reporting the sink as RUNNING throughout the cycle, so its
+# state is not usable as confirmation. Judge the result by ear.
+#
+# Usage: bt-audio-resync
+# Env:   WAIT=2   seconds to hold the sink suspended (default 1)
+
+set -eu
+
+WAIT=${WAIT:-1}
+
+# Headsets to recognise: "<label> <MAC>". Sink names are derived from the MAC
+# (bluez_output.<mac with _ for :>.<n>), so no sink names are hardcoded.
+HEADSETS='
+WH-1000XM4 94:DB:56:4F:16:F7
+Nautilus 28:11:A5:31:BB:87
+'
+
+die() {
+	printf 'bt-audio-resync: %s\n' "$*" >&2
+	exit 1
+}
+
+command -v pactl >/dev/null 2>&1 || die "pactl not found"
+command -v bluetoothctl >/dev/null 2>&1 || die "bluetoothctl not found"
+
+# MACs of currently connected Bluetooth devices.
+connected=$(bluetoothctl devices Connected 2>/dev/null |
+	sed -n 's/^Device \([0-9A-Fa-f:]\{17\}\).*/\1/p')
+
+# Sink-name prefixes for connected headsets from the list above.
+prefixes=''
+while read -r label mac; do
+	[ -n "$label" ] || continue
+	for c in $connected; do
+		if [ "$c" = "$mac" ]; then
+			prefixes="$prefixes $(printf '%s' "$mac" | tr ':' '_')"
+			break
+		fi
+	done
+done <<HEADSETS_EOF
+$HEADSETS
+HEADSETS_EOF
+
+[ -n "$prefixes" ] || die "none of the configured headsets is connected"
+
+# BlueZ sinks belonging to those headsets.
+matches=''
+for sink in $(pactl list sinks short 2>/dev/null | awk '{print $2}'); do
+	for p in $prefixes; do
+		case "$sink" in
+		"bluez_output.$p."*)
+			matches="$matches $sink"
+			break
+			;;
+		esac
+	done
+done
+
+[ -n "$matches" ] || die "headset connected but no bluez sink found (wrong card profile?)"
+
+# With several headsets connected, prefer whichever is the default sink.
+sink=''
+count=0
+default=$(pactl get-default-sink 2>/dev/null || true)
+for m in $matches; do
+	count=$((count + 1))
+	if [ -z "$sink" ]; then sink=$m; fi
+	if [ "$m" = "$default" ]; then sink=$m; fi
+done
+
+if [ "$count" -gt 1 ]; then
+	[ "$sink" = "$default" ] ||
+		die "several headsets connected and none is the default sink:$matches"
+fi
+
+printf 'resyncing %s\n' "$sink"
+pactl suspend-sink "$sink" 1
+sleep "$WAIT"
+pactl suspend-sink "$sink" 0
+printf 'done (%s) — check by ear\n' "$sink"
